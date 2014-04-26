@@ -9,8 +9,11 @@
 /vendor/
 /bin/
 /composer.phar
+<<<<<<< HEAD
 /.idea/
 
 .idea/vcs.xml
 
 .idea/workspace.xml
+=======
+>>>>>>> FETCH_HEAD

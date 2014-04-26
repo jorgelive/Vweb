@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="49eb20f3-d84b-4fe3-99af-7684978f25df" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
     </list>
+=======
+    <list default="true" id="49eb20f3-d84b-4fe3-99af-7684978f25df" name="Default" comment="" />
+>>>>>>> FETCH_HEAD
     <ignored path="Vweb.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -28,8 +32,19 @@
       <file leaf-file-name="config.yml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/config/config.yml">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="50" column="19" selection-start="1324" selection-end="1337" vertical-scroll-proportion="0.0" vertical-offset="750" max-vertical-offset="2520">
               <folding />
+=======
+            <state line="50" column="19" selection-start="1324" selection-end="1337" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2520">
+              <folding>
+                <marker date="1398470622000" expanded="true" signature="3684:5943" placeholder="sonata_doctrine_orm_admin:" />
+                <marker date="1398470622000" expanded="true" signature="3824:5943" placeholder="templates:" />
+                <marker date="1398470622000" expanded="true" signature="5944:6120" placeholder="services:" />
+                <marker date="1398470622000" expanded="true" signature="5958:6120" placeholder="fixUser.listener:" />
+                <marker date="1398470622000" expanded="true" signature="6047:6120" placeholder="tags:" />
+              </folding>
+>>>>>>> FETCH_HEAD
             </state>
           </provider>
         </entry>
@@ -37,7 +52,11 @@
       <file leaf-file-name="routing.yml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/config/routing.yml">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="3" column="23" selection-start="124" selection-end="124" vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="690">
+=======
+            <state line="3" column="23" selection-start="124" selection-end="124" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -46,7 +65,11 @@
       <file leaf-file-name="GoproVipacCargadorBundle.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Gopro/Vipac/Bundle/CargadorBundle/GoproVipacCargadorBundle.php">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
+=======
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="225">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -55,8 +78,15 @@
       <file leaf-file-name="DefaultController.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Gopro/Vipac/Bundle/CargadorBundle/Controller/DefaultController.php">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="28" column="0" selection-start="771" selection-end="771" vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="510">
               <folding />
+=======
+            <state line="28" column="0" selection-start="771" selection-end="771" vertical-scroll-proportion="-17.5" vertical-offset="0" max-vertical-offset="510">
+              <folding>
+                <element signature="e#64#121#0" expanded="true" />
+              </folding>
+>>>>>>> FETCH_HEAD
             </state>
           </provider>
         </entry>
@@ -64,7 +94,11 @@
       <file leaf-file-name="AppKernel.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/AppKernel.php">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="53" column="5" selection-start="2136" selection-end="2136" vertical-scroll-proportion="0.0" vertical-offset="795" max-vertical-offset="915">
+=======
+            <state line="53" column="5" selection-start="2136" selection-end="2136" vertical-scroll-proportion="-26.458334" vertical-offset="145" max-vertical-offset="900">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -73,7 +107,11 @@
       <file leaf-file-name="index.html.twig" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Gopro/Vipac/Bundle/CargadorBundle/Resources/views/Default/index.html.twig">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="0" column="20" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="421">
+=======
+            <state line="0" column="20" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="665">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -82,7 +120,11 @@
       <file leaf-file-name="global.html.twig" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/Resources/views/global.html.twig">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="8" column="16" selection-start="229" selection-end="229" vertical-scroll-proportion="0.0" vertical-offset="120" max-vertical-offset="270">
+=======
+            <state line="8" column="16" selection-start="229" selection-end="229" vertical-scroll-proportion="-5.0" vertical-offset="0" max-vertical-offset="270">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -91,7 +133,11 @@
       <file leaf-file-name="SymfonyRequirements.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/SymfonyRequirements.php">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="39" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="0.0" vertical-offset="585" max-vertical-offset="10395">
+=======
+            <state line="39" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="-20.0" vertical-offset="0" max-vertical-offset="10290">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -100,7 +146,11 @@
       <file leaf-file-name="parameters.yml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/config/parameters.yml">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state line="14" column="0" selection-start="405" selection-end="405" vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="405">
+=======
+            <state line="14" column="0" selection-start="405" selection-end="405" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
+>>>>>>> FETCH_HEAD
               <folding />
             </state>
           </provider>
@@ -113,6 +163,7 @@
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
   </component>
+<<<<<<< HEAD
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -121,6 +172,8 @@
       <MyDateState />
     </option>
   </component>
+=======
+>>>>>>> FETCH_HEAD
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
@@ -136,12 +189,21 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
+<<<<<<< HEAD
     <option name="x" value="156" />
     <option name="y" value="22" />
     <option name="width" value="1400" />
     <option name="height" value="860" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+=======
+    <option name="x" value="215" />
+    <option name="y" value="46" />
+    <option name="width" value="1400" />
+    <option name="height" value="860" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+>>>>>>> FETCH_HEAD
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -439,9 +501,15 @@
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="true" />
+<<<<<<< HEAD
     <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+=======
+    <property name="options.lastSelected" value="File.Encoding" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+>>>>>>> FETCH_HEAD
   </component>
   <component name="PublishConfig">
     <servers>
@@ -476,6 +544,7 @@
     <list size="0" />
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+<<<<<<< HEAD
   <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="sslv3">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
@@ -493,6 +562,8 @@
     <option name="IGNORE_EXTERNALS" value="false" />
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
+=======
+>>>>>>> FETCH_HEAD
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="49eb20f3-d84b-4fe3-99af-7684978f25df" name="Default" comment="" />
@@ -502,6 +573,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
+<<<<<<< HEAD
     <frame x="156" y="22" width="1400" height="860" extended-state="0" />
     <editor active="false" />
     <layout>
@@ -525,6 +597,31 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+=======
+    <frame x="215" y="46" width="1400" height="860" extended-state="0" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Framework" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24963072" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+>>>>>>> FETCH_HEAD
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -539,6 +636,7 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/src/Gopro/Vipac/Bundle/CargadorBundle/Controller/DefaultController.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="28" column="0" selection-start="771" selection-end="771" vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="510">
@@ -581,6 +679,8 @@
         </state>
       </provider>
     </entry>
+=======
+>>>>>>> FETCH_HEAD
     <entry file="file://$PROJECT_DIR$/app/config/routing.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="3" column="23" selection-start="124" selection-end="124" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690">
@@ -605,20 +705,38 @@
     <entry file="file://$PROJECT_DIR$/app/config/config.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="50" column="19" selection-start="1324" selection-end="1337" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2520">
+<<<<<<< HEAD
           <folding />
+=======
+          <folding>
+            <marker date="1398470622000" expanded="true" signature="3684:5943" placeholder="sonata_doctrine_orm_admin:" />
+            <marker date="1398470622000" expanded="true" signature="3824:5943" placeholder="templates:" />
+            <marker date="1398470622000" expanded="true" signature="5944:6120" placeholder="services:" />
+            <marker date="1398470622000" expanded="true" signature="5958:6120" placeholder="fixUser.listener:" />
+            <marker date="1398470622000" expanded="true" signature="6047:6120" placeholder="tags:" />
+          </folding>
+>>>>>>> FETCH_HEAD
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/AppKernel.php">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state line="53" column="5" selection-start="2136" selection-end="2136" vertical-scroll-proportion="0.0" vertical-offset="795" max-vertical-offset="915">
+=======
+        <state line="53" column="5" selection-start="2136" selection-end="2136" vertical-scroll-proportion="-26.458334" vertical-offset="145" max-vertical-offset="900">
+>>>>>>> FETCH_HEAD
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/SymfonyRequirements.php">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state line="39" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="0.0" vertical-offset="585" max-vertical-offset="10395">
+=======
+        <state line="39" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="-20.0" vertical-offset="0" max-vertical-offset="10290">
+>>>>>>> FETCH_HEAD
           <folding />
         </state>
       </provider>
@@ -632,14 +750,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Gopro/Vipac/Bundle/CargadorBundle/Controller/DefaultController.php">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state line="28" column="0" selection-start="771" selection-end="771" vertical-scroll-proportion="0.0" vertical-offset="420" max-vertical-offset="510">
           <folding />
+=======
+        <state line="28" column="0" selection-start="771" selection-end="771" vertical-scroll-proportion="-17.5" vertical-offset="0" max-vertical-offset="510">
+          <folding>
+            <element signature="e#64#121#0" expanded="true" />
+          </folding>
+>>>>>>> FETCH_HEAD
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/Resources/views/global.html.twig">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state line="8" column="16" selection-start="229" selection-end="229" vertical-scroll-proportion="0.0" vertical-offset="120" max-vertical-offset="270">
+=======
+        <state line="8" column="16" selection-start="229" selection-end="229" vertical-scroll-proportion="-5.0" vertical-offset="0" max-vertical-offset="270">
+>>>>>>> FETCH_HEAD
           <folding />
         </state>
       </provider>
