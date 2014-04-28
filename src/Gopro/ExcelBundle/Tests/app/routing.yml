@@ -1,0 +1,11 @@
+fake_route_stream:
+    path:      /fake/stream
+    defaults:  { _controller: GoproExcelBundle:Fake:stream }
+
+fake_route_store:
+    path:      /fake/store
+    defaults:  { _controller: GoproExcelBundle:Fake:store }
+
+fake_route_read:
+    path:      /fake/read
+    defaults:  { _controller: GoproExcelBundle:Fake:readAndSave }

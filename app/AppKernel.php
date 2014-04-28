@@ -18,7 +18,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new FOS\UserBundle\FOSUserBundle(),
 //            new Sonata\jQueryBundle\SonatajQueryBundle(),
-new Sonata\CoreBundle\SonataCoreBundle(),
+            new Sonata\CoreBundle\SonataCoreBundle(),
             new Sonata\AdminBundle\SonataAdminBundle(),
             new Sonata\BlockBundle\SonataBlockBundle(),
             new Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle(),
@@ -26,7 +26,8 @@ new Sonata\CoreBundle\SonataCoreBundle(),
             new Sonata\UserBundle\SonataUserBundle('FOSUserBundle'), 
             new Application\Sonata\UserBundle\ApplicationSonataUserBundle(),
             new Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
-            new Gopro\Vipac\Bundle\CargadorBundle\GoproVipacCargadorBundle(),
+            new Gopro\ExcelBundle\GoproExcelBundle(),
+            new Gopro\Vipac\CargadorBundle\GoproVipacCargadorBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
@@ -48,8 +49,8 @@ new Sonata\CoreBundle\SonataCoreBundle(),
      *
      * @return string The charset
      */
-    public function getCharset()
+    /*public function getCharset()
     {
         return 'ISO-8859-1';
-    }
+    }*/
 }

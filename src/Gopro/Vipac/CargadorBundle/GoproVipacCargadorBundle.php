@@ -1,6 +1,6 @@
 <?php
 
-namespace Gopro\Vipac\Bundle\CargadorBundle;
+namespace Gopro\Vipac\CargadorBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

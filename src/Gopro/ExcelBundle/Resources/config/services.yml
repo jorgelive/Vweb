@@ -1,0 +1,6 @@
+parameters:
+    phpexcel.class:  Gopro\ExcelBundle\Factory
+
+services:
+    phpexcel:
+      class: %phpexcel.class%

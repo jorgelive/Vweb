@@ -1,6 +1,6 @@
 <?php
 
-namespace Gopro\Vipac\Bundle\CargadorBundle\DependencyInjection;
+namespace Gopro\Vipac\CargadorBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
