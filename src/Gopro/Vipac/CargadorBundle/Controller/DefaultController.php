@@ -52,33 +52,118 @@ class DefaultController extends Controller
      */
     public function excelreaderAction()
     {
-        $conn = $this->get('doctrine.dbal.default_connection');
+        extract($this->parseExcel());
 
-        $filename ='/Volumes/Archivo/prueba.xlsx';
-        $excelLoader = $this->get('phpexcel');
-        $objPHPExcel = $excelLoader->createPHPExcelObject( $filename);
+        if(isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
+            $mensajes=$this->dbPreProcesss($tablaSpecs,$columnaSpecs,$valores);
+        }else{
+            $mensajes=array('No existe informacion necesaria para el proceso');
+        }
+        return array('mensajes' => $mensajes);
+    }
 
-        $total_sheets=$objPHPExcel->getSheetCount();
-
-        $allSheetName=$objPHPExcel->getSheetNames();
-        $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
-        $highestRow = $objWorksheet->getHighestRow();
-        $highestColumn = $objWorksheet->getHighestColumn();
-        $highestColumnIndex = $this->get('phpexcel')->columnIndexFromString($highestColumn);
-        $valores=array();
-        $columnaSpecs=array();
-        $tablaSpecs=array();
-        $arrayY=0;
-        $specRow=false;
-        $specRowType='';
-        for ($row = 1; $row <= $highestRow;++$row)
+    private function sanitizeString($str, $what=NULL, $with='')
+    {
+        if($what === NULL)
         {
+            $what[] = "/[\\x00-\\x20]+/";
+            $what[] = "/[']+/";
+            $what[] = "/[(]+/";
+            $what[] = "/[)]+/";
+            $with=array();
+        }
+
+        foreach ($what as $dummy):
+            $with[]='';
+        endForeach;
+
+        $proceso = trim(preg_replace($what, $with, $str ));
+        return $proceso;
+    }
+
+
+    private function dbPreProcesss($tablaSpecs,$columnaSpecs,$valores){
+        $conn = $this->get('doctrine.dbal.default_connection');
+        $existente=array();
+        foreach ($valores as $rowNumber => $row):
+            foreach ($row as $col => $valor):
+                if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['llave'])){
+                    if($columnaSpecs[$col]['llave']=='si'){
+                        $primaryKeysPH[$rowNumber][]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'].$this->sanitizeString($valor);
+                        $primaryKeys[$rowNumber][$columnaSpecs[$col]['nombre'].$this->sanitizeString($valor)]=$valor;
+                    }
+                }
+            endforeach;
+        endforeach;
+
+        if(!empty($primaryKeys)&&!empty($primaryKeysPH)){
+            foreach ($primaryKeysPH as $row):
+                $wherePH[]='('.implode(' AND ', $row).')';
+            endforeach;
+
+            $selectQuery='SELECT '.implode(', ',$tablaSpecs['columnas']).' FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
+            $statement = $conn->prepare($selectQuery);
+            foreach($primaryKeys as $whereArray):
+                foreach ($whereArray as $whereKey => $whereValor):
+                    $statement->bindValue($whereKey,$whereValor);
+                endforeach;
+            endforeach;
+            $statement->execute();
+            $registro=$statement->fetchAll();
+            //print_r($tablaSpecs);
+            foreach($registro as $linea):
+                $identArray=array();
+                foreach($tablaSpecs['llaves'] as $llave):
+                    $identArray[]=$linea[$llave];
+                endforeach;
+                $existente[implode('|',$identArray)]=$linea;
+            endforeach;
+        }
+
+        foreach ($valores as $rowNumber => $row):
             $whereArray=array();
             $wherePH=array();
             $actArray=array();
             $actPH=array();
             $insertPH=array();
             $insertArray=array();
+            foreach ($row as $col => $valor):
+                if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['llave'])){
+                    if($columnaSpecs[$col]['llave']=='si'){
+                        $wherePH[]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'];
+                        $whereArray[$columnaSpecs[$col]['nombre']]=$valor;
+                    }else{
+                        $actPH[]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'];
+                        $actArray[$columnaSpecs[$col]['nombre']]=$valor;
+                    }
+                    $insertPH[]=':'.$columnaSpecs[$col]['nombre'];
+                    $insertArray[$columnaSpecs[$col]['nombre']]=$valor;
+                }
+            endforeach;
+            $mensajes[]=$this->dbProcess($conn,$rowNumber,$tablaSpecs,$wherePH,$whereArray,$actPH,$actArray,$insertPH,$insertArray,$existente);
+        endforeach;
+        return $mensajes;
+
+
+    }
+
+    private function parseExcel($filename='/Volumes/Archivo/prueba.xlsx'){
+        $tablaSpecs=array();
+        $columnaSpecs=array();
+        $valores=array();
+        $excelLoader = $this->get('phpexcel');
+        $objPHPExcel = $excelLoader->createPHPExcelObject( $filename);
+        $total_sheets=$objPHPExcel->getSheetCount();
+        $allSheetName=$objPHPExcel->getSheetNames();
+        $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
+        $highestRow = $objWorksheet->getHighestRow();
+        $highestColumn = $objWorksheet->getHighestColumn();
+        $highestColumnIndex = $this->get('phpexcel')->columnIndexFromString($highestColumn);
+        $arrayY=0;
+        $specRow=false;
+        $specRowType='';
+        for ($row = 1; $row <= $highestRow;++$row)
+        {
             for ($col = 0; $col <$highestColumnIndex;++$col)
             {
                 $value=$objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
@@ -106,6 +191,9 @@ class DefaultController extends Controller
                             if($valorArray[0]=='nombre'){
                                 $tablaSpecs['columnas'][$col]=$valorArray[1];
                             }
+                            if($valorArray[0]=='llave'&&$valorArray[1]=='si'&& isset($columnaSpecs[$col]['nombre'])){
+                                $tablaSpecs['llaves'][$col]=$columnaSpecs[$col]['nombre'];
+                            }
                         }
 
                     }if($specRowType=='T'){
@@ -115,78 +203,64 @@ class DefaultController extends Controller
                         }
 
                     }
-
-
                 }else{
-                    $valores[$arrayY][$col]=$value; //era $row-1
-                    if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['tipo'])&&isset($columnaSpecs[$col]['llave'])){
-                        //if($columnaSpecs[$col]['tipo']=='cadena'){$comilla="'";}else{$comilla='';}
-                        if($columnaSpecs[$col]['llave']=='si'){
-                            $wherePH[]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'];
-                            $whereArray[$columnaSpecs[$col]['nombre']]=$value;
-                        }else{
-                            $actPH[]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'];
-                            $actArray[$columnaSpecs[$col]['nombre']]=$value;
-                        }
-
-                        $insertPH[]=':'.$columnaSpecs[$col]['nombre'];
-                        $insertArray[$columnaSpecs[$col]['nombre']]=$value;
-                    }
-
-
+                    $valores[$arrayY][$col]=$value;
                 }
             }
-            if($specRow===true){
-                //$arrayYSpecs ++;
-            }else{
-                $selectQuery='SELECT * FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' AND ', $wherePH);
-                //echo $selectQuery;
-                $statement = $conn->prepare($selectQuery);
+            $arrayY ++;
+        }
+        return compact('tablaSpecs','columnaSpecs','valores');
+    }
+
+    private function dbProcess($conn,$rowNumber,$tablaSpecs,$wherePH,$whereArray,$actPH,$actArray,$insertPH,$insertArray,$existente){
+
+        /*if(!empty($whereArray)){
+            $selectQuery='SELECT * FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' AND ', $wherePH);
+            $statement = $conn->prepare($selectQuery);
+            foreach ($whereArray as $whereKey => $whereValor):
+                $statement->bindValue($whereKey,$whereValor);
+            endforeach;
+            $statement->execute();
+            $registro=$statement->fetchAll();
+            foreach ($whereArray as $whereKey => $whereValor):
+                unset($registro[0][$whereKey]);
+            endforeach;
+        }*/
+        $busqueda=implode('|',$whereArray);
+        if(array_key_exists($busqueda,$existente)===true){
+            foreach ($whereArray as $whereKey => $whereValor):
+                unset($existente[$busqueda][$whereKey]);
+            endforeach;
+            $diferencia=array_diff_assoc($existente[$busqueda],$actArray);
+            if(!empty($diferencia)){
+                $updateQuery='UPDATE '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' SET '.implode(', ',$actPH).' WHERE '.implode(' AND ', $wherePH);//update
+                $statement = $conn->prepare($updateQuery);
+                foreach ($actArray as $actKey => $actValor):
+                    $statement->bindValue($actKey,$actValor);
+                endforeach;
                 foreach ($whereArray as $whereKey => $whereValor):
                     $statement->bindValue($whereKey,$whereValor);
                 endforeach;
                 $statement->execute();
-                $registro=$statement->fetchAll();
-                if(isset($registro)&&!empty($registro[0])&&isset($whereArray)&&!empty($whereArray)){
-
-
-                    foreach ($whereArray as $whereKey => $whereValor):
-                       unset($registro[0][$whereKey]);
-                    endforeach;
-                    $diferencia=array_diff_assoc($registro[0],$actArray);
-                    if(!empty($diferencia)){
-                    //print_r($actArray);
-                        $updateQuery='UPDATE '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' SET '.implode(', ',$actPH).' WHERE '.implode(' AND ', $wherePH);//update
-                        //echo $updateQuery;
-                        $statement = $conn->prepare($updateQuery);
-                        foreach ($actArray as $actKey => $actValor):
-                            $statement->bindValue($actKey,$actValor);
-                        endforeach;
-                        foreach ($whereArray as $whereKey => $whereValor):
-                            $statement->bindValue($whereKey,$whereValor);
-                        endforeach;
-                        $statement->execute();
-                        $mensaje[]= 'Actualizando para la linea: '.$row;
-                    }else{
-                        $mensaje[]= 'Nada que actualizar para la linea: '.$row;
-                    }
-                    //var_dump($registro);
-                }else{
-                    $addQuery='INSERT INTO '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' ('.implode(', ',$tablaSpecs['columnas']).') VALUES ('.implode(', ',$insertPH).')';
-                    //echo $addQuery;
-                    $statement = $conn->prepare($addQuery);
-                    foreach ($insertArray as $insertKey => $insertValor):
-                        $statement->bindValue($insertKey,$insertValor);
-                    endforeach;
-                    $statement->execute();
-                    $mensaje[]= 'Agregando para la linea: '.$row;
-                    //var_dump($registro);
-                }
-                $arrayY ++;
+                $mensaje= 'Actualizando para la linea: '.$rowNumber;
+            }else{
+                $mensaje= 'Nada que actualizar para la linea: '.$rowNumber;
             }
+        }elseif(isset($insertArray)&&!empty($insertArray)){
+            $addQuery='INSERT INTO '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' ('.implode(', ',$tablaSpecs['columnas']).') VALUES ('.implode(', ',$insertPH).')';
+            //echo $addQuery;
+            $statement = $conn->prepare($addQuery);
+            foreach ($insertArray as $insertKey => $insertValor):
+                $statement->bindValue($insertKey,$insertValor);
+            endforeach;
+            $statement->execute();
+            $mensaje= 'Agregando para la linea: '.$rowNumber;
+        }else{
+            return ('No se actualizo nada, los parametros son errados');
 
         }
-        return array('mensajes' => $mensaje);
+
+        return $mensaje;
     }
 
 
