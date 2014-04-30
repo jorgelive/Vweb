@@ -2,15 +2,17 @@
 
 namespace Gopro\Vipac\CargadorBundle\Controller;
 
+use Gopro\Vipac\CargadorBundle\Entity\Archivo;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use \Doctrine\DBAL\Schema\Table;
+
 
 class DefaultController extends Controller
 {
     /**
-     * @Route("/index/{name}")
+     * @Route("/index/{name}", name="gopro_vipac_cargador_default_index")
      * @Template()
      */
     public function indexAction($name)
@@ -28,30 +30,38 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/upload")
+     * @Route("/upload", name="gopro_vipac_cargador_default_upload")
      * @Template()
      */
-    public function uploadAction()
+    public function uploadAction(Request $request)
     {
-        $conn = $this->get('doctrine.dbal.default_connection');
-        $paises = $conn->fetchAll('SELECT * FROM reservas.pais');
-        //print_r($array);
-        //$sql = "SELECT * FROM reservas.paises WHERE";
-        //$stmt = $this->connection->prepare($sql);
-        //$stmt->execute();
+        $archivo = new Archivo();
+        $form = $this->createFormBuilder($archivo)
+            ->add('name')
+            ->add('file')
+            ->getForm();
 
+        $form->handleRequest($request);
 
-        //return $bar;
-        return array('paises' => $paises);
+        if ($form->isValid()){
+            $em = $this->getDoctrine()->getManager();
+            $archivo->upload();
+            $em->persist($archivo);
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('gopro_vipac_cargador_default_upload'));
+        }
+
+        return array('form' => $form->createView());
     }
 
 
 
     /**
-     * @Route("/excelreader")
+     * @Route("/cargadorgenerico", name="gopro_vipac_cargador_default_cargadorgenerico")
      * @Template()
      */
-    public function excelreaderAction()
+    public function cargadorgenericoAction()
     {
         extract($this->parseExcel());
 
@@ -74,6 +84,11 @@ class DefaultController extends Controller
             $what[] = "/[(]+/";
             $what[] = "/[)]+/";
             $what[] = "/[-]+/";
+            $what[] = "/[+]+/";
+            $what[] = "/[*]+/";
+            $what[] = "/[/]+/";
+            $what[] = "/[\]+/";
+            $what[] = "/[?]+/";
             $with=array();
         }
 
