@@ -55,9 +55,9 @@ class DefaultController extends Controller
     {
         extract($this->parseExcel());
 
-        if(in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))&&isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
+        if(isset($tablaSpecs['tipo'])&&in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))&&isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
             $mensajes=$this->dbPreProcesss($tablaSpecs,$columnaSpecs,$valores);
-        }elseif(!in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))){
+        }elseif(isset($tablaSpecs['tipo'])&&!in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))){
             $mensajes=array('No se definio correctamente el tipo de proceso');
         }else{
             $mensajes=array('No existe informacion necesaria para el proceso');
@@ -73,6 +73,7 @@ class DefaultController extends Controller
             $what[] = "/[']+/";
             $what[] = "/[(]+/";
             $what[] = "/[)]+/";
+            $what[] = "/[-]+/";
             $with=array();
         }
 
@@ -92,6 +93,7 @@ class DefaultController extends Controller
         $query[]="WHERE cols.table_name = '".$tablaSpecs['nombre']."' AND cons.constraint_type = 'P'";
         $query[]="AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner";
         $query[]="AND cons.owner = '".$tablaSpecs['schema']."' ORDER BY cols.table_name, cols.position";
+        //print_r(implode(' ',$query));
         $statement = $conn->query(implode(' ',$query));
         $keysArray = $statement->fetchAll();
 
@@ -123,11 +125,13 @@ class DefaultController extends Controller
                 endforeach;
                 $selectQuery='SELECT '.implode(', ',$tablaSpecs['columnas']).' FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
                 $statement = $conn->prepare($selectQuery);
+                //echo ($selectQuery);
                 foreach($primaryKeys as $whereArray):
                     foreach ($whereArray as $whereKey => $whereValor):
                         $statement->bindValue($whereKey,$whereValor);
                     endforeach;
                 endforeach;
+
                 $statement->execute();
                 $registro=$statement->fetchAll();
                 //print_r($tablaSpecs);
@@ -164,7 +168,7 @@ class DefaultController extends Controller
                         $insertArray[$columnaSpecs[$col]['nombre']]=$valor;
                     }
                 endforeach;
-                $mensajes[]=$this->dbProcess($conn,$rowNumber,$tablaSpecs,$wherePH,$whereArray,$actPH,$actArray,$insertPH,$insertArray,$existente);
+                $mensajes[]=$this->dbProcess($conn,$rowNumber+1,$tablaSpecs,$wherePH,$whereArray,$actPH,$actArray,$insertPH,$insertArray,$existente);
             endforeach;
         }else{
             $mensajes[]="Solo se permite inserciones con tipo 'I'";
