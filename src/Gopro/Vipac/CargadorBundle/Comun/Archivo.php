@@ -6,9 +6,19 @@ use \Symfony\Component\DependencyInjection\ContainerAware;
 
 class Archivo extends ContainerAware{
 
-    public function parseExcel($filename='/Volumes/Archivo/prueba.xlsx'){
-        $tablaSpecs=array();
-        $columnaSpecs=array();
+    public function parseExcel($setTablaSpecs,$setColumnaSpecs,$filename='/Volumes/Archivo/prueba.xlsx'){
+        if ($setTablaSpecs !==false){
+            $tablaSpecs=$setTablaSpecs;
+        }else{
+            $tablaSpecs=array();
+        }
+
+        if ($setColumnaSpecs !==false){
+            $columnaSpecs=$setColumnaSpecs;
+        }else{
+            $columnaSpecs=array();
+        }
+
         $valores=array();
         $excelLoader = $this->container->get('phpexcel');
         $objPHPExcel = $excelLoader->createPHPExcelObject( $filename);
@@ -43,7 +53,7 @@ class Archivo extends ContainerAware{
                     $specRowType='';
                 }
                 if($specRow===true){
-                    if($specRowType=='C'){
+                    if($specRowType=='C'&&$setColumnaSpecs===false){
                         $valorArray=explode(':',$value);
                         if(isset($valorArray[1])){
                             $columnaSpecs[$col][$valorArray[0]]=$valorArray[1];
@@ -55,7 +65,8 @@ class Archivo extends ContainerAware{
                             }
                         }
 
-                    }if($specRowType=='T'){
+                    }
+                    if($specRowType=='T'&&$setTablaSpecs===false){
                         $valorArray=explode(':',$value);
                         if(isset($valorArray[1])){
                             $tablaSpecs[$valorArray[0]]=$valorArray[1];

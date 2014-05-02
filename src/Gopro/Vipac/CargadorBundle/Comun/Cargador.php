@@ -2,9 +2,19 @@
 namespace Gopro\Vipac\CargadorBundle\Comun;
 use \Symfony\Component\DependencyInjection\ContainerAware;
 
+class Cargador extends ContainerAware{
 
-class Database extends ContainerAware{
+    public function ejecutar($tablaSpecs,$columnaSpecs,$valores){
 
+        if(isset($tablaSpecs['tipo'])&&in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))&&isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
+            $mensajes=$this->dbPreProcess($tablaSpecs,$columnaSpecs,$valores);
+        }elseif(isset($tablaSpecs['tipo'])&&!in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))){
+            $mensajes=array('No se definio correctamente el tipo de proceso');
+        }else{
+            $mensajes=array('No existe informacion necesaria para el proceso');
+        }
+        return $mensajes;
+    }
 
     public function dbPreProcess($tablaSpecs,$columnaSpecs,$valores){
         $conn = $this->container->get('doctrine.dbal.default_connection');

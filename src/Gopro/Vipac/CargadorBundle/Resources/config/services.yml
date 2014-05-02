@@ -1,6 +1,6 @@
 parameters:
     archivo.class:  Gopro\Vipac\CargadorBundle\Comun\Archivo
-    database.class:  Gopro\Vipac\CargadorBundle\Comun\Database
+    cargador.class:  Gopro\Vipac\CargadorBundle\Comun\Cargador
     variable.class:  Gopro\Vipac\CargadorBundle\Comun\Variable
 
 services:
@@ -8,8 +8,8 @@ services:
         class: %archivo.class%
         calls:
             - [ setContainer,[ @service_container ] ]
-    gopro_comun_database:
-        class: %database.class%
+    gopro_comun_cargador:
+        class: %cargador.class%
         calls:
             - [ setContainer,[ @service_container ] ]
     gopro_comun_variable:

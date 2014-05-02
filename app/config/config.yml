@@ -189,6 +189,7 @@ stof_doctrine_extensions:
             tree: true
             timestampable: true
 
+
 services:
     fixUser.listener:
         class: Doctrine\DBAL\Event\Listeners\OracleSessionInit

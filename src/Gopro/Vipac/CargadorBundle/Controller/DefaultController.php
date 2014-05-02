@@ -16,46 +16,44 @@ class DefaultController extends Controller
      * @Route("/index/{name}", name="gopro_vipac_cargador_default_index")
      * @Template()
      */
-    public function indexAction($name)
+    public function indexAction($pais)
     {
-        $conn = $this->get('doctrine.dbal.default_connection');
-        $paises = $conn->fetchAll('SELECT * FROM reservas.pais');
-        //print_r($array);
-        //$sql = "SELECT * FROM reservas.paises WHERE";
-        //$stmt = $this->connection->prepare($sql);
-        //$stmt->execute();
 
-
-        //return $bar;
-        return array('paises' => $paises);
+        return array('paises' => $pais);
     }
 
     /**
-     * @Route("/upload", name="gopro_vipac_cargador_default_upload")
+     * @Route("/carga", name="gopro_vipac_cargador_default_carga")
      * @Template()
      */
-    public function uploadAction(Request $request)
+    public function cargaAction(Request $request)
     {
+        $usuario=$this->get('security.context')->getToken()->getUser();
+
+        $repositorio = $this->getDoctrine()->getRepository('GoproVipacCargadorBundle:Archivo');
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'cargadorgenerico'));
+
+
+
         $archivo = new Archivo();
-        $form = $this->createFormBuilder($archivo)
-            ->add('name')
+        $formulario = $this->createFormBuilder($archivo)
+            ->add('nombre')
             ->add('file')
             ->getForm();
 
-        $form->handleRequest($request);
+        $formulario->handleRequest($request);
 
-        if ($form->isValid()){
-            $archivo->setUsuario($this->get('security.context')->getToken()->getUser());
+        if ($formulario->isValid()){
+            $archivo->setUsuario($usuario);
             $archivo->setOperacion('cargadorgenerico');
             $em = $this->getDoctrine()->getManager();
-            $archivo->upload();
             $em->persist($archivo);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('gopro_vipac_cargador_default_upload'));
+            return $this->redirect($this->generateUrl('gopro_vipac_cargador_default_carga'));
         }
 
-        return array('form' => $form->createView());
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados);
     }
 
     /**
@@ -64,17 +62,15 @@ class DefaultController extends Controller
      */
     public function cargadorgenericoAction()
     {
-        $archivo=$this->get('gopro_comun_archivo')->parseExcel();//new ArchivoOpe();
+        $tablaSpecs=array();
+        $columnaSpecs=array();
+        $valores=array();
+        $archivo=$this->get('gopro_comun_archivo')->parseExcel(false,false);//para limitar pasar los valores
 
         extract($archivo);
 
-        if(isset($tablaSpecs['tipo'])&&in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))&&isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
-            $mensajes=$this->get('gopro_comun_database')->dbPreProcess($tablaSpecs,$columnaSpecs,$valores);
-        }elseif(isset($tablaSpecs['tipo'])&&!in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))){
-            $mensajes=array('No se definio correctamente el tipo de proceso');
-        }else{
-            $mensajes=array('No existe informacion necesaria para el proceso');
-        }
+        $mensajes = $this->get('gopro_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
+
         return array('mensajes' => $mensajes);
     }
 
