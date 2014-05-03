@@ -35,6 +35,7 @@ class Archivo extends ContainerAware{
                     foreach($nombres as $nombre):
                         $columnaSpecs[$nombre]=$columna;
                         $columnaSpecs[$nombre]['nombre']=$nombre;
+                        $tablaSpecs['columnas'][]=$nombre;
                     endforeach;
 
                 }else{
@@ -93,17 +94,30 @@ class Archivo extends ContainerAware{
                         $valorArray=explode(':',$value);
                         if(isset($valorArray[1])){
                             if($valorArray[0]=='nombre'){
-                                $columnaSpecs[$valorArray[1]][$valorArray[0]]=$valorArray[1];
-                                $tablaSpecs['columnas'][]=$valorArray[1];
                                 $validCols[]=$valorArray[1];
+                                if(preg_match("/-/i", $valorArray[1])){
+                                    $nombres=explode('-',$valorArray[1]);
+                                }else{
+                                    $nombres=array($valorArray[1]);
+                                }
+                                foreach($nombres as $nombre):
+                                    $columnaSpecs[$nombre]['nombre']=$nombre;
+                                    $tablaSpecs['columnas'][]=$nombre;
+
+                                endforeach;
                                 $procesandoNombre=true;
                             }elseif($procesandoNombre===true){
                                 $validCols[]='noProcess';
                             }elseif($procesandoNombre!==true&&isset($validCols)&&!empty($validCols)&&isset($validCols[$col])&&$validCols[$col]!='noProcess'){
-                                $arrayKeys=array_keys($columnaSpecs);
-                                $columnaSpecs[$validCols[$col]][$valorArray[0]]=$valorArray[1];
+                                if(preg_match("/-/i", $validCols[$col])){
+                                    $nombres=explode('-',$validCols[$col]);
+                                }else{
+                                    $nombres=array($validCols[$col]);
+                                }
+                                foreach($nombres as $nombre):
+                                    $columnaSpecs[$nombre][$valorArray[0]]=$valorArray[1];
+                                endforeach;
                             }
-
                             if($valorArray[0]=='llave'&&$valorArray[1]=='si'&&isset($validCols[$col])&&$validCols[$col]!='noProcess'){
                                 $tablaSpecs['llaves'][]=$columnaSpecs[$validCols[$col]]['nombre'];
                             }
@@ -146,6 +160,7 @@ class Archivo extends ContainerAware{
             }
             $arrayY ++;
         }
+
 
         return compact('tablaSpecs','columnaSpecs','valores');
     }
