@@ -1,19 +1,19 @@
 <?php
 
-namespace Gopro\Vipac\CargadorBundle\Controller;
+namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
-use Gopro\Vipac\CargadorBundle\Entity\Archivo;
+use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Gopro\Vipac\CargadorBundle\Comun\Archivo as ArchivoOpe;
+use Gopro\Vipac\DbprocesoBundle\Comun\Archivo as ArchivoOpe;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 
-class DefaultController extends Controller
+class CargaController extends Controller
 {
     /**
-     * @Route("/index/{name}", name="gopro_vipac_cargador_default_index")
+     * @Route("/carga/index/{name}", name="gopro_vipac_dbproceso_carga_index")
      * @Template()
      */
     public function indexAction($pais)
@@ -23,17 +23,15 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/carga", name="gopro_vipac_cargador_default_carga")
+     * @Route("/carga/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_generico", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function cargaAction(Request $request)
+    public function genericoAction(Request $request,$archivoEjecutar)
     {
         $usuario=$this->get('security.context')->getToken()->getUser();
 
-        $repositorio = $this->getDoctrine()->getRepository('GoproVipacCargadorBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'cargadorgenerico'));
-
-
+        $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_generico'));
 
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
@@ -45,33 +43,33 @@ class DefaultController extends Controller
 
         if ($formulario->isValid()){
             $archivo->setUsuario($usuario);
-            $archivo->setOperacion('cargadorgenerico');
+            $archivo->setOperacion('carga_generico');
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('gopro_vipac_cargador_default_carga'));
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_generico'));
         }
 
-        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados);
-    }
+        if($archivoEjecutar!==null){
+            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
+        }
+        if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='carga_generico'){
 
-    /**
-     * @Route("/cargadorgenerico", name="gopro_vipac_cargador_default_cargadorgenerico")
-     * @Template()
-     */
-    public function cargadorgenericoAction()
-    {
-        $tablaSpecs=array();
-        $columnaSpecs=array();
-        $valores=array();
-        $archivo=$this->get('gopro_comun_archivo')->parseExcel(false,false);//para limitar pasar los valores
+            $tablaSpecs=array();
+            $columnaSpecs=array();
+            $valores=array();
+            $archivoProcesado=$this->get('gopro_dbproceso_comun_archivo')->parseExcel(false,false,$archivoAlmacenado->getAbsolutePath());//para limitar pasar los valores
+            //print_r($archivoProcesado);
+            extract($archivoProcesado);
+            $mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
 
-        extract($archivo);
 
-        $mensajes = $this->get('gopro_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
+        }else{
+            $mensajes[]='El archivo no existe';
+        }
 
-        return array('mensajes' => $mensajes);
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 
     /**

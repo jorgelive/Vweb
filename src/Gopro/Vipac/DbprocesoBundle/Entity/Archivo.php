@@ -1,5 +1,5 @@
 <?php
-namespace Gopro\Vipac\CargadorBundle\Entity;
+namespace Gopro\Vipac\DbprocesoBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -8,7 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="ca_archivo")
+ * @ORM\Table(name="dbp_archivo")
  * @ORM\HasLifecycleCallbacks
  */
 class Archivo
@@ -29,7 +29,7 @@ class Archivo
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $path;
+    private $extension;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -63,18 +63,6 @@ class Archivo
     private $file;
 
     /**
-     * Get file.
-     *
-     * @return UploadedFile
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    private $temp;
-
-    /**
      * Sets file.
      *
      * @param UploadedFile $file
@@ -87,9 +75,21 @@ class Archivo
             // store the old name to delete after the update
             $this->temp = $this->getAbsolutePath();
         } else {
-            $this->path = 'initial';
+            $this->extension = 'initial';
         }
     }
+
+    /**
+     * Get file.
+     *
+     * @return UploadedFile
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    private $temp;
 
     /**
      * @ORM\PrePersist()
@@ -98,7 +98,7 @@ class Archivo
     public function preUpload()
     {
         if (null !== $this->getFile()) {
-            $this->path = $this->getFile()->guessExtension();
+            $this->extension = $this->getFile()->guessExtension();
         }
     }
 
@@ -151,16 +151,16 @@ class Archivo
 
     public function getAbsolutePath()
     {
-        return null === $this->path
+        return null === $this->extension
             ? null
-            : $this->getUploadRootDir().'/'.$this->id.'.'.$this->path;
+            : $this->getUploadRootDir().'/'.$this->id.'.'.$this->extension;
     }
 
     public function getWebPath()
     {
-        return null === $this->path
+        return null === $this->extension
             ? null
-            : $this->getUploadDir() . '/' . $this->path;
+            : $this->getUploadDir() . '/'.$this->id.'.'.$this->extension;
     }
 
     protected function getUploadRootDir()
@@ -209,26 +209,26 @@ class Archivo
     }
 
     /**
-     * Set path
+     * Set extension
      *
-     * @param string $path
+     * @param string $extension
      * @return Archivo
      */
-    public function setPath($path)
+    public function setExtension($extension)
     {
-        $this->path = $path;
+        $this->extension = $extension;
 
         return $this;
     }
 
     /**
-     * Get path
+     * Get extension
      *
      * @return string 
      */
-    public function getPath()
+    public function getextension()
     {
-        return $this->path;
+        return $this->extension;
     }
 
     /**

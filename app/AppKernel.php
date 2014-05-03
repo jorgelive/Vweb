@@ -26,7 +26,7 @@ class AppKernel extends Kernel
             new Application\Sonata\UserBundle\ApplicationSonataUserBundle(),
             new Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
             new Gopro\ExcelBundle\GoproExcelBundle(),
-            new Gopro\Vipac\CargadorBundle\GoproVipacCargadorBundle(),
+            new Gopro\Vipac\DbprocesoBundle\GoproVipacDbprocesoBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
         );
 

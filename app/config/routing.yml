@@ -1,7 +1,7 @@
 gopro_vipac_cargador:
-    resource: "@GoproVipacCargadorBundle/Controller/"
+    resource: "@GoproVipacDbprocesoBundle/Controller/"
     type:     annotation
-    prefix:   /cargador
+    prefix:   /dbproceso
 
 fos_user_security:
     resource: "@FOSUserBundle/Resources/config/routing/security.xml"

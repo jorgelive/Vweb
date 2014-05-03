@@ -1,6 +1,6 @@
 <?php
 
-namespace Gopro\Vipac\Bundle\CargadorBundle\Tests\Controller;
+namespace Gopro\Vipac\Bundle\DbprocesoBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

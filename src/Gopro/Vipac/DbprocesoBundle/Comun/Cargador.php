@@ -1,5 +1,5 @@
 <?php
-namespace Gopro\Vipac\CargadorBundle\Comun;
+namespace Gopro\Vipac\DbprocesoBundle\Comun;
 use \Symfony\Component\DependencyInjection\ContainerAware;
 
 class Cargador extends ContainerAware{
@@ -41,8 +41,8 @@ class Cargador extends ContainerAware{
                 foreach ($row as $col => $valor):
                     if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['llave'])){
                         if($columnaSpecs[$col]['llave']=='si'){
-                            $primaryKeysPH[$rowNumber][]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'].$this->container->get('gopro_comun_variable')->sanitizeString($valor);
-                            $primaryKeys[$rowNumber][$columnaSpecs[$col]['nombre'].$this->container->get('gopro_comun_variable')->sanitizeString($valor)]=$valor;
+                            $primaryKeysPH[$rowNumber][]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor);
+                            $primaryKeys[$rowNumber][$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor)]=$valor;
                         }
                     }
                 endforeach;
@@ -54,6 +54,7 @@ class Cargador extends ContainerAware{
                     $wherePH[]='('.implode(' AND ', $row).')';
                 endforeach;
                 $selectQuery='SELECT '.implode(', ',$tablaSpecs['columnas']).' FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
+
                 $statement = $conn->prepare($selectQuery);
                 //echo ($selectQuery);
                 foreach($primaryKeys as $whereArray):

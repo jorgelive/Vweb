@@ -1,0 +1,39 @@
+{% extends '::global.html.twig' %}
+{% block body %}
+    <h1>Agregar archivo</h1>
+
+    <form action="#" method="post" {{ form_enctype(formulario) }}>
+        {{ form_widget(formulario) }}
+
+        <input type="submit" value="Subir archivo" />
+    </form>
+
+    {% if archivosAlmacenados|default %}
+        <h1>Listado de Archivos</h1>
+        <table border="1">
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha de Creacion</th>
+            </tr>
+            {% for archivo in archivosAlmacenados %}
+                <tr>
+                    <td><a href="{{ path('gopro_vipac_dbproceso_carga_generico', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
+                    <td>{{ archivo.creado | date('d-m-Y') }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    {% if mensajes|default %}
+        <h1>Resultados del proceso</h1>
+        <ul>
+            {% for mensaje in mensajes %}
+                <li>{{ mensaje }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock %}
+
+
+
+

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gopro\Vipac\CargadorBundle\Comun;
+namespace Gopro\Vipac\DbprocesoBundle\Comun;
 use \Symfony\Component\DependencyInjection\ContainerAware;
 
 
