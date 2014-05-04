@@ -8,21 +8,55 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class Archivo extends ContainerAware{
 
-    public function parseExcel($setTablaSpecs,$setColumnaSpecs,$filename){
+    private $archivo;
+    private $mensajes;
+    private $setTablaSpecs;
+    private $setColumnaSpecs;
+    private $validCols;
+    private $parsed;
 
-        //$filename='/Volumes/Archivo/prueba.xlsx';
+    private $tablaSpecs;
+    private $columnaSpecs;
+    private $valores;
+    private $valoresIndizados;
+    private $descartados;
 
+    public function getTablaSpecs(){
+        return $this->tablaSpecs;
+    }
 
-        if ($setTablaSpecs !==false){
-            $tablaSpecs=$setTablaSpecs;
-        }else{
-            $tablaSpecs=array();
+    public function getColumnaSpecs(){
+        return $this->columnaSpecs;
+    }
+
+    public function getValores(){
+        return $this->valores;
+    }
+
+    public function getValoresIndizados(){
+        return $this->valoresIndizados;
+    }
+
+    public function getDescartados(){
+        return $this->descartados;
+    }
+
+    public function setParametros($archivo,$setTablaSpecs,$setColumnaSpecs){
+        $this->archivo=$archivo;
+        $this->setTableSpecs=$setTablaSpecs;
+        $this->setColumnaSpecs=$setColumnaSpecs;
+        if(!is_null($setTablaSpecs)&&!isset($setTablaSpecs['tipo'])){
+            $setTablaSpecs['tipo']='S';
         }
-
-        if ($setColumnaSpecs !==false){
+        if (!is_null($setTablaSpecs)){
+            $this->tablaSpecs=$setTablaSpecs;
+        }else{
+            $this->tablaSpecs=array();
+        }
+        if (!is_null($setColumnaSpecs)){
             foreach($setColumnaSpecs as $columna):
                 if(isset($columna['nombre'])){
-                    $validCols[]=$columna['nombre'];
+                    $this->validCols[]=$columna['nombre'];
 
                     if (preg_match("/-/i", $columna['nombre'])) {
                         $nombres=explode('-',$columna['nombre']);
@@ -33,36 +67,63 @@ class Archivo extends ContainerAware{
 
                     unset($columna['nombre']);
                     foreach($nombres as $nombre):
-                        $columnaSpecs[$nombre]=$columna;
-                        $columnaSpecs[$nombre]['nombre']=$nombre;
-                        $tablaSpecs['columnas'][]=$nombre;
+                        $this->columnaSpecs[$nombre]=$columna;
+                        $this->columnaSpecs[$nombre]['nombre']=$nombre;
+                        $this->tablaSpecs['columnas'][]=$nombre;
+                        if(!isset($columna['proceso'])||(isset($columna['proceso'])&&$columna['proceso']=='si')){
+                            $this->tablaSpecs['columnasProceso'][]=$nombre;
+                        }
+                        if(isset($columna['llave'])&&$columna['llave']=='si'){
+                            $this->tablaSpecs['llaves'][]=$nombre;
+                        }
                     endforeach;
 
                 }else{
-                    $validCols[]='noProcess';
+                    $this->validCols[]='noProcess';
                 }
             endforeach;
         }else{
-            $columnaSpecs=array();
+            $this->columnaSpecs=array();
+            $this->validCols=array();
         }
+        $this->valores=array();
+        $this->descartados=array();
+        $this->mensajes=array();
+        $this->parsed='no';
+    }
 
-        $valores=array();
+    public function getMensajes(){
+        return $this->mensajes;
+    }
+
+    private function setMensajes($mensaje){
+        $this->mensajes[]=$mensaje;
+    }
+
+    public function parseExcel(){
+
+        //$filename='/Volumes/Archivo/prueba.xlsx';
+        if($this->parsed=='si'){
+            $this->setMensajes('El archivo ya fue procesado anteriormente');
+            return true;
+        }
+        $this->parsed='si';
 
         $fs = new Filesystem();
 
-        if(empty($filename)||!$fs->exists($filename)){
-            return compact('tablaSpecs','columnaSpecs','valores');
-
+        if(empty($this->archivo)||!$fs->exists($this->archivo)){
+            $this->setMensajes('El archivo no existe');
+            return false;
         }
+
         $excelLoader = $this->container->get('phpexcel');
-        $objPHPExcel = $excelLoader->createPHPExcelObject( $filename);
+        $objPHPExcel = $excelLoader->createPHPExcelObject($this->archivo);
         $total_sheets=$objPHPExcel->getSheetCount();
         $allSheetName=$objPHPExcel->getSheetNames();
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
         $highestRow = $objWorksheet->getHighestRow();
         $highestColumn = $objWorksheet->getHighestColumn();
         $highestColumnIndex = $this->container->get('phpexcel')->columnIndexFromString($highestColumn);
-        $valoresDescartados=array();
         $arrayY=0;
         $specRow=false;
         $specRowType='';
@@ -89,77 +150,95 @@ class Archivo extends ContainerAware{
                     $specRowType='';
                 }
                 if($specRow===true){
-                    if($specRowType=='C'&&$setColumnaSpecs===false){
+                    if($specRowType=='C'&&is_null($this->setColumnaSpecs)){
                         $valorArray=explode(':',$value);
                         if(isset($valorArray[1])){
                             if($valorArray[0]=='nombre'){
-                                $validCols[]=$valorArray[1];
+                                $this->validCols[]=$valorArray[1];
                                 if(preg_match("/-/i", $valorArray[1])){
                                     $nombres=explode('-',$valorArray[1]);
                                 }else{
                                     $nombres=array($valorArray[1]);
                                 }
                                 foreach($nombres as $nombre):
-                                    $columnaSpecs[$nombre]['nombre']=$nombre;
-                                    $tablaSpecs['columnas'][]=$nombre;
+                                    $this->columnaSpecs[$nombre]['nombre']=$nombre;
+                                    $this->tablaSpecs['columnas'][]=$nombre;
+                                    $this->tablaSpecs['columnasProceso'][]=$nombre;
 
                                 endforeach;
                                 $procesandoNombre=true;
                             }elseif($procesandoNombre===true){
-                                $validCols[]='noProcess';
-                            }elseif($procesandoNombre!==true&&isset($validCols)&&!empty($validCols)&&isset($validCols[$col])&&$validCols[$col]!='noProcess'){
-                                if(preg_match("/-/i", $validCols[$col])){
-                                    $nombres=explode('-',$validCols[$col]);
+                                $this->validCols[]='noProcess';
+                            }elseif($procesandoNombre!==true&&!empty($this->validCols)&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
+                                if(preg_match("/-/i", $this->validCols[$col])){
+                                    $nombres=explode('-',$this->validCols[$col]);
                                 }else{
-                                    $nombres=array($validCols[$col]);
+                                    $nombres=array($this->validCols[$col]);
                                 }
                                 foreach($nombres as $nombre):
-                                    $columnaSpecs[$nombre][$valorArray[0]]=$valorArray[1];
+                                    $this->columnaSpecs[$nombre][$valorArray[0]]=$valorArray[1];
                                 endforeach;
                             }
-                            if($valorArray[0]=='llave'&&$valorArray[1]=='si'&&isset($validCols[$col])&&$validCols[$col]!='noProcess'){
-                                $tablaSpecs['llaves'][]=$columnaSpecs[$validCols[$col]]['nombre'];
+                            if($valorArray[0]=='llave'&&$valorArray[1]=='si'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
+                                $this->tablaSpecs['llaves'][]=$this->columnaSpecs[$this->validCols[$col]]['nombre'];
+                            }
+                            if($valorArray[0]=='proceso'&&$valorArray[1]=='no'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
+                                $encontrado=array_search($this->columnaSpecs[$this->validCols[$col]]['nombre'], $this->tablaSpecs['columnasProceso'],true);
+                                if($encontrado!==false){
+                                    unset($this->tablaSpecs['columnasProceso'][$encontrado]);
+                                }
                             }
                         }
                     }
-                    if($specRowType=='T'&&$setTablaSpecs===false){
+                    if($specRowType=='T'&&is_null($this->setTablaSpecs)){
                         $valorArray=explode(':',$value);
                         if(isset($valorArray[1])){
-                            $tablaSpecs[$valorArray[0]]=$valorArray[1];
+                            $this->tablaSpecs[$valorArray[0]]=$valorArray[1];
                         }
 
                     }
                 }else{
-                    if(isset($validCols)&&!empty($validCols)&&isset($validCols[$col])&&$validCols[$col]!='noProcess'){
-                        $columnName=$validCols[$col];
-                        if(preg_match("/-/i", $validCols[$col])){
+                    if(!empty($this->validCols)&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
+                        $columnName=$this->validCols[$col];
+                        if(preg_match("/-/i", $this->validCols[$col])){
                             $value=explode('-',$value);
                             $columnName=explode('-',$columnName);
-
                         }else{
                             $value=array($value);
                             $columnName=array($columnName);
                         }
                         foreach($value as $key => $parteValor):
-                            if(isset($columnaSpecs[$columnName[$key]]['tipo'])&&$columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
+                            if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
                                 $parteValor = date('d/m/Y', mktime(0,0,0,1,$parteValor-1,1900));
                             }
-                            if(isset($columnaSpecs[$columnName[$key]]['tipo'])&&$columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
+                            if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-                            $valores[$arrayY][$columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            $this->valores[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
                         endforeach;
                     }else{
-                        $valoresDescartados[$arrayY][]=$value;
+                        $this->descartados[$arrayY][]=$value;
                     }
 
                 }
             }
             $arrayY ++;
         }
+        $this->setValoresIndizados();
+    }
 
-
-        return compact('tablaSpecs','columnaSpecs','valores','valoresDescartados');
+    private function setValoresIndizados(){
+        if(empty($this->valores)){
+            $this->setMensajes('No hay valores que procesar');
+            return false;
+        }
+        foreach ($this->valores as $valor):
+            $indice=array();
+            foreach($this->tablaSpecs['llaves'] as $llave):
+                $indice[]=$valor[$llave];
+            endforeach;
+            $this->valoresIndizados[implode('|',$indice)]=$valor;
+        endforeach;
     }
 
 }

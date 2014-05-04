@@ -48,28 +48,56 @@ class ProcesoController extends Controller
         }
         if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='proceso_cheque'){
 
-            $tablaSpecs=array();
-            $columnaSpecs=array();
-            $valores=array();
-            $valoresDescartados=array();
-            $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate');
+            $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
+            $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
             $columnaspecs[1]=null;
             $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
             $columnaspecs[3]=null;
-            $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no');
-            $archivoProcesado=$this->get('gopro_dbproceso_comun_archivo')->parseExcel(false,$columnaspecs,$archivoAlmacenado->getAbsolutePath());//para limitar pasar los valores
-            foreach($archivoProcesado['valores'] as $row):
+            $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
+            $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
 
-            endforeach;
-            extract($archivoProcesado);
-            print_r($archivoProcesado);
-            //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
+
+            $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+            $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),$tablaSpecs,$columnaspecs);
+            $mensajes=$procesoArchivo->getMensajes();
+            //print_r($procesoArchivo->getTablaSpecs());
+            //print_r($procesoArchivo->getColumnaSpecs());
+            if($procesoArchivo->parseExcel()!==false){
+                $carga=$this->get('gopro_dbproceso_comun_cargador');
+                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
+                $carga->cargaGenerica();
+                $existente=$carga->getExistente();
+                //print_r($existente);
+                //print_r($procesoArchivo->getValoresIndizados());
+                $fusion=array_replace_recursive($existente,$procesoArchivo->getValoresIndizados());
+                $valido=true;
+                foreach($procesoArchivo->getValoresIndizados() as $key=>$temp):
+                    if (!array_key_exists($key, $existente)) {
+                        $mensajes=array_merge($mensajes,array('El valor '.$key.' no se encuentra en la base de datos'));
+                        $valido=false;
+                    }
+                endforeach;
+                $resultado=array();
+                if($valido===true){
+                    foreach($fusion as $fusionPart):
+                        if(!isset($resultados[$fusionPart['CENTRO_COSTO']])){
+                            $resultados[$fusionPart['CENTRO_COSTO']]=0;
+                        }
+                        $resultados[$fusionPart['CENTRO_COSTO']]=$resultados[$fusionPart['CENTRO_COSTO']]+$fusionPart['MONTO'];
+                    endforeach;
+
+                }
+                $mensajes=array_merge($mensajes,$carga->getMensajes());
+            }else{
+                $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
+            }
+           //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
 
         }else{
             $mensajes[]='El archivo no existe';
         }
 
-        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $mensajes);
     }
 
 

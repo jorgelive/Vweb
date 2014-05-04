@@ -56,25 +56,27 @@ class CargaController extends Controller
         }
         if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='carga_generico'){
 
-            $tablaSpecs=array();
-            $columnaSpecs=array();
-            $valores=array();
-            $valoresDescartados=array();
-            $archivoProcesado=$this->get('gopro_dbproceso_comun_archivo')->parseExcel(false,false,$archivoAlmacenado->getAbsolutePath());//para limitar pasar los valores
+            $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+            $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),null,null);
+            $mensajes=$procesoArchivo->getMensajes();
+
             //print_r($archivoProcesado);
-            extract($archivoProcesado);
+            if($procesoArchivo->parseExcel()!==false){
+                //print_r($procesoArchivo->getTablaSpecs());
+                //print_r($procesoArchivo->getColumnaSpecs());
+                $carga=$this->get('gopro_dbproceso_comun_cargador');
+                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
+                $carga->cargaGenerica();
+                $mensajes=array_merge($mensajes,$carga->getMensajes());
+            }else{
+                $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
+            }
 
-            $carga=$this->get('gopro_dbproceso_comun_cargador');
-            $carga->setTablaSpecs($tablaSpecs);
-            $carga->setColumnaSpecs($columnaSpecs);
-            $carga->setValores($valores);
-
-            $mensajes=$carga->getMensajes();
             //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->cargadorGenerico($tablaSpecs,$columnaSpecs,$valores);
 
 
         }else{
-            $mensajes[]='El archivo no existe';
+            $mensajes[]='El archivo no existe, o no es valido para el proceso';
         }
 
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);

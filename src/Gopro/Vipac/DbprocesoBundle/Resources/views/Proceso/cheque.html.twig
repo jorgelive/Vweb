@@ -23,8 +23,24 @@
             {% endfor %}
         </table>
     {% endif %}
+    {% if resultados|default %}
+        <h1>Resultado del proceso</h1>
+        <table border="1">
+            <tr>
+                <th>Centro de Costo</th>
+                <th>Monto</th>
+            </tr>
+            {% for centro,monto in resultados %}
+                <tr>
+                    <td>{{ centro }}</a></td>
+                    <td>{{ monto }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
     {% if mensajes|default %}
-        <h1>Resultados del proceso</h1>
+        <h1>Mensajes del proceso</h1>
+
         <ul>
             {% for mensaje in mensajes %}
                 <li>{{ mensaje }}</li>
