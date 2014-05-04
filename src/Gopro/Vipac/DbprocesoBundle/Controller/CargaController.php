@@ -59,10 +59,18 @@ class CargaController extends Controller
             $tablaSpecs=array();
             $columnaSpecs=array();
             $valores=array();
+            $valoresDescartados=array();
             $archivoProcesado=$this->get('gopro_dbproceso_comun_archivo')->parseExcel(false,false,$archivoAlmacenado->getAbsolutePath());//para limitar pasar los valores
             //print_r($archivoProcesado);
             extract($archivoProcesado);
-            $mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
+
+            $carga=$this->get('gopro_dbproceso_comun_cargador');
+            $carga->setTablaSpecs($tablaSpecs);
+            $carga->setColumnaSpecs($columnaSpecs);
+            $carga->setValores($valores);
+
+            $mensajes=$carga->getMensajes();
+            //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->cargadorGenerico($tablaSpecs,$columnaSpecs,$valores);
 
 
         }else{

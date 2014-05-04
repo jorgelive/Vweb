@@ -54,8 +54,6 @@ class Archivo extends ContainerAware{
             return compact('tablaSpecs','columnaSpecs','valores');
 
         }
-
-
         $excelLoader = $this->container->get('phpexcel');
         $objPHPExcel = $excelLoader->createPHPExcelObject( $filename);
         $total_sheets=$objPHPExcel->getSheetCount();
@@ -64,6 +62,7 @@ class Archivo extends ContainerAware{
         $highestRow = $objWorksheet->getHighestRow();
         $highestColumn = $objWorksheet->getHighestColumn();
         $highestColumnIndex = $this->container->get('phpexcel')->columnIndexFromString($highestColumn);
+        $valoresDescartados=array();
         $arrayY=0;
         $specRow=false;
         $specRowType='';
@@ -144,25 +143,23 @@ class Archivo extends ContainerAware{
                         foreach($value as $key => $parteValor):
                             if(isset($columnaSpecs[$columnName[$key]]['tipo'])&&$columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
                                 $parteValor = date('d/m/Y', mktime(0,0,0,1,$parteValor-1,1900));
-                                //$columnaSpecs[$validCols[$col]]['nombre'];
                             }
                             if(isset($columnaSpecs[$columnName[$key]]['tipo'])&&$columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
-
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-
                             $valores[$arrayY][$columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
-
                         endforeach;
-
+                    }else{
+                        $valoresDescartados[$arrayY][]=$value;
                     }
+
                 }
             }
             $arrayY ++;
         }
 
 
-        return compact('tablaSpecs','columnaSpecs','valores');
+        return compact('tablaSpecs','columnaSpecs','valores','valoresDescartados');
     }
 
 }

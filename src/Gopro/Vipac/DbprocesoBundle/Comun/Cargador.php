@@ -4,10 +4,44 @@ use \Symfony\Component\DependencyInjection\ContainerAware;
 
 class Cargador extends ContainerAware{
 
-    public function ejecutar($tablaSpecs,$columnaSpecs,$valores){
+
+
+    private $mensajes;
+
+    private $tablaSpecs;
+
+    private $columnaSpecs;
+
+    private $valores;
+
+    public function setTablaSpecs($tablaSpecs){
+        $this->tablaSpecs=$tablaSpecs;
+    }
+
+    public function setColumnaSpecs($columnaSpecs){
+        $this->columnaSpecs=$columnaSpecs;
+    }
+
+    public function setValores($valores){
+        $this->valores=$valores;
+    }
+
+    public function getMensajes(){
+        return $this->mensajes;
+    }
+
+    private function setMensajes($mensaje){
+        $this->mensajes[]=$mensaje;
+    }
+
+
+
+    public function cargadorGenerico($tablaSpecs,$columnaSpecs,$valores){
 
         if(isset($tablaSpecs['tipo'])&&in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))&&isset($valores)&&isset($tablaSpecs)&&isset($columnaSpecs)&&!empty($valores)&&!empty($tablaSpecs)&&!empty($columnaSpecs)){
-            $mensajes=$this->dbPreProcess($tablaSpecs,$columnaSpecs,$valores);
+            $conn = $this->container->get('doctrine.dbal.default_connection');
+            $existente=$this->generalQuery($conn,$tablaSpecs,$columnaSpecs,$valores,true);
+            $mensajes=$this->dbPreProcess($conn,$tablaSpecs,$columnaSpecs,$valores,$existente);
         }elseif(isset($tablaSpecs['tipo'])&&!in_array($tablaSpecs['tipo'],Array('IU','UI','I','U'))){
             $mensajes=array('No se definio correctamente el tipo de proceso');
         }else{
@@ -16,8 +50,7 @@ class Cargador extends ContainerAware{
         return $mensajes;
     }
 
-    public function dbPreProcess($tablaSpecs,$columnaSpecs,$valores){
-        $conn = $this->container->get('doctrine.dbal.default_connection');
+    public function obtenerLlaves($conn,$tablaSpecs){
         $query[]="SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner";
         $query[]="FROM all_constraints cons, all_cons_columns cols";
         $query[]="WHERE cols.table_name = '".$tablaSpecs['nombre']."' AND cons.constraint_type = 'P'";
@@ -26,59 +59,69 @@ class Cargador extends ContainerAware{
         //print_r(implode(' ',$query));
         $statement = $conn->query(implode(' ',$query));
         $keysArray = $statement->fetchAll();
-
+        $keyInTable=array();
         foreach($keysArray as $key):
             $keyInTable[]=$key['COLUMN_NAME'];
         endforeach;
-        //$table = new \Doctrine\DBAL\Schema\Table('PRUEBA');
-        //$keys=$table->getPrimaryKeyColumns();
-        $keysDiff=array_diff($keyInTable,$tablaSpecs['llaves']);
+        return $keyInTable;
 
+    }
+
+    public function generalQuery($conn,$tablaSpecs,$columnaSpecs,$valores,$estricto){
+
+        $keysDiff=array_diff($this->obtenerLlaves($conn,$tablaSpecs),$tablaSpecs['llaves']);
         $existente=array();
+        if(!empty($keysDiff)&&$estricto===true){
+            return array();
 
-        if (empty($keysDiff)){
-            foreach ($valores as $rowNumber => $row):
-                foreach ($row as $col => $valor):
-                    if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['llave'])){
-                        if($columnaSpecs[$col]['llave']=='si'){
-                            $primaryKeysPH[$rowNumber][]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor);
-                            $primaryKeys[$rowNumber][$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor)]=$valor;
-                        }
+        }
+
+        foreach ($valores as $rowNumber => $row):
+            foreach ($row as $col => $valor):
+                if(isset($columnaSpecs[$col]['nombre'])&&isset($columnaSpecs[$col]['llave'])){
+                    if($columnaSpecs[$col]['llave']=='si'){
+                        $primaryKeysPH[$rowNumber][]=$columnaSpecs[$col]['nombre'].'= :'.$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor);
+                        $primaryKeys[$rowNumber][$columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor)]=$valor;
                     }
+                }
+            endforeach;
+        endforeach;
+
+        if(!empty($primaryKeys)&&!empty($primaryKeysPH)){
+
+            foreach ($primaryKeysPH as $row):
+                $wherePH[]='('.implode(' AND ', $row).')';
+            endforeach;
+            $selectQuery='SELECT '.implode(', ',$tablaSpecs['columnas']).' FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
+
+            $statement = $conn->prepare($selectQuery);
+            //echo ($selectQuery);
+            foreach($primaryKeys as $whereArray):
+                foreach ($whereArray as $whereKey => $whereValor):
+                    $statement->bindValue($whereKey,$whereValor);
                 endforeach;
             endforeach;
 
-            if(!empty($primaryKeys)&&!empty($primaryKeysPH)){
-
-                foreach ($primaryKeysPH as $row):
-                    $wherePH[]='('.implode(' AND ', $row).')';
+            $statement->execute();
+            $registro=$statement->fetchAll();
+            //print_r($tablaSpecs);
+            foreach($registro as $linea):
+                $identArray=array();
+                foreach($tablaSpecs['llaves'] as $llave):
+                    $identArray[]=$linea[$llave];
                 endforeach;
-                $selectQuery='SELECT '.implode(', ',$tablaSpecs['columnas']).' FROM '.$tablaSpecs['schema'].'.'.$tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
-
-                $statement = $conn->prepare($selectQuery);
-                //echo ($selectQuery);
-                foreach($primaryKeys as $whereArray):
-                    foreach ($whereArray as $whereKey => $whereValor):
-                        $statement->bindValue($whereKey,$whereValor);
-                    endforeach;
-                endforeach;
-
-                $statement->execute();
-                $registro=$statement->fetchAll();
-                //print_r($tablaSpecs);
-                foreach($registro as $linea):
-                    $identArray=array();
-                    foreach($tablaSpecs['llaves'] as $llave):
-                        $identArray[]=$linea[$llave];
-                    endforeach;
-                    $existente[implode('|',$identArray)]=$linea;
-                endforeach;
-            }
-        }else{
-            $mensajes[]="Las llaves primarias no coiciden con las definidas en la tabla";
+                $existente[implode('|',$identArray)]=$linea;
+            endforeach;
         }
 
-        if(!empty($existente)||(empty($existente) && $tablaSpecs['tipo']=='I')){
+        return $existente;
+
+    }
+
+
+
+    public function dbPreProcess($conn,$tablaSpecs,$columnaSpecs,$valores,$existente){
+         if(!empty($existente)||(empty($existente)&&$tablaSpecs['tipo']=='I')){
             foreach ($valores as $rowNumber => $row):
                 $whereArray=array();
                 $wherePH=array();

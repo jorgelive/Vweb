@@ -51,9 +51,12 @@ class ProcesoController extends Controller
             $tablaSpecs=array();
             $columnaSpecs=array();
             $valores=array();
-            $columnaspecs[0]=array('nombre'=>'fecha','llave'=>'si','tipo'=>'exceldate');
+            $valoresDescartados=array();
+            $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate');
             $columnaspecs[1]=null;
-            $columnaspecs[2]=array('nombre'=>'luis-jorge','llave'=>'no','tipo'=>'file');
+            $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
+            $columnaspecs[3]=null;
+            $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no');
             $archivoProcesado=$this->get('gopro_dbproceso_comun_archivo')->parseExcel(false,$columnaspecs,$archivoAlmacenado->getAbsolutePath());//para limitar pasar los valores
             foreach($archivoProcesado['valores'] as $row):
 
