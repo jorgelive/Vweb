@@ -14,6 +14,10 @@ class ProcesoController extends Controller
 {
 
 
+    public function cargaCp(){
+
+    }
+
     /**
      * @Route("/proceso/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
      * @Template()
@@ -39,7 +43,6 @@ class ProcesoController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-
             return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_generico'));
         }
 
@@ -47,7 +50,6 @@ class ProcesoController extends Controller
             $archivoAlmacenado=$repositorio->find($archivoEjecutar);
         }
         if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='proceso_cheque'){
-
             $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
             $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
             $columnaspecs[1]=null;
@@ -55,7 +57,6 @@ class ProcesoController extends Controller
             $columnaspecs[3]=null;
             $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
             $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
-
 
             $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
             $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),$tablaSpecs,$columnaspecs);
