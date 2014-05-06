@@ -123,7 +123,7 @@ class Archivo extends ContainerAware{
         $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
         $highestRow = $objWorksheet->getHighestRow();
         $highestColumn = $objWorksheet->getHighestColumn();
-        $highestColumnIndex = $this->container->get('phpexcel')->columnIndexFromString($highestColumn);
+        $highestColumnIndex = $excelLoader->columnIndexFromString($highestColumn);
         $arrayY=0;
         $specRow=false;
         $specRowType='';
@@ -237,8 +237,30 @@ class Archivo extends ContainerAware{
             foreach($this->tablaSpecs['llaves'] as $llave):
                 $indice[]=$valor[$llave];
             endforeach;
-            $this->valoresIndizados[implode('|',$indice)]=$valor;
+            $this->valoresIndizados[implode('|',$indice)][]=$valor;
         endforeach;
     }
 
+    public function escribirExcel($archivo,$encabezados,$datos){
+        $excelLoader = $this->container->get('phpexcel');
+        $phpExcelObject = $excelLoader->createPHPExcelObject();
+        $phpExcelObject->getProperties()->setCreator("Viapac")
+            ->setTitle("Documento Generado")
+            ->setDescription("Documento generado para descargar");
+        $hoja=$phpExcelObject->setActiveSheetIndex(0);
+        foreach($encabezados as $key=>$encabezado):
+            $index = $excelLoader->columnIndexFromString($key+1);
+            $hoja->setCellValue('A'.$index, $encabezado);
+        endforeach;
+        $hoja->fromArray($datos, NULL, 'A2');
+        $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
+        $phpExcelObject->setActiveSheetIndex(0);
+        $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
+        $response = $this->get('phpexcel')->createStreamedResponse($writer);
+        $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment;filename='.$archivo.'.xlsx');
+        $response->headers->set('Pragma', 'public');
+        $response->headers->set('Cache-Control', 'maxage=1');
+        return $response;
+    }
 }

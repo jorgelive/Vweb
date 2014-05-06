@@ -70,15 +70,19 @@ class ProcesoController extends Controller
                 $existente=$carga->getExistente();
                 //print_r($existente);
                 //print_r($procesoArchivo->getValoresIndizados());
-                $fusion=array_replace_recursive($existente,$procesoArchivo->getValoresIndizados());
+                //$fusion=array_replace_recursive($existente,$procesoArchivo->getValoresIndizados());
                 $valido=true;
-                foreach($procesoArchivo->getValoresIndizados() as $key=>$temp):
+                foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
                     if (!array_key_exists($key, $existente)) {
                         $mensajes=array_merge($mensajes,array('El valor '.$key.' no se encuentra en la base de datos'));
                         $valido=false;
+                    }else{
+                        foreach($valores as $valor):
+                            $fusion[]=array_replace_recursive($valor,$existente[$key]);
+                        endforeach;
                     }
                 endforeach;
-                $resultado=array();
+                $resultados=array();
                 if($valido===true){
                     foreach($fusion as $fusionPart):
                         if(!isset($resultados[$fusionPart['CENTRO_COSTO']])){
@@ -134,8 +138,6 @@ class ProcesoController extends Controller
         }
         if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='proceso_calculadora'){
             $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
-
-
             $columnaspecs[0]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
             $columnaspecs[1]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
             $columnaspecs[2]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
@@ -151,48 +153,27 @@ class ProcesoController extends Controller
                 $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
                 $carga->cargaGenerica();
                 $existente=$carga->getExistente();
-                $fusion=array_replace_recursive($existente,$procesoArchivo->getValoresIndizados());
-
-                $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
-
-                $phpExcelObject->getProperties()->setCreator("Viapac")
-                    ->setTitle("Documento Generado")
-                    ->setDescription("Documento generado para descargar");
-                $phpExcelObject->setActiveSheetIndex(0)
-                    ->setCellValue('A1', 'FECHA')
-                    ->setCellValue('B1', 'NOMBREPA')
-                    ->setCellValue('C1', 'ANO')
-                    ->setCellValue('D1', 'FILE')
-                    ->setCellValue('D1', 'LLEGADA')
-                    ->setCellValue('D1', 'SALIDA');
-
-                $phpExcelObject->setActiveSheetIndex(0)->fromArray($fusion, NULL, 'A2');
-                $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
-
-                // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-                $phpExcelObject->setActiveSheetIndex(0);
-
-                // create the writer
-                $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-                // create the response
-                $response = $this->get('phpexcel')->createStreamedResponse($writer);
-                // adding headers
-                $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-                $response->headers->set('Content-Disposition', 'attachment;filename=archivo.xlsx');
-                $response->headers->set('Pragma', 'public');
-                $response->headers->set('Cache-Control', 'maxage=1');
-
-                return $response;
-
+                foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
+                    if (!array_key_exists($key, $existente)) {
+                        $mensajes=array_merge($mensajes,array('El valor '.$key.' no se encuentra en la base de datos'));
+                        $existente[$key]['mensaje']='No se encuentra en la BD';
+                    }
+                    foreach($valores as $valor):
+                        $fusion[]=array_replace_recursive($valor,$existente[$key]);
+                    endforeach;
+                endforeach;
+                if(isset($fusion[0])&&!empty($fusion[0])){
+                    $encabezados=array_keys($fusion[0]);
+                    $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($archivoAlmacenado->getNombre(),$encabezados,$fusion);
+                    return $respuesta;
+                }
+                $mensajes=array_merge($mensajes,array('No existendatos para generar archivo'));
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
-            //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
-
         }else{
             $mensajes[]='El archivo no existe';
         }
-
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 
