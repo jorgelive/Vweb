@@ -13,8 +13,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class ProcesoController extends Controller
 {
 
+    /**
+     * @Route("/index", name="gopro_vipac_dbproceso_proceso_index")
+     * @Template()
+     */
+    public function indexAction(){
 
-    public function cargaCp(){
 
     }
 
@@ -24,10 +28,12 @@ class ProcesoController extends Controller
      */
     public function chequeAction(Request $request,$archivoEjecutar)
     {
+        $mensajes=array();
+        $resultados=array();
         $usuario=$this->get('security.context')->getToken()->getUser();
 
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'proceso_cheque'));
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'proceso_cheque'),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
@@ -46,10 +52,8 @@ class ProcesoController extends Controller
             return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_proceso_cheque'));
         }
 
-        if($archivoEjecutar!==null){
-            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
-        }
-        if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='proceso_cheque'){
+        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+        if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'proceso_cheque')===true){
             $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
             $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
             $columnaspecs[1]=null;
@@ -57,9 +61,7 @@ class ProcesoController extends Controller
             $columnaspecs[3]=null;
             $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
             $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
-
-            $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-            $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),$tablaSpecs,$columnaspecs);
+            $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
             $mensajes=$procesoArchivo->getMensajes();
             //print_r($procesoArchivo->getTablaSpecs());
             //print_r($procesoArchivo->getColumnaSpecs());
@@ -82,7 +84,6 @@ class ProcesoController extends Controller
                         endforeach;
                     }
                 endforeach;
-                $resultados=array();
                 if($valido===true){
                     foreach($fusion as $fusionPart):
                         if(!isset($resultados[$fusionPart['CENTRO_COSTO']])){
@@ -96,12 +97,8 @@ class ProcesoController extends Controller
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
-           //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->ejecutar($tablaSpecs,$columnaSpecs,$valores);
-
-        }else{
-            $mensajes[]='El archivo no existe';
         }
-
+        $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $mensajes);
     }
 
@@ -111,19 +108,18 @@ class ProcesoController extends Controller
      */
     public function calculadoraAction(Request $request,$archivoEjecutar)
     {
+        $mensajes=array();
         $usuario=$this->get('security.context')->getToken()->getUser();
 
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'proceso_calculadora'));
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'proceso_calculadora'),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
             ->add('nombre')
             ->add('file')
             ->getForm();
-
         $formulario->handleRequest($request);
-
         if ($formulario->isValid()){
             $archivo->setUsuario($usuario);
             $archivo->setOperacion('proceso_calculadora');
@@ -132,21 +128,17 @@ class ProcesoController extends Controller
             $em->flush();
             return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_proceso_calculadora'));
         }
-
-        if($archivoEjecutar!==null){
-            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
-        }
-        if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='proceso_calculadora'){
+        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+        if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'proceso_calculadora')===true){
             $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
-            $columnaspecs[0]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
+            /*$columnaspecs[0]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
             $columnaspecs[1]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
             $columnaspecs[2]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
             $columnaspecs[3]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
             $columnaspecs[4]=array('nombre'=>'NUM_PAX','llave'=>'no');
             $columnaspecs[5]=array('nombre'=>'LLEGADA','llave'=>'no');
-            $columnaspecs[6]=array('nombre'=>'SALIDA','llave'=>'no');
-            $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-            $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),$tablaSpecs,$columnaspecs);
+            $columnaspecs[6]=array('nombre'=>'SALIDA','llave'=>'no');*/
+            $procesoArchivo->setParametros($tablaSpecs,null);
             $mensajes=$procesoArchivo->getMensajes();
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
@@ -164,16 +156,15 @@ class ProcesoController extends Controller
                 endforeach;
                 if(isset($fusion[0])&&!empty($fusion[0])){
                     $encabezados=array_keys($fusion[0]);
-                    $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($archivoAlmacenado->getNombre(),$encabezados,$fusion);
+                    $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
                     return $respuesta;
                 }
                 $mensajes=array_merge($mensajes,array('No existendatos para generar archivo'));
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
-        }else{
-            $mensajes[]='El archivo no existe';
         }
+        $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 

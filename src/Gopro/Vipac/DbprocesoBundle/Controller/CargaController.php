@@ -28,10 +28,11 @@ class CargaController extends Controller
      */
     public function genericoAction(Request $request,$archivoEjecutar)
     {
+        $mensajes=array();
         $usuario=$this->get('security.context')->getToken()->getUser();
 
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_generico'));
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_generico'),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
@@ -51,15 +52,12 @@ class CargaController extends Controller
             return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_generico'));
         }
 
-        if($archivoEjecutar!==null){
-            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
-        }
-        if(isset($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()=='carga_generico'){
+        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
 
-            $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-            $procesoArchivo->setParametros($archivoAlmacenado->getAbsolutePath(),null,null);
+        if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_generico')===true){
+
+            $procesoArchivo->setParametros(null,null);
             $mensajes=$procesoArchivo->getMensajes();
-
             //print_r($archivoProcesado);
             if($procesoArchivo->parseExcel()!==false){
                 //print_r($procesoArchivo->getTablaSpecs());
@@ -71,51 +69,13 @@ class CargaController extends Controller
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
-
             //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->cargadorGenerico($tablaSpecs,$columnaSpecs,$valores);
-
-
-        }else{
-            $mensajes[]='El archivo no existe, o no es valido para el proceso';
         }
-
+        $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 
-    /**
-     * @Route("/excel")
-     * @Template()
-     */
-    public function excelAction()
-    {
-        $conn = $this->get('doctrine.dbal.default_connection');
-        $paises = $conn->fetchAll('SELECT * FROM reservas.pais');
 
-        $phpExcelObject = $this->get('phpexcel')->createPHPExcelObject();
 
-        $phpExcelObject->getProperties()->setCreator("Viapac")
-            ->setTitle("Documento Generado")
-            ->setDescription("Documento generado para descargar");
-        $phpExcelObject->setActiveSheetIndex(0)
-            ->setCellValue('A1', 'Codigo')
-            ->setCellValue('B1', 'Nombre');
 
-        $phpExcelObject->setActiveSheetIndex(0)->fromArray($paises, NULL, 'A2');
-        $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
-
-        // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-        $phpExcelObject->setActiveSheetIndex(0);
-
-        // create the writer
-        $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-        // create the response
-        $response = $this->get('phpexcel')->createStreamedResponse($writer);
-        // adding headers
-        $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename=archivo.xlsx');
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Cache-Control', 'maxage=1');
-
-        return $response;
-    }
 }

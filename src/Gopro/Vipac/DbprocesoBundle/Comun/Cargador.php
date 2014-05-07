@@ -4,7 +4,7 @@ use \Symfony\Component\DependencyInjection\ContainerAware;
 
 class Cargador extends ContainerAware{
 
-    private $mensajes;
+    private $mensajes=array();
     private $tablaSpecs;
     private $columnaSpecs;
     private $valores;
@@ -58,7 +58,7 @@ class Cargador extends ContainerAware{
         //print_r($this->tablaSpecs);
         $this->keysDiff=array_diff($this->getLlaves(),$this->tablaSpecs['llaves']);
         if(!empty($this->keysDiff)){
-            $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condición');
+            $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condiciï¿½n');
         }
         $existente=array();
         $primaryKeys=array();

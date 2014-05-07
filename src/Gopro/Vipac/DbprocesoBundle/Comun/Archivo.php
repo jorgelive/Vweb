@@ -9,7 +9,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 class Archivo extends ContainerAware{
 
     private $archivo;
-    private $mensajes;
+    private $mensajes=array();
     private $setTablaSpecs;
     private $setColumnaSpecs;
     private $validCols;
@@ -20,6 +20,7 @@ class Archivo extends ContainerAware{
     private $valores;
     private $valoresIndizados;
     private $descartados;
+    private $archivoValido;
 
     public function getTablaSpecs(){
         return $this->tablaSpecs;
@@ -41,8 +42,16 @@ class Archivo extends ContainerAware{
         return $this->descartados;
     }
 
-    public function setParametros($archivo,$setTablaSpecs,$setColumnaSpecs){
-        $this->archivo=$archivo;
+    public function getArchivoValido(){
+        return $this->archivoValido;
+    }
+
+    public function setParametros($setTablaSpecs,$setColumnaSpecs){
+        if(is_null($this->getArchivoValido())||is_null($this->getArchivoValido()->getAbsolutePath())){
+            $this->setMensajes('El archivo no existe');
+            return false;
+        }
+        $this->archivo=$this->getArchivoValido()->getAbsolutePath();
         $this->setTableSpecs=$setTablaSpecs;
         $this->setColumnaSpecs=$setColumnaSpecs;
         if(!is_null($setTablaSpecs)&&!isset($setTablaSpecs['tipo'])){
@@ -180,7 +189,17 @@ class Archivo extends ContainerAware{
                                 endforeach;
                             }
                             if($valorArray[0]=='llave'&&$valorArray[1]=='si'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
-                                $this->tablaSpecs['llaves'][]=$this->columnaSpecs[$this->validCols[$col]]['nombre'];
+                                //print_r($this->columnaSpecs);
+                                //print_r($this->validCols);
+                                if(preg_match("/-/i", $this->validCols[$col])){
+                                    $nombres=explode('-',$this->validCols[$col]);
+                                }else{
+                                    $nombres=array($this->validCols[$col]);
+                                }
+                                foreach($nombres as $nombre):
+                                    $this->tablaSpecs['llaves'][]=$this->columnaSpecs[$nombre]['nombre'];
+
+                                endforeach;
                             }
                             if($valorArray[0]=='proceso'&&$valorArray[1]=='no'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
                                 $encontrado=array_search($this->columnaSpecs[$this->validCols[$col]]['nombre'], $this->tablaSpecs['columnasProceso'],true);
@@ -224,6 +243,7 @@ class Archivo extends ContainerAware{
             }
             $arrayY ++;
         }
+        //print_r($this->tablaSpecs);
         $this->setValoresIndizados();
     }
 
@@ -241,7 +261,7 @@ class Archivo extends ContainerAware{
         endforeach;
     }
 
-    public function escribirExcel($archivo,$encabezados,$datos){
+    public function escribirExcel($archivo,$encabezados,$datos,$tipo='xlsx'){
         $excelLoader = $this->container->get('phpexcel');
         $phpExcelObject = $excelLoader->createPHPExcelObject();
         $phpExcelObject->getProperties()->setCreator("Viapac")
@@ -249,18 +269,35 @@ class Archivo extends ContainerAware{
             ->setDescription("Documento generado para descargar");
         $hoja=$phpExcelObject->setActiveSheetIndex(0);
         foreach($encabezados as $key=>$encabezado):
-            $index = $excelLoader->columnIndexFromString($key+1);
-            $hoja->setCellValue('A'.$index, $encabezado);
+            $columna = $excelLoader->stringFromColumnIndex($key);
+            $hoja->setCellValue($columna.'1', $encabezado);
         endforeach;
         $hoja->fromArray($datos, NULL, 'A2');
         $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
         $phpExcelObject->setActiveSheetIndex(0);
-        $writer = $this->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-        $response = $this->get('phpexcel')->createStreamedResponse($writer);
+        $writer = $this->container->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
+        $response = $this->container->get('phpexcel')->createStreamedResponse($writer);
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename='.$archivo.'.xlsx');
+        $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($archivo).'.'.$tipo);
         $response->headers->set('Pragma', 'public');
         $response->headers->set('Cache-Control', 'maxage=1');
         return $response;
+    }
+
+
+    public function validarArchivo($repositorio,$archivoEjecutar,$funcionArchivo){
+        $ejecutar=false;
+        if($archivoEjecutar!==null){
+            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
+            $ejecutar=true;
+        }
+        if($ejecutar===true&&(empty($archivoAlmacenado)||(!empty($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()!=$funcionArchivo))){
+            $this->setMensajes('El archivo no existe, o no es valido para el proceso');
+            $ejecutar=false;
+        }elseif($ejecutar===true){
+            $this->archivoValido=$archivoAlmacenado;
+        }
+
+        return $ejecutar;
     }
 }

@@ -49,6 +49,19 @@ class Factory
         return call_user_func(array($this->phpExcelCell, 'columnIndexFromString'), $column);
     }
 
+
+    /**
+     * Creates an empty PHPExcel Object if the filename is empty, otherwise loads the file into the object.
+     *
+     * @param string $column
+     *
+     * @return \PHPExcel
+     */
+    public function stringFromColumnIndex($indice =  null)
+    {
+        return call_user_func(array($this->phpExcelCell, 'stringFromColumnIndex'), $indice);
+    }
+
     /**
      * Create a writer given the PHPExcelObject and the type,
      *   the type coul be one of PHPExcel_IOFactory::$_autoResolveClasses

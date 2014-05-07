@@ -18,7 +18,7 @@
             {% for archivo in archivosAlmacenados %}
                 <tr>
                     <td><a href="{{ path('gopro_vipac_dbproceso_carga_generico', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
-                    <td>{{ archivo.creado | date('d-m-Y') }}</td>
+                    <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
                 </tr>
             {% endfor %}
         </table>
