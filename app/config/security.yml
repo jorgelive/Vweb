@@ -87,6 +87,7 @@ security:
         # This config requires being logged for the whole site and having the admin role for the admin part.
         # Change these rules to adapt them to your needs
         - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/dbproceso/carga/generico, role: ROLE_ADMIN }
         - { path: ^/dbproceso/, role: ROLE_STAFF }
 
 

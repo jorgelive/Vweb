@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "db44e005215685122063ce4d6e4a0bc0",
+    "hash": "cd20fcd654f8ea3fd41487bb094e928d",
     "packages": [
         {
             "name": "beberlei/DoctrineExtensions",
@@ -1164,16 +1164,16 @@
         },
         {
             "name": "michelf/php-markdown",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michelf/php-markdown.git",
-                "reference": "96d8150406f67e683ef4acc09fef91785fef1266"
+                "reference": "de9a19c7bf352d41cc99ed86c3c0ef17e87394b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/96d8150406f67e683ef4acc09fef91785fef1266",
-                "reference": "96d8150406f67e683ef4acc09fef91785fef1266",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/de9a19c7bf352d41cc99ed86c3c0ef17e87394b6",
+                "reference": "de9a19c7bf352d41cc99ed86c3c0ef17e87394b6",
                 "shasum": ""
             },
             "require": {
@@ -1211,7 +1211,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2013-11-29 17:09:24"
+            "time": "2014-05-05 02:43:50"
         },
         {
             "name": "monolog/monolog",
@@ -1611,12 +1611,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sonata-project/SonataAdminBundle.git",
-                "reference": "98da9fdef197b1ad1ac05048c675938e0b5d14db"
+                "reference": "d89d9dc1447f2e0eaac14e89558a4738385c4099"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sonata-project/SonataAdminBundle/zipball/98da9fdef197b1ad1ac05048c675938e0b5d14db",
-                "reference": "98da9fdef197b1ad1ac05048c675938e0b5d14db",
+                "url": "https://api.github.com/repos/sonata-project/SonataAdminBundle/zipball/d89d9dc1447f2e0eaac14e89558a4738385c4099",
+                "reference": "d89d9dc1447f2e0eaac14e89558a4738385c4099",
                 "shasum": ""
             },
             "require": {
@@ -1682,7 +1682,7 @@
                 "bootstrap",
                 "sonata"
             ],
-            "time": "2014-04-28 18:11:57"
+            "time": "2014-05-07 08:41:34"
         },
         {
             "name": "sonata-project/block-bundle",

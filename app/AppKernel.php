@@ -28,6 +28,8 @@ class AppKernel extends Kernel
             new Gopro\ExcelBundle\GoproExcelBundle(),
             new Gopro\Vipac\DbprocesoBundle\GoproVipacDbprocesoBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+            new Gopro\Vipac\ExtraBundle\GoproVipacExtraBundle(),
+            new Gopro\Vipac\MainBundle\GoproVipacMainBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
@@ -49,8 +51,8 @@ class AppKernel extends Kernel
      *
      * @return string The charset
      */
-    /*public function getCharset()
+    public function getCharset()
     {
         return 'ISO-8859-1';
-    }*/
+    }
 }

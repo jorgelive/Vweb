@@ -1,14 +1,14 @@
-{% extends 'GoproVipacDbproceso::layout.html.twig' %}
+{% extends 'GoproVipacExtraBundle::layout.html.twig' %}
 {% block content %}
-    <h1>Agregar archivo</h1>
+    <h1>Generador de Firmas</h1>
 
     <form action="#" method="post" {{ form_enctype(formulario) }}>
         {{ form_widget(formulario) }}
 
-        <input type="submit" value="Subir archivo" />
+        <input type="submit" value="Generar" />
     </form>
 
-    {% if archivosAlmacenados|default %}
+    {% if resultado|default %}
         <h1>Listado de Archivos</h1>
         <table border="1">
             <tr>
@@ -17,19 +17,11 @@
             </tr>
             {% for archivo in archivosAlmacenados %}
                 <tr>
-                    <td><a href="{{ path('gopro_vipac_dbproceso_carga_generico', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
+                    <td><a href="{{ path('gopro_vipac_dbproceso_proceso_calculadora', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
                     <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
                 </tr>
             {% endfor %}
         </table>
-    {% endif %}
-    {% if mensajes|default %}
-        <h1>Resultados del proceso</h1>
-        <ul>
-            {% for mensaje in mensajes %}
-                <li>{{ mensaje }}</li>
-            {% endfor %}
-        </ul>
     {% endif %}
 
 {% endblock content %}

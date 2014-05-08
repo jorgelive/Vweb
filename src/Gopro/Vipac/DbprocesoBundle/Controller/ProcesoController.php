@@ -5,7 +5,6 @@ namespace Gopro\Vipac\DbprocesoBundle\Controller;
 use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Gopro\Vipac\DbprocesoBundle\Comun\Archivo as ArchivoOpe;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
