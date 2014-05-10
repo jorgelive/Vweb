@@ -21,7 +21,7 @@ security:
 #            - ROLE_SONATA_ADMIN_DEMO_FOO_DELETE
 #            - ROLE_SONATA_ADMIN_DEMO_FOO_EXPORT
         # those are the roles I will use (less verbose)
-        ROLE_ADMIN:             [ROLE_STAFF, ROLE_SONATA_FOO_EDITOR, ROLE_SONATA_FOO_ADMIN]
+        ROLE_ADMIN:             [ROLE_STAFF, ROLE_SHAREFILES_READER, ROLE_SHAREFILES_EDITOR, ROLE_SONATA_FOO_EDITOR, ROLE_SONATA_FOO_ADMIN]
         ROLE_SUPER_ADMIN:       [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     # set access_strategy to unanimous, else you may have unexpected behaviors

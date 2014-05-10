@@ -51,8 +51,8 @@ class AppKernel extends Kernel
      *
      * @return string The charset
      */
-    public function getCharset()
+    /*public function getCharset()
     {
         return 'ISO-8859-1';
-    }
+    }*/
 }

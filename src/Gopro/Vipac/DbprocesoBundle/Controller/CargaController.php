@@ -31,6 +31,10 @@ class CargaController extends Controller
         $mensajes=array();
         $usuario=$this->get('security.context')->getToken()->getUser();
 
+        if(!is_string($usuario)){
+            $usuario=$usuario->getUsername();
+        }
+
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_generico'),array('creado' => 'DESC'));
 

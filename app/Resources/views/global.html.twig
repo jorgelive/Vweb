@@ -2,7 +2,14 @@
 <html>
 <head>
     <title>{% block title %}Bienvenidos!{% endblock title %}</title>
+    {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*' filter='cssrewrite' %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
     {% block stylesheets %}{% endblock stylesheets%}
+    {% javascripts '@GoproVipacMainBundle/Resources/public/js/*' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    {% block javascripts %}{% endblock javascripts %}
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
 </head>
 <body>
@@ -30,9 +37,11 @@
         {% endfor %}
     {% endfor %}
     </div>
-
-{% block container %}{% endblock container %}
+    <div id="container">
+        {% block container %}{% endblock container %}
+    </div>
 {% endblock body %}
-{% block javascripts %}{% endblock javascripts %}
+{% block javascriptsfinal %}{% endblock javascriptsfinal %}
+
 </body>
 </html>

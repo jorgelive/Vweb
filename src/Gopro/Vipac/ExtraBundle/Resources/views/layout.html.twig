@@ -5,3 +5,22 @@
         {% endblock content %}
     </div>
 {% endblock container %}
+
+{% extends "::global.html.twig" %}
+{% block stylesheets %}
+    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock stylesheets%}
+{% block javascripts %}
+    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/*' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock javascripts %}
+{% block container %}
+    <div id="GoproViapacExtraBundle">
+        {% block content %}
+        {% endblock content %}
+    </div>
+{% endblock container %}
+{% block javascriptsfinal %}{% endblock javascriptsfinal %}

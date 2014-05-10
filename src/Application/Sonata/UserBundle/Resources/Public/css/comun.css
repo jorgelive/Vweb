@@ -1,0 +1,10 @@
+div#container div#ApplicationSonataUserBundle{ width:100%}
+div#container div#ApplicationSonataUserBundle div#login{width:300px; margin: 0 auto;}
+
+div#container div#ApplicationSonataUserBundle div#login div#loginForm{padding: 10px; border: 1px solid #444; width:160px; margin: 10px auto; border-radius: 10px; box-shadow: 5px 5px 3px 0px rgba(25,25,25,0.55);}
+div#container div#ApplicationSonataUserBundle div#login div#loginForm form label{font-size: 80%;}
+div#container div#ApplicationSonataUserBundle div#login div#loginForm form input.text{width:95%}
+div#container div#ApplicationSonataUserBundle div#login div#loginForm form input#_submit{width:100%; margin-top:10px;}
+
+div#container div#ApplicationSonataUserBundle div#login div#loginError {width:100%;}
+div#container div#ApplicationSonataUserBundle div#login div#loginError div.loginErrorItem{margin-botom:5px; padding: 2px 15px; border: 1px solid #b92c28; width:100%; border-radius: 10px; color: #b92c28; font-size: 80%;}
