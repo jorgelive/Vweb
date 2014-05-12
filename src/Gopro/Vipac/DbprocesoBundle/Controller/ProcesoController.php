@@ -70,7 +70,7 @@ class ProcesoController extends Controller
             //print_r($procesoArchivo->getColumnaSpecs());
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
-                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
+                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $carga->cargaGenerica();
                 $existente=$carga->getExistente();
                 //print_r($existente);
@@ -149,7 +149,7 @@ class ProcesoController extends Controller
             $mensajes=$procesoArchivo->getMensajes();
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
-                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
+                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $carga->cargaGenerica();
                 $existente=$carga->getExistente();
                 foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
@@ -175,30 +175,5 @@ class ProcesoController extends Controller
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 
-    /**
-     * @Route("/proceso/firma", name="gopro_vipac_dbproceso_proceso_firma")
-     * @Template()
-     */
-    public function firmaAction(Request $request)
-    {
-        $datos = array();
-        $resultado=array();
-        $oficinaChOp =$countries = array('re'=>'reducto','lm'=>'La Mar','cu'=>'Cusco','app'=>'Arequipa');
-        $oficinaCh=array('choices'=>$oficinaChOp,'multiple'=>false,'expanded'=>true);
-
-        $formulario = $this->createFormBuilder($datos)
-            ->add('query', 'text')
-            ->add('oficina', 'choice', $oficinaCh)
-            ->getForm();
-
-        if ($request->isMethod('POST')) {
-            $formulario->handleRequest($request);
-
-            // $data is a simply array with your form fields
-            // like "query" and "category" as defined above.
-            $data = $formulario->getData();
-        }
-        return array('formulario' => $formulario->createView(),'resultado' => $resultado);
-    }
 
 }

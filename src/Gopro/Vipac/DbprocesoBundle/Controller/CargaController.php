@@ -67,7 +67,7 @@ class CargaController extends Controller
                 //print_r($procesoArchivo->getTablaSpecs());
                 //print_r($procesoArchivo->getColumnaSpecs());
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
-                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.default_connection'));
+                $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $carga->cargaGenerica();
                 $mensajes=array_merge($mensajes,$carga->getMensajes());
             }else{

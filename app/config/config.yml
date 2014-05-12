@@ -30,7 +30,7 @@ twig:
 assetic:
     debug:          %kernel.debug%
     use_controller: false
-    bundles:        [ GoproVipacMainBundle, GoproVipacDbprocesoBundle, SonataUserBundle]
+    bundles:        [ GoproVipacMainBundle, GoproVipacDbprocesoBundle, GoproVipacExtraBundle, SonataUserBundle, FOSUserBundle]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -42,13 +42,25 @@ assetic:
 # Doctrine Configuration
 doctrine:
     dbal:
-        driver:   %database_driver%
-        host:     %database_host%
-        port:     %database_port%
-        dbname:   %database_name%
-        user:     %database_user%
-        password: %database_password%
-        charset:  UTF8 #WE8ISO8859P15
+        default_connection: default
+        connections:
+            default:
+                driver:   %database_driver%
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
+
+            vipac:
+                driver:   %database_driver2%
+                host:     %database_host2%
+                port:     %database_port2%
+                dbname:   %database_name2%
+                user:     %database_user2%
+                password: %database_password2%
+                charset:  WE8ISO8859P15
         # if using pdo_sqlite as your database driver, add the path in parameters.yml
         # e.g. database_path: %kernel.root_dir%/data/data.db3
         # path:     %database_path%
@@ -58,6 +70,7 @@ doctrine:
         auto_generate_proxy_classes: %kernel.debug%
         entity_managers:
             default:
+                connection: default
                 auto_mapping: true
                 mappings:
                     gedmo_translatable:
@@ -191,7 +204,7 @@ stof_doctrine_extensions:
 
 
 services:
-    fixUser.listener:
-        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
-        tags:
-            - { name: doctrine.event_listener, event: postConnect }
+#    fixUser.listener:
+#        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
+#        tags:
+#            - { name: doctrine.event_listener, event: postConnect }

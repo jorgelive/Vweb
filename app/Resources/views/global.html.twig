@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Bienvenidos!{% endblock title %}</title>
+    <title>{% block title %}Bienvenidos! - VWeb{% endblock title %}</title>
     {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*' filter='cssrewrite' %}
         <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
@@ -15,7 +15,9 @@
 <body>
 {% block body %}
     <div id="header">
+        <div id='titulo'>{% block titulo %}{% endblock titulo %}</div>
         <div id="loginStatus">
+
             {% if  is_granted("IS_AUTHENTICATED_REMEMBERED") %}
                 {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
                 <a href="{{ path('fos_user_security_logout') }}">
@@ -36,6 +38,11 @@
             </div>
         {% endfor %}
     {% endfor %}
+    </div>
+    <div id='sidebar'>
+        {{ render(controller('GoproVipacMainBundle:Default:sidebar')) }}
+        {% block sidebar %}
+        {% endblock sidebar %}
     </div>
     <div id="container">
         {% block container %}{% endblock container %}

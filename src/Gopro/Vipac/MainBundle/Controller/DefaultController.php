@@ -16,4 +16,20 @@ class DefaultController extends Controller
     {
         return array('name' => 'Vipac');
     }
+
+    /**
+     * @Route("/sidebar")
+     * @Template()
+     */
+    public function sidebarAction()
+    {
+        $items=array(
+            array('nombre'=>'Calculadora','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
+            array('nombre'=>'Cheque','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
+            array('nombre'=>'Cargador Generico','route'=>'gopro_vipac_dbproceso_carga_generico')
+        );
+        return array('items'=> $items);
+    }
+
+
 }
