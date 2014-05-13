@@ -19,8 +19,8 @@ class Variable extends ContainerAware{
             $what[] = "/[+]+/";
             $what[] = "/[*]+/";
             $what[] = "/[,]+/";
-            //$what[] = "/[\/]+/";
-            //$what[] = "/[\\]+/";
+            $what[] = "/[\/]+/";
+            $what[] = "/[\\\\]+/";
             $what[] = "/[?]+/";
             $with=array();
         }

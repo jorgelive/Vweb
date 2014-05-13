@@ -122,7 +122,6 @@ class CargaController extends Controller
                 $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $documentoCp->cargaGenerica();
                 $exiDocumentoCp=$documentoCp->getExistente();
-print_r($procesoArchivo->getValores());
                 $tablaAsiDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'ASIENTO_DE_DIARIO',
@@ -159,16 +158,16 @@ print_r($procesoArchivo->getValores());
                 $exiDi=$di->getExistente();
                 foreach ($exiDi as $key => $valores):
                     $keyArray=explode('|',$key);
-                    $result[$keyArray[0]]['diario'][$keyArray[1]]=$valores;
-                    $result[$keyArray[0]]['asidiario']=$exiAsiDi[$keyArray[0]];
-                    $result[$keyArray[0]]['doccp']=$exiDocumentoCp[$keyArray[0]];
+                    $resultado[$keyArray[0]]['diario'][$keyArray[1]]=$valores;
+                    $resultado[$keyArray[0]]['asidiario']=$exiAsiDi[$keyArray[0]];
+                    $resultado[$keyArray[0]]['doccp']=$exiDocumentoCp[$keyArray[0]];
                     $fechas[]=$exiAsiDi[$keyArray[0]]['FECHA'];
                     $fechas[]=$exiDocumentoCp[$keyArray[0]]['FECHA'];
 
                 endforeach;
                 $i=0;
                 foreach(array_unique($fechas) as $fecha):
-                    $fechaBuscar[$i]['trunc(FECHA)']="trunc(to_date('".$fecha."','dd-mon-yy'))";
+                    $fechaBuscar[$i]['FECHA']=$fecha;
                     $fechaBuscar[$i]['TIPO_CAMBIO']='TCV';
                     $i++;
                 endforeach;
@@ -177,17 +176,17 @@ print_r($procesoArchivo->getValores());
                     'schema'=>'VIAPAC',
                     'nombre'=>'TIPO_CAMBIO_HIST',
                     'tipo'=>'S',
-                    'columnasProceso'=>Array('trunc(FECHA)','TIPO_CAMBIO','MONTO'),
-                    'llaves'=>Array('trunc(FECHA)')
+                    'columnasProceso'=>Array('FECHA','TIPO_CAMBIO','MONTO'),
+                    'llaves'=>Array('FECHA')
                 );
-                $columnaTc['trunc(FECHA)']=array('nombre'=>'trunc(FECHA)','llave'=>'si');
+                $columnaTc['FECHA']=array('nombre'=>'FECHA','llave'=>'si');
                 $columnaTc['TIPO_CAMBIO']=array('nombre'=>'TIPO_CAMBIO','llave'=>'si');//en lista no llave
                 $columnaTc['MONTO']=array('nombre'=>'MONTO','llave'=>'no');
                 $tc=$this->get('gopro_dbproceso_comun_cargador');
                 $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
                 $tc->cargaGenerica();
                 $exiTc=$tc->getExistente();
-
+                print_r($resultado);
                 print_r($exiTc);
                 $mensajes=array_merge($mensajes,array('No existen datos para generar archivo'));
             }else{
