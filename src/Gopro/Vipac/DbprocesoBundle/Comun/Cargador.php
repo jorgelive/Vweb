@@ -55,7 +55,7 @@ class Cargador extends ContainerAware{
 
     private function setExistente(){
         $this->setLlaves();
-        //print_r($this->tablaSpecs);
+        //print_r($this->columnaSpecs);
         $this->keysDiff=array_diff($this->getLlaves(),$this->tablaSpecs['llaves']);
         if(!empty($this->keysDiff)){
             $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condici�n');
@@ -63,22 +63,20 @@ class Cargador extends ContainerAware{
         $existente=array();
         $primaryKeys=array();
         $primaryKeysPH=array();
-
         foreach ($this->valores as $rowNumber => $row):
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])&&$this->columnaSpecs[$col]['llave']=='si'){
                     $primaryKeysPH[$rowNumber][]=$this->columnaSpecs[$col]['nombre'].'= :'.$this->columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor);
-                    $primaryKeys[$rowNumber][$this->columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor)]=$valor;
+                    $primaryKeys[$rowNumber][$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->columnaSpecs[$col]['nombre'].$valor)]=$valor;
 
                 }
             endforeach;
         endforeach;
-
+        //var_dump($primaryKeys);
         if(empty($primaryKeys)||empty($primaryKeysPH)){
             $this->setMensajes('No existe informacion de las llaves primarias');
             return false;
         }
-
         foreach ($primaryKeysPH as $row):
             $wherePH[]='('.implode(' AND ', $row).')';
         endforeach;

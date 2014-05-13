@@ -12,6 +12,7 @@ services:
         class: %cargador.class%
         calls:
             - [ setContainer,[ @service_container ] ]
+        scope: prototype
     gopro_dbproceso_comun_variable:
         class: %variable.class%
         calls:

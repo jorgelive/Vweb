@@ -166,7 +166,7 @@ class ProcesoController extends Controller
                     $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
                     return $respuesta;
                 }
-                $mensajes=array_merge($mensajes,array('No existendatos para generar archivo'));
+                $mensajes=array_merge($mensajes,array('No existen datos para generar archivo'));
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
@@ -174,6 +174,5 @@ class ProcesoController extends Controller
         $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
-
 
 }

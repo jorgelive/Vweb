@@ -1,0 +1,48 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Arreglar Tipo de Cambio{% endblock title %}
+{% block titulo %}Arreglar Tipo de Cambio{% endblock titulo %}
+{% block content %}
+    <div id="carga">
+        <h1>Agregar archivo</h1>
+        <div id="archivosForm">
+            <form action="#" method="post" {{ form_enctype(formulario) }}>
+                {{ form_widget(formulario) }}
+
+                <input type="submit" value="Subir archivo" />
+            </form>
+        </div>
+    </div>
+
+    {% if archivosAlmacenados|default %}
+        <div id="archivos">
+            <h1>Listado de Archivos</h1>
+            <table border="1">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha de Creacion</th>
+                </tr>
+                {% for archivo in archivosAlmacenados %}
+                    <tr>
+                        <td><a href="{{ path('gopro_vipac_dbproceso_carga_arreglartc', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
+                        <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Mensajes del proceso</h1>
+            <ul>
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+{% endblock content %}
+
+
+
+

@@ -79,6 +79,125 @@ class CargaController extends Controller
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
 
+    /**
+     * @Route("/carga/arreglartc/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_arreglartc", defaults={"archivoEjecutar" = null})
+     * @Template()
+     */
+    public function arreglartcAction(Request $request,$archivoEjecutar)
+    {
+        $mensajes=array();
+        $usuario=$this->get('security.context')->getToken()->getUser();
+
+        if(!is_string($usuario)){
+            $usuario=$usuario->getUsername();
+        }
+
+        $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_arreglartc'),array('creado' => 'DESC'));
+
+        $archivo = new Archivo();
+        $formulario = $this->createFormBuilder($archivo)
+            ->add('nombre')
+            ->add('file')
+            ->getForm();
+        $formulario->handleRequest($request);
+        if ($formulario->isValid()){
+            $archivo->setUsuario($usuario);
+            $archivo->setOperacion('carga_arreglartc');
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($archivo);
+            $em->flush();
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_arreglartc'));
+        }
+        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+        if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_arreglartc')===true){
+            $tablaDocCp=array('schema'=>'VIAPAC',"nombre"=>'DOCUMENTOS_CP');
+            $columnaDocCp[0]=array('nombre'=>'ASIENTO','llave'=>'si');
+            $columnaDocCp[1]=array('nombre'=>'MONTO','llave'=>'no');
+            $columnaDocCp[2]=array('nombre'=>'FECHA','llave'=>'no');
+            $procesoArchivo->setParametros($tablaDocCp,$columnaDocCp);
+            $mensajes=$procesoArchivo->getMensajes();
+            if($procesoArchivo->parseExcel()!==false){
+                $documentoCp=$this->get('gopro_dbproceso_comun_cargador');
+                $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+                $documentoCp->cargaGenerica();
+                $exiDocumentoCp=$documentoCp->getExistente();
+print_r($procesoArchivo->getValores());
+                $tablaAsiDi=array(
+                    'schema'=>'VIAPAC',
+                    'nombre'=>'ASIENTO_DE_DIARIO',
+                    'tipo'=>'S',
+                    'columnasProceso'=>Array('ASIENTO','TOTAL_DEBITO_DOL','TOTAL_CREDITO_DOL','TOTAL_CONTROL_DOL','FECHA'),
+                    'llaves'=>Array('ASIENTO')
+                );
+                $columnaAsiDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
+                $columnaAsiDi['TOTAL_DEBITO_DOL']=array('nombre'=>'TOTAL_DEBITO_DOL','llave'=>'no');
+                $columnaAsiDi['TOTAL_CREDITO_DOL']=array('nombre'=>'TOTAL_CREDITO_DOL','llave'=>'no');
+                $columnaAsiDi['TOTAL_CONTROL_DOL']=array('nombre'=>'TOTAL_CONTROL_DOL','llave'=>'no');
+                $columnaAsiDi['FECHA']=array('nombre'=>'FECHA','llave'=>'no');
+                $asiDi=$this->get('gopro_dbproceso_comun_cargador');
+                $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+                $asiDi->cargaGenerica();
+
+                $exiAsiDi=$asiDi->getExistente();
+
+                $tablaDi=array(
+                    'schema'=>'VIAPAC',
+                    'nombre'=>'DIARIO',
+                    'tipo'=>'S',
+                    'columnasProceso'=>Array('ASIENTO','CONSECUTIVO','DEBITO_DOLAR','CREDITO_DOLAR'),
+                    'llaves'=>Array('ASIENTO','CONSECUTIVO')
+                );
+                $columnaDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
+                $columnaDi['CONSECUTIVO']=array('nombre'=>'CONSECUTIVO','llave'=>'no');//no en lista
+                $columnaDi['DEBITO_DOLAR']=array('nombre'=>'DEBITO_DOLAR','llave'=>'no');
+                $columnaDi['CREDITO_DOLAR']=array('nombre'=>'CREDITO_DOLAR','llave'=>'no');
+                $di=$this->get('gopro_dbproceso_comun_cargador');
+                $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+                $di->cargaGenerica();
+
+                $exiDi=$di->getExistente();
+                foreach ($exiDi as $key => $valores):
+                    $keyArray=explode('|',$key);
+                    $result[$keyArray[0]]['diario'][$keyArray[1]]=$valores;
+                    $result[$keyArray[0]]['asidiario']=$exiAsiDi[$keyArray[0]];
+                    $result[$keyArray[0]]['doccp']=$exiDocumentoCp[$keyArray[0]];
+                    $fechas[]=$exiAsiDi[$keyArray[0]]['FECHA'];
+                    $fechas[]=$exiDocumentoCp[$keyArray[0]]['FECHA'];
+
+                endforeach;
+                $i=0;
+                foreach(array_unique($fechas) as $fecha):
+                    $fechaBuscar[$i]['trunc(FECHA)']="trunc(to_date('".$fecha."','dd-mon-yy'))";
+                    $fechaBuscar[$i]['TIPO_CAMBIO']='TCV';
+                    $i++;
+                endforeach;
+
+                $tablaTc=array(
+                    'schema'=>'VIAPAC',
+                    'nombre'=>'TIPO_CAMBIO_HIST',
+                    'tipo'=>'S',
+                    'columnasProceso'=>Array('trunc(FECHA)','TIPO_CAMBIO','MONTO'),
+                    'llaves'=>Array('trunc(FECHA)')
+                );
+                $columnaTc['trunc(FECHA)']=array('nombre'=>'trunc(FECHA)','llave'=>'si');
+                $columnaTc['TIPO_CAMBIO']=array('nombre'=>'TIPO_CAMBIO','llave'=>'si');//en lista no llave
+                $columnaTc['MONTO']=array('nombre'=>'MONTO','llave'=>'no');
+                $tc=$this->get('gopro_dbproceso_comun_cargador');
+                $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
+                $tc->cargaGenerica();
+                $exiTc=$tc->getExistente();
+
+                print_r($exiTc);
+                $mensajes=array_merge($mensajes,array('No existen datos para generar archivo'));
+            }else{
+                $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
+            }
+        }
+        $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
+    }
+
 
 
 
