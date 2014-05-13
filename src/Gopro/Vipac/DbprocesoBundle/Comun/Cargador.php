@@ -210,6 +210,7 @@ class Cargador extends ContainerAware{
         }elseif(isset($insertArray)&&!empty($insertArray)){
             if ($this->tablaSpecs['tipo']=='U'){
                 $this->setMensajes('La linea '.$rowNumber. ' no existe, estamos en modo solo actualizar');
+                return false;
             }
 
             $addQuery='INSERT INTO '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' ('.implode(', ',$this->tablaSpecs['columnas']).') VALUES ('.implode(', ',$insertPH).')';

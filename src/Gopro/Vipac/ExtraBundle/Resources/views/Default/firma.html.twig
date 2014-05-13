@@ -1,4 +1,14 @@
 {% extends 'GoproVipacExtraBundle::layout.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% if css|default %}
+        {{ css | raw}}
+        <style type="text/css">
+            textarea.codigo{ border:#000000 solid 1px; margin:10px; width:600px; height: 600px;}
+        </style>
+    {% endif %}
+{% endblock stylesheets%}
+
 {% block content %}
     <h1>Generador de Firmas</h1>
 
@@ -8,20 +18,11 @@
         <input type="submit" value="Generar" />
     </form>
 
-    {% if resultado|default %}
-        <h1>Listado de Archivos</h1>
-        <table border="1">
-            <tr>
-                <th>Nombre</th>
-                <th>Fecha de Creacion</th>
-            </tr>
-            {% for archivo in archivosAlmacenados %}
-                <tr>
-                    <td><a href="{{ path('gopro_vipac_dbproceso_proceso_calculadora', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
-                    <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+    {% if body|default %}
+        {{ body | raw}}
+        <textarea class="codigo">
+            {{ textarea }}
+        </textarea>
     {% endif %}
 
 {% endblock content %}

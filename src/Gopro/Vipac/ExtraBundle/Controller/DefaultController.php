@@ -28,8 +28,8 @@ class DefaultController extends Controller
             ->add('Nombre', 'text')
             ->add('E-mail', 'text')
             ->add('Cargo', 'text')
-            ->add('Anexo', 'text')
-            ->add('Opcional', 'text')
+            ->add('Anexo', 'text', array('required' => false))
+            ->add('Opcional', 'text', array('required' => false))
             ->add('Oficina', 'choice', $oficinaCh)
             ->add('Idioma', 'choice', $idiomaCh)
             ->getForm();
@@ -46,12 +46,13 @@ $markupOpen.='<head>';
     $markupOpen.='<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
     $css='<style type="text/css">';
         $css.='#firma *{margin: 0; padding: 0; border: 0; }';
-        $css.='#firma { text-align: left; font-family: calibri; font-size: 11px; line-height: 11px;}';
+        $css.='#firma { text-align: left; font-family: calibri; font-size: 11px;}';
         $css.='#firma table, #firma tr, #firma td {padding: 0; border: 0; border-collapse: collapse; }';
         $css.='#firma a { margin: 0; padding: 0; font-family: calibri; text-decoration: none; border: 0;}';
         $css.='#firma a:hover { text-decoration: underline; }';
         $css.='#firma p { color:#474747; margin: 0; padding: 0; font-size: 14px; text-align: justify; text-decoration: none }';
         $css.='#firma .plomo{ color:#474747;}';
+        $css.='#firma .amarillo{ color:#FC0; }';
         $css.='#firma .verde{ color:#060;}';
         $css.='textarea.codigo{ border:#000000 solid 1px; margin-left:10px; width:600px; height: 1000px;}';
     $css.='</style>';
@@ -85,7 +86,7 @@ $body.='<table style="width: 613px;">';
                         $body.='<p style="font-size:13px; text-align:right;'.$temp1.'">';
                             $body.=$this->getTraduccion('local',$data['Oficina']);
                         $body.='</p>';
-                        if (!empty($_POST['opcional'])){
+                        if (!empty($data['Opcional'])){
                             $body.='<p style="font-size:13px; text-align:right;">';
                                 $body.=$data['Opcional'];
                             $body.='</p>';
@@ -132,7 +133,7 @@ $body.='<table style="width: 613px;">';
             $body.='</table>';
         $body.='</td>';
         $body.='<td style="width:465px; margin:0px;">';
-            $body.='<a href="http://vipac.pe/firmas/2014/publi.php?idioma='.$data['Idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/publi/'.$this->getTraduccion('publi',$data['Idioma']).'" style="width:465px; height:70px;" /></a>';
+            $body.='<a href="http://vipac.pe/firmas/2014/publi.php?idioma='.$data['Idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/publi/'.$this->getTraduccion('publi',$data['Idioma']).'" style="display:block; width:465px; height:70px;" /></a>';
         $body.='</td>';
     $body.='</tr>';
     $body.='<tr>';
@@ -149,7 +150,7 @@ $body.='</table>';
 $body.='</div>';
 $markupClose='</body>';
 $markupClose.='</html>';
-            $textarea=$markupOpen.$css.$markupMiddle.$body.$markupClose;
+            $textarea=$this->getTextoSinAcentos($markupOpen.$css.$markupMiddle.$body.$markupClose);
         }
 
 
@@ -182,10 +183,10 @@ $markupClose.='</html>';
 
     }
 
-    function getEntityOfText($text) {
+    function getTextoSinAcentos($text) {
         $reemplazo=array("&aacute;","&eacute;","&iacute;","&oacute;","&uacute;","&uuml;","&ntilde;","&Aacute;","&Eacute;","&Iacute;","&Oacute;","&Uacute;","&Uuml;","&Ntilde;");
         $original = array("á","é","í","ó","ú","ü","ñ","Á","É","Í","Ó","Ú","Ü","Ñ");
-        $text = htmlentities(str_replace($original, $reemplazo, $text));
+        $text = str_replace($original, $reemplazo, $text);
         return $text;
     }
 }

@@ -1,3 +1,7 @@
 div#container div#GoproViapacDbprocesoBundle div#carga{width:400px; margin:10px auto;}
 div#container div#GoproViapacDbprocesoBundle div#carga div#archivosForm form div#form div label{font-size: 80%; display:block;}
 div#container div#GoproViapacDbprocesoBundle div#carga div#archivosForm form div#form div input#form_nombre{width:95%}
+
+div#GoproViapacDbprocesoBundle div#mensajes{margin-top: 10px;}
+div#GoproViapacDbprocesoBundle div#mensajes ul{margin-left: 30px;}
+div#GoproViapacDbprocesoBundle div#archivos{margin-top: 10px;}
