@@ -105,7 +105,7 @@ class Cargador extends ContainerAware{
 
     }
 
-    public function cargaGenerica(){
+    public function ejecutar(){
         $procesar=true;
         if(!isset($this->tablaSpecs['tipo'])||!in_array($this->tablaSpecs['tipo'],Array('S','IU','UI','I','U'))){
             $this->setMensajes('El tipo de proceso no esta establecido o no es correcto');

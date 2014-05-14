@@ -1,1 +1,8 @@
-Hello {{ name }}!
+{% extends 'GoproVipacMainBundle::layout.html.twig' %}
+{% block title %}{{ parent() }}{% endblock title %}
+{% block titulo %}{{ parent() }}{% endblock titulo %}
+{% block content %}
+    Hello {{ name }}!
+{% endblock content %}
+
+

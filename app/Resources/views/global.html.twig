@@ -2,14 +2,19 @@
 <html>
 <head>
     <title>{% block title %}Bienvenidos! - VWeb{% endblock title %}</title>
-    {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*' filter='cssrewrite' %}
-        <link rel="stylesheet" href="{{ asset_url }}" />
-    {% endstylesheets %}
-    {% block stylesheets %}{% endblock stylesheets%}
-    {% javascripts '@GoproVipacMainBundle/Resources/public/js/*' %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-    {% block javascripts %}{% endblock javascripts %}
+
+    {% block stylesheets %}
+        {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*' filter='cssrewrite' %}
+            <link rel="stylesheet" href="{{ asset_url }}" />
+        {% endstylesheets %}
+
+    {% endblock stylesheets%}
+
+    {% block javascripts %}
+        {% javascripts '@GoproVipacMainBundle/Resources/public/js/*' %}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+        {% endjavascripts %}
+    {% endblock javascripts %}
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
 </head>
 <body>
@@ -39,16 +44,19 @@
         {% endfor %}
     {% endfor %}
     </div>
-    <div id='sidebar'>
-        {{ render(controller('GoproVipacMainBundle:Default:sidebar')) }}
-        {% block sidebar %}
-        {% endblock sidebar %}
-    </div>
-    <div id="container">
-        {% block container %}{% endblock container %}
-    </div>
+    <div id='sidebar'>{% block sidebar %}
+            {{ render(controller('GoproVipacMainBundle:Default:sidebar')) }}
+    {% endblock sidebar %}</div>
+
+    <div id="container">{% block container %}{% endblock container %}</div>
 {% endblock body %}
-{% block javascriptsfinal %}{% endblock javascriptsfinal %}
+{% block javascriptsfinal %}
+    <script type="text/javascript">
+        if($('div#sidebar').css('display')=='none'){
+            $('div#container').width('100%');
+        }
+    </script>
+{% endblock javascriptsfinal %}
 
 </body>
 </html>

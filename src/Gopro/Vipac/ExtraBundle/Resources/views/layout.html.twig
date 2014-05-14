@@ -1,18 +1,27 @@
 {% extends "::global.html.twig" %}
+{% block title %}Funciones Extras - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
 {% block stylesheets %}
+    {{ parent() }}
     {% stylesheets '@GoproVipacExtraBundle/Resources/public/css/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock stylesheets%}
 {% block javascripts %}
+    {{ parent() }}
     {% javascripts '@GoproVipacExtraBundle/Resources/public/js/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascripts %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
 {% block container %}
     <div id="GoproViapacExtraBundle">
         {% block content %}
         {% endblock content %}
     </div>
 {% endblock container %}
-{% block javascriptsfinal %}{% endblock javascriptsfinal %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

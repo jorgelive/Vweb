@@ -1,0 +1,25 @@
+{% extends "::global.html.twig" %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets '@GoproUserBundle/Resources/public/css/*' filter='cssrewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock stylesheets%}
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts '@GoproUserBundle/Resources/public/js/*' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock javascripts %}
+{% block title %}Seguridad y autenticación - {{ parent() }}{% endblock title %}
+{% block titulo %}Opciones de seguridad y autenticación{% endblock titulo %}
+{% block sidebar %}{% endblock sidebar %}
+{% block container %}
+    <div id="GoproUserBundle">
+        {% block fos_user_content %}
+        {% endblock fos_user_content %}
+    </div>
+{% endblock container %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

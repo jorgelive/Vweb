@@ -13,5 +13,9 @@ div#header {width: 100%; height: 40px; background: #FCBA15; padding:5px; display
 div#header div#loginStatus {display:block; position: absolute; right:20px;}
 div#header div#loginStatus a{color:#eee;}
 div#header div#loginStatus a:hover{color:#fff;}
+div#sidebar{padding:10px; width:20%; display: inline-block;}
+div#sidebar:empty{display:none;}
+div#sidebar ul{list-style-type: none;}
+div#sidebar ul li{text-align: center; background-color: #999; margin-right: 30px; width: 100%;line-height: 30px;}
 
-div#container{padding:10px; width:100%;}
+div#container{padding:10px; width:75%; display: inline-block;}

@@ -66,16 +66,11 @@ class ProcesoController extends Controller
             $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
             $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
             $mensajes=$procesoArchivo->getMensajes();
-            //print_r($procesoArchivo->getTablaSpecs());
-            //print_r($procesoArchivo->getColumnaSpecs());
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
                 $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
-                $carga->cargaGenerica();
+                $carga->ejecutar();
                 $existente=$carga->getExistente();
-                //print_r($existente);
-                //print_r($procesoArchivo->getValoresIndizados());
-                //$fusion=array_replace_recursive($existente,$procesoArchivo->getValoresIndizados());
                 $valido=true;
                 foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
                     if (!array_key_exists($key, $existente)) {
@@ -150,7 +145,7 @@ class ProcesoController extends Controller
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
                 $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
-                $carga->cargaGenerica();
+                $carga->ejecutar();
                 $existente=$carga->getExistente();
                 foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
                     if (!array_key_exists($key, $existente)) {

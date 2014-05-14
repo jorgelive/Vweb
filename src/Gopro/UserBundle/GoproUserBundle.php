@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Application\Sonata\UserBundle;
+namespace Gopro\UserBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @author <yourname> <youremail>
  */
-class ApplicationSonataUserBundle extends Bundle
+class GoproUserBundle extends Bundle
 {
     /**
      * {@inheritdoc}

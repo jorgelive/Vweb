@@ -23,7 +23,7 @@ class AppKernel extends Kernel
             new Sonata\DoctrineORMAdminBundle\SonataDoctrineORMAdminBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(), 
             new Sonata\UserBundle\SonataUserBundle('FOSUserBundle'), 
-            new Application\Sonata\UserBundle\ApplicationSonataUserBundle(),
+            new Gopro\UserBundle\GoproUserBundle(),
             new Sonata\EasyExtendsBundle\SonataEasyExtendsBundle(),
             new Gopro\ExcelBundle\GoproExcelBundle(),
             new Gopro\Vipac\DbprocesoBundle\GoproVipacDbprocesoBundle(),

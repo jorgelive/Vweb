@@ -1,20 +1,27 @@
 {% extends "::global.html.twig" %}
-{% block title %}Procesos con base de datos{% endblock title %}
+{% block title %}Procesos con base de datos - {{ parent() }}{% endblock title %}
 {% block titulo %}{% endblock titulo %}
 {% block stylesheets %}
+    {{ parent() }}
     {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='cssrewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock stylesheets%}
 {% block javascripts %}
+    {{ parent() }}
     {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascripts %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
 {% block container %}
     <div id="GoproViapacDbprocesoBundle">
         {% block content %}
         {% endblock content %}
     </div>
 {% endblock container %}
-{% block javascriptsfinal %}{% endblock javascriptsfinal %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

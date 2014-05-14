@@ -111,9 +111,9 @@ swiftmailer:
 fos_user:
     db_driver: orm
     firewall_name: main
-    user_class: Application\Sonata\UserBundle\Entity\User
+    user_class: Gopro\UserBundle\Entity\User
     group:
-        group_class: Application\Sonata\UserBundle\Entity\Group
+        group_class: Gopro\UserBundle\Entity\Group
 
 # Sonata Configuration
 sonata_block:
