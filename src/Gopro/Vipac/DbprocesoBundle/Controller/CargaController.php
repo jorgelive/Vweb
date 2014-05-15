@@ -114,7 +114,7 @@ class CargaController extends Controller
             $tablaDocCp=array('schema'=>'VIAPAC',"nombre"=>'DOCUMENTOS_CP');
             $columnaDocCp[0]=array('nombre'=>'ASIENTO','llave'=>'si');
             $columnaDocCp[1]=array('nombre'=>'MONTO','llave'=>'no');
-            $columnaDocCp[2]=array('nombre'=>'FECHA','llave'=>'no');
+            $columnaDocCp[2]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no');
             $columnaDocCp[3]=array('nombre'=>'MONEDA','llave'=>'no');
             $procesoArchivo->setParametros($tablaDocCp,$columnaDocCp);
             $mensajes=$procesoArchivo->getMensajes();
@@ -134,7 +134,6 @@ class CargaController extends Controller
                 $columnaAsiDi['TOTAL_DEBITO_DOL']=array('nombre'=>'TOTAL_DEBITO_DOL','llave'=>'no');
                 $columnaAsiDi['TOTAL_CREDITO_DOL']=array('nombre'=>'TOTAL_CREDITO_DOL','llave'=>'no');
                 $columnaAsiDi['TOTAL_CONTROL_DOL']=array('nombre'=>'TOTAL_CONTROL_DOL','llave'=>'no');
-                $columnaAsiDi['FECHA']=array('nombre'=>'FECHA','llave'=>'no');
                 $asiDi=$this->get('gopro_dbproceso_comun_cargador');
                 $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $asiDi->ejecutar();
@@ -155,14 +154,15 @@ class CargaController extends Controller
                 $di=$this->get('gopro_dbproceso_comun_cargador');
                 $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $di->ejecutar();
+
                 $exiDi=$di->getExistente();
                 foreach ($exiDi as $key => $valores):
                     $keyArray=explode('|',$key);
                     $resultado[$keyArray[0]]['DIARIO'][$keyArray[1]]=$valores;
                     $resultado[$keyArray[0]]['ASIENTO_DE_DIARIO']=$exiAsiDi[$keyArray[0]];
                     $resultado[$keyArray[0]]['DOCUMENTOS_CP']=$exiDocumentoCp[$keyArray[0]];
-                    $fechas[]=$exiAsiDi[$keyArray[0]]['FECHA'];
-                    $fechas[]=$exiDocumentoCp[$keyArray[0]]['FECHA'];
+                    $fechas[]=$exiDocumentoCp[$keyArray[0]]['FECHA_DOCUMENTO'];
+
                 endforeach;
                 $i=0;
                 foreach(array_unique($fechas) as $fecha):
@@ -187,37 +187,42 @@ class CargaController extends Controller
                 $exiTc=$tc->getExistente();
                 foreach ($resultado as $codigoAsiento => $procesoTablas):
                     $procesar='si';
-                    if(!isset($resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA'])||!isset($resultado[$codigoAsiento]['ASIENTO_DE_DIARIO']['FECHA'])){
+                    if(!isset($resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO'])){
                         $mensajes=array_merge($mensajes,array('No existe la fecha para: '.$codigoAsiento));
                         $procesar='no';
                     }else{
-                        if(!isset($exiTc[$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA']])||!isset($exiTc[$resultado[$codigoAsiento]['ASIENTO_DE_DIARIO']['FECHA']])){
-                            $mensajes=array_merge($mensajes,array('No hay tipo de cambio para la fecha para: '.$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA']));
+                        if(!isset($exiTc[$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO']])){
+                            $mensajes=array_merge($mensajes,array('No hay tipo de cambio para la fecha para: '.$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO']));
                             $procesar='no';
                         }else{
-                            $tipoCambioDocumentoCp=$exiTc[$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA']]['MONTO'];
-                            $tipoCambioAsiDi=$exiTc[$resultado[$codigoAsiento]['ASIENTO_DE_DIARIO']['FECHA']]['MONTO'];
+                            $tipoCambio=$exiTc[$resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO']]['MONTO'];
                         }
                     };
                     if($procesar=='si'&& $resultado[$codigoAsiento]['DOCUMENTOS_CP']['MONEDA']!='USD'){
                         $procesar='no';
                         $mensajes=array_merge($mensajes,array('la moneda no es dolar para: '.$codigoAsiento));
                     }
+
                     if($procesar=='si'){
                         foreach($procesoTablas as $tablaNombre => $contenido):
                             if($tablaNombre=='DOCUMENTOS_CP'){
-                                $monto = round($contenido['MONTO']*$tipoCambioDocumentoCp,2);
+                                $monto = round($contenido['MONTO']*$tipoCambio,2);
+                                //echo $monto.'<br>';
                                 $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set MONTO_LOCAL=:MONTO, SALDO_LOCAL=:MONTO, TIPO_CAMBIO_MONEDA=:TC, TIPO_CAMBIO_DOLAR=:TC, TIPO_CAMBIO_PROV=:TC, TIPO_CAMB_ACT_LOC=:TC, TIPO_CAMB_ACT_DOL=:TC, TIPO_CAMB_ACT_PROV=:TC WHERE ASIENTO=:ASIENTO';
                                 $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                 $statement->bindValue('MONTO',$monto);
-                                $statement->bindValue('TC',$tipoCambioDocumentoCp);
+                                $statement->bindValue('TC',$tipoCambio);
                                 $statement->bindValue('ASIENTO',$codigoAsiento);
                                 $statement->execute();
                                 $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para:'.$codigoAsiento));
+
                             }elseif($tablaNombre=='ASIENTO_DE_DIARIO'){
-                                $montoDebito = round($contenido['TOTAL_DEBITO_DOL']*$tipoCambioAsiDi,2);
-                                $montoCredito = round($contenido['TOTAL_CREDITO_DOL']*$tipoCambioAsiDi,2);
-                                $montoControl = round($contenido['TOTAL_CONTROL_DOL']*$tipoCambioAsiDi,2);
+                                $montoDebito = round($contenido['TOTAL_DEBITO_DOL']*$tipoCambio,2);
+                                $montoCredito = round($contenido['TOTAL_CREDITO_DOL']*$tipoCambio,2);
+                                $montoControl = round($contenido['TOTAL_CONTROL_DOL']*$tipoCambio,2);
+                                //echo $montoDebito.'<br>';
+                                //echo $montoCredito.'<br>';
+                                //echo $montoControl.'<br>';
                                 $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set TOTAL_DEBITO_LOC=:TOTAL_DEBITO_LOC, TOTAL_CREDITO_LOC=:TOTAL_CREDITO_LOC, TOTAL_CONTROL_LOC=:TOTAL_CONTROL_LOC WHERE ASIENTO=:ASIENTO';
                                 $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                 $statement->bindValue('TOTAL_DEBITO_LOC',$montoDebito);
@@ -226,10 +231,13 @@ class CargaController extends Controller
                                 $statement->bindValue('ASIENTO',$codigoAsiento);
                                 $statement->execute();
                                 $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para:'.$codigoAsiento));
+
+
                             }elseif($tablaNombre=='DIARIO'){
                                 foreach($contenido as $consecutivo => $item):
                                     if(!empty($item['DEBITO_DOLAR'])){
-                                        $monto = round($item['DEBITO_DOLAR']*$tipoCambioAsiDi,2);
+                                        $monto = round($item['DEBITO_DOLAR']*$tipoCambio,2);
+                                        //echo $monto;
                                         $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set DEBITO_LOCAL=:DEBITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
                                         $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                         $statement->bindValue('DEBITO_LOCAL',$monto);
@@ -237,8 +245,9 @@ class CargaController extends Controller
                                         $statement->bindValue('CONSECUTIVO',$consecutivo);
                                         $statement->execute();
                                         $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
+
                                     }else{
-                                        $monto = round($item['CREDITO_DOLAR']*$tipoCambioAsiDi,2);
+                                        $monto = round($item['CREDITO_DOLAR']*$tipoCambio,2);
                                         $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set CREDITO_LOCAL=:CREDITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
                                         $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                         $statement->bindValue('CREDITO_LOCAL',$monto);
@@ -252,6 +261,7 @@ class CargaController extends Controller
                         endforeach;
                     }
                 endforeach;
+
                 $mensajes=array_merge($mensajes,array('No existen datos para generar archivo'));
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
@@ -260,8 +270,4 @@ class CargaController extends Controller
         $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
     }
-
-
-
-
 }
