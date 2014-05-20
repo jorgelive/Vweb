@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}E-Mail{% endblock title %}</title>
+
+    {% block stylesheets %}
+        {% stylesheets '@GoproVipacMainBundle/Resources/public/css/email/*.css' filter='cssrewrite' %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+        {% endstylesheets %}
+
+    {% endblock stylesheets%}
+
+</head>
+<body>
+{% block body %}{% endblock body %}
+</body>
+</html>

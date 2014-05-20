@@ -1,0 +1,34 @@
+{% extends "::email.html.twig" %}
+{% block title %}Pago de servicios - {{ parent() }}{% endblock title %}
+{% block body %}
+<div id="GoproViapacExtraBundle">
+    <div id="beneficiario">Sres: <div id="nombre">{{ contenido.nombre }}</div></div>
+    <div id="mensajeGlobal">Viajes Pacífico ha realizado la programación de los pagos pendientes que se detallan a continuación</div>
+    <div id="operaciones">
+    {% for operacion in contenido.operaciones %}
+        <div class="operacion">
+            <div class="detalle">
+                {% if operacion.tipo=='T/D' %}
+                     <div class="tipo">Transferencia a su cuenta</div>
+                {% else %}
+                     <div class="tipo">Emision de Cheque</div>
+                {% endif %}
+                <div class="codigo">Codigo de operacion:{{ operacion.tipo }}-{{ operacion.numero }}</div>
+            </div>
+            <table>
+                <tr>
+                    <td>Factura/Boleta</td>
+                    <td>Monto</td>
+                </tr>
+            {% for item in operacion.items %}
+                <tr>
+                    <td>{{ item.CONCEPTO}}</td>
+                    <td>{{ item.MONEDA}} {{ item.MONTO_DESTINO}}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock body %}

@@ -11,7 +11,9 @@ class Cargador extends ContainerAware{
     private $conn;
     private $llaves;
     private $keysDiff;
-    private $existente;
+    private $existenteRaw;
+    private $existenteWhere;
+    private $existenteIndex;
 
     public function setParametros($tablaSpecs,$columnaSpecs,$valores,$conn){
         $this->tablaSpecs=$tablaSpecs;
@@ -25,10 +27,6 @@ class Cargador extends ContainerAware{
         return $this->mensajes;
     }
 
-    public function getExistente(){
-        return $this->existente;
-    }
-
     private function setMensajes($mensaje){
         $this->mensajes[]=$mensaje;
     }
@@ -36,6 +34,31 @@ class Cargador extends ContainerAware{
     private function getLlaves(){
         return $this->llaves;
     }
+
+    private function setExistenteWhere($where){
+        $this->existenteWhere=$where;
+    }
+
+    public function getExistenteWhere(){
+        return $this->existenteWhere;
+    }
+
+    private function setExistenteRaw($datos){
+        $this->existenteRaw=$datos;
+    }
+
+    public function getExistenteRaw(){
+        return $this->existenteRaw;
+    }
+
+    public function getExistenteIndex(){
+        return $this->existenteIndex;
+    }
+
+    private function setExistenteIndex($datos){
+        $this->existenteIndex=$datos;
+    }
+
 
     private function setLlaves(){
         $query[]="SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner";
@@ -53,7 +76,7 @@ class Cargador extends ContainerAware{
         $this->llaves=$keyInTable;
     }
 
-    private function setExistente(){
+    private function setExistentes(){
         $this->setLlaves();
         //print_r($this->columnaSpecs);
         $this->keysDiff=array_diff($this->getLlaves(),$this->tablaSpecs['llaves']);
@@ -80,7 +103,8 @@ class Cargador extends ContainerAware{
         foreach ($primaryKeysPH as $row):
             $wherePH[]='('.implode(' AND ', $row).')';
         endforeach;
-        $selectQuery='SELECT '.implode(', ',$this->tablaSpecs['columnasProceso']).' FROM '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' WHERE '.implode(' OR ', $wherePH);
+        $this->setExistenteWhere(implode(' OR ', $wherePH));
+        $selectQuery='SELECT '.implode(', ',$this->tablaSpecs['columnasProceso']).' FROM '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' WHERE '.$this->getExistenteWhere();
 
         $statement = $this->conn->prepare($selectQuery);
         //echo ($selectQuery);
@@ -92,8 +116,9 @@ class Cargador extends ContainerAware{
 
         $statement->execute();
         $registro=$statement->fetchAll();
+        $this->setExistenteRaw($registro);
         //print_r($tablaSpecs);
-        foreach($registro as $linea):
+        foreach($this->getExistenteRaw() as $linea):
             $identArray=array();
             foreach($this->tablaSpecs['llaves'] as $llave):
                 $identArray[]=$linea[$llave];
@@ -101,7 +126,9 @@ class Cargador extends ContainerAware{
             $existente[implode('|',$identArray)]=$linea;
         endforeach;
 
-        $this->existente = $existente;
+        $this->setExistenteIndex($existente);
+
+
 
     }
 
@@ -130,7 +157,7 @@ class Cargador extends ContainerAware{
         if($procesar===false){
             return false;
         }
-        $this->setExistente();
+        $this->setExistentes();
         if(empty($this->keysDiff)&&$this->tablaSpecs['tipo']!='S'){
             $this->setMensajes('Se realizo la busqueda, se ejecutan los procesos de escritura');
             $this->dbProcess();
@@ -145,7 +172,7 @@ class Cargador extends ContainerAware{
     }
 
     public function dbProcess(){
-        if(empty($this->existente)&&$this->tablaSpecs['tipo']!='I'){
+        if(empty($this->getExistenteIndex())&&$this->tablaSpecs['tipo']!='I'){
             $this->setMensajes('Solo se permite inserciones con tipo I');
             return false;
         }
@@ -182,15 +209,15 @@ class Cargador extends ContainerAware{
     private function dbRowProcess($rowNumber,$wherePH,$whereArray,$actPH,$actArray,$insertPH,$insertArray){
 
         $busqueda=implode('|',$whereArray);
-        if(array_key_exists($busqueda,$this->existente)===true){
+        if(array_key_exists($busqueda,$this->getExistenteIndex())===true){
             if($this->tablaSpecs['tipo']=='I'){
                 $this->setMensajes('La linea '.$rowNumber.' ya existe, estamos en modo solo insertar');
                 return false;
             }
             foreach ($whereArray as $whereKey => $whereValor):
-                unset($this->existente[$busqueda][$whereKey]);
+                unset($this->getExistenteIndex()[$busqueda][$whereKey]);
             endforeach;
-            $diferencia=array_diff_assoc($this->existente[$busqueda],$actArray);
+            $diferencia=array_diff_assoc($this->getExistenteIndex()[$busqueda],$actArray);
             if(empty($diferencia)){
                 $this->setMensajes('Nada que actualizar para la linea: '.$rowNumber);
                 return true;

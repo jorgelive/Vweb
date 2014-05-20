@@ -122,7 +122,7 @@ class CargaController extends Controller
                 $documentoCp=$this->get('gopro_dbproceso_comun_cargador');
                 $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $documentoCp->ejecutar();
-                $exiDocumentoCp=$documentoCp->getExistente();
+                $exiDocumentoCp=$documentoCp->getExistenteIndex();
                 $tablaAsiDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'ASIENTO_DE_DIARIO',
@@ -138,7 +138,7 @@ class CargaController extends Controller
                 $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $asiDi->ejecutar();
 
-                $exiAsiDi=$asiDi->getExistente();
+                $exiAsiDi=$asiDi->getExistenteIndex();
 
                 $tablaDi=array(
                     'schema'=>'VIAPAC',
@@ -155,7 +155,7 @@ class CargaController extends Controller
                 $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $di->ejecutar();
 
-                $exiDi=$di->getExistente();
+                $exiDi=$di->getExistenteIndex();
                 foreach ($exiDi as $key => $valores):
                     $keyArray=explode('|',$key);
                     $resultado[$keyArray[0]]['DIARIO'][$keyArray[1]]=$valores;
@@ -184,7 +184,7 @@ class CargaController extends Controller
                 $tc=$this->get('gopro_dbproceso_comun_cargador');
                 $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
                 $tc->ejecutar();
-                $exiTc=$tc->getExistente();
+                $exiTc=$tc->getExistenteIndex();
                 foreach ($resultado as $codigoAsiento => $procesoTablas):
                     $procesar='si';
                     if(!isset($resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO'])){
