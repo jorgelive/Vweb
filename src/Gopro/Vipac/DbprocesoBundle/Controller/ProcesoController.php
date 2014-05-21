@@ -112,10 +112,8 @@ class ProcesoController extends Controller
         if(!is_string($usuario)){
             $usuario=$usuario->getUsername();
         }
-
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'proceso_calculadora'),array('creado' => 'DESC'));
-
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
             ->add('nombre')

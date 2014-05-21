@@ -220,9 +220,6 @@ class CargaController extends Controller
                                 $montoDebito = round($contenido['TOTAL_DEBITO_DOL']*$tipoCambio,2);
                                 $montoCredito = round($contenido['TOTAL_CREDITO_DOL']*$tipoCambio,2);
                                 $montoControl = round($contenido['TOTAL_CONTROL_DOL']*$tipoCambio,2);
-                                //echo $montoDebito.'<br>';
-                                //echo $montoCredito.'<br>';
-                                //echo $montoControl.'<br>';
                                 $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set TOTAL_DEBITO_LOC=:TOTAL_DEBITO_LOC, TOTAL_CREDITO_LOC=:TOTAL_CREDITO_LOC, TOTAL_CONTROL_LOC=:TOTAL_CONTROL_LOC WHERE ASIENTO=:ASIENTO';
                                 $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                 $statement->bindValue('TOTAL_DEBITO_LOC',$montoDebito);
@@ -231,32 +228,45 @@ class CargaController extends Controller
                                 $statement->bindValue('ASIENTO',$codigoAsiento);
                                 $statement->execute();
                                 $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para:'.$codigoAsiento));
-
-
                             }elseif($tablaNombre=='DIARIO'){
-                                foreach($contenido as $consecutivo => $item):
-                                    if(!empty($item['DEBITO_DOLAR'])){
-                                        $monto = round($item['DEBITO_DOLAR']*$tipoCambio,2);
-                                        //echo $monto;
-                                        $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set DEBITO_LOCAL=:DEBITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
-                                        $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
-                                        $statement->bindValue('DEBITO_LOCAL',$monto);
-                                        $statement->bindValue('ASIENTO',$codigoAsiento);
-                                        $statement->bindValue('CONSECUTIVO',$consecutivo);
-                                        $statement->execute();
-                                        $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
+                                asort($contenido);
+                                if(empty($contenido[1]['CREDITO_DOLAR'])){
+                                    $mensajes=array_merge($mensajes,array('No se actualiza: '.$tablaNombre.', para:'.$codigoAsiento.', el primer item no es credito'));
+                                }else{
+                                    $contador=1;
+                                    foreach($contenido as $consecutivo => $item):
+                                        if(empty($item['DEBITO_DOLAR'])){
+                                            $monto = round($item['CREDITO_DOLAR']*$tipoCambio,2);
+                                            $montoTotalCredito=$monto;
+                                            $montoTotalDebito=0;
+                                            $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set CREDITO_LOCAL=:CREDITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
+                                            $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
+                                            $statement->bindValue('CREDITO_LOCAL',$monto);
+                                            $statement->bindValue('ASIENTO',$codigoAsiento);
+                                            $statement->bindValue('CONSECUTIVO',$consecutivo);
+                                            $statement->execute();
+                                            $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
 
-                                    }else{
-                                        $monto = round($item['CREDITO_DOLAR']*$tipoCambio,2);
-                                        $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set CREDITO_LOCAL=:CREDITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
-                                        $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
-                                        $statement->bindValue('CREDITO_LOCAL',$monto);
-                                        $statement->bindValue('ASIENTO',$codigoAsiento);
-                                        $statement->bindValue('CONSECUTIVO',$consecutivo);
-                                        $statement->execute();
-                                        $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
-                                    }
-                                endforeach;
+                                        }else{
+                                            if(count($contenido)==$contador){
+                                                $monto=$montoTotalCredito-$montoTotalDebito;
+                                            }else{
+                                                $monto = round($item['DEBITO_DOLAR']*$tipoCambio,2);
+                                                $montoTotalDebito=$montoTotalDebito+$monto;
+                                            }
+                                            $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set DEBITO_LOCAL=:DEBITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
+                                            $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
+                                            $statement->bindValue('DEBITO_LOCAL',$monto);
+                                            $statement->bindValue('ASIENTO',$codigoAsiento);
+                                            $statement->bindValue('CONSECUTIVO',$consecutivo);
+                                            $statement->execute();
+                                            $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
+
+
+                                        }
+                                        $contador++;
+                                    endforeach;
+                                }
                             }
                         endforeach;
                     }
