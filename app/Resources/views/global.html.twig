@@ -4,7 +4,7 @@
     <title>{% block title %}Bienvenidos! - VWeb{% endblock title %}</title>
 
     {% block stylesheets %}
-        {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*.css' filter='cssrewrite' %}
+        {% stylesheets '@GoproVipacMainBundle/Resources/public/css/*' filter='cssrewrite' %}
             <link rel="stylesheet" href="{{ asset_url }}" />
         {% endstylesheets %}
 

@@ -29,7 +29,7 @@ twig:
 # Assetic Configuration
 assetic:
     debug:          %kernel.debug%
-    use_controller: false
+    use_controller: true
     bundles:        [ GoproVipacMainBundle, GoproVipacDbprocesoBundle, GoproVipacExtraBundle, SonataUserBundle, FOSUserBundle]
     #java: /usr/bin/java
     filters:

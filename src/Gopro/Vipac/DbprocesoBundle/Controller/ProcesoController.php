@@ -133,20 +133,14 @@ class ProcesoController extends Controller
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'proceso_calculadora')===true){
             $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
-            /*$columnaspecs[0]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
-            $columnaspecs[1]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
-            $columnaspecs[2]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
-            $columnaspecs[3]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
-            $columnaspecs[4]=array('nombre'=>'NUM_PAX','llave'=>'no');
-            $columnaspecs[5]=array('nombre'=>'LLEGADA','llave'=>'no');
-            $columnaspecs[6]=array('nombre'=>'SALIDA','llave'=>'no');*/
             $procesoArchivo->setParametros($tablaSpecs,null);
             $mensajes=$procesoArchivo->getMensajes();
+
             if($procesoArchivo->parseExcel()!==false){
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
                 $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $carga->ejecutar();
-                $existente=$carga->getExistente();
+                $existente=$carga->getExistenteIndex();
                 foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
                     if (!array_key_exists($key, $existente)) {
                         $mensajes=array_merge($mensajes,array('El valor '.$key.' no se encuentra en la base de datos'));

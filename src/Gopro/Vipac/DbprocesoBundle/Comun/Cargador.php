@@ -89,8 +89,8 @@ class Cargador extends ContainerAware{
         foreach ($this->valores as $rowNumber => $row):
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])&&$this->columnaSpecs[$col]['llave']=='si'){
-                    $primaryKeysPH[$rowNumber][]=$this->columnaSpecs[$col]['nombre'].'= :'.$this->columnaSpecs[$col]['nombre'].$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($valor);
-                    $primaryKeys[$rowNumber][$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->columnaSpecs[$col]['nombre'].$valor)]=$valor;
+                    $primaryKeysPH[$rowNumber][]=$this->columnaSpecs[$col]['nombre'].'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->columnaSpecs[$col]['nombre'].$valor)),0,28);
+                    $primaryKeys[$rowNumber]['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->columnaSpecs[$col]['nombre'].$valor)),0,28)]=$valor;
 
                 }
             endforeach;
