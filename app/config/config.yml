@@ -202,6 +202,11 @@ stof_doctrine_extensions:
             tree: true
             timestampable: true
 
+sonata_user:
+    class:                  # Entity Classes
+        user:               Gopro\UserBundle\Entity\User
+        group:              Gopro\UserBundle\Entity\Group
+
 
 services:
 #    fixUser.listener:
