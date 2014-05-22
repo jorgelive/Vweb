@@ -1,0 +1,88 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Calculadora de centros de costo por número de File{% endblock title %}
+{% block titulo %}Calculadora de centros de costo por número de Reserva{% endblock titulo %}
+{% block content %}
+    <div id="carga">
+        <h1>Agregar archivo</h1>
+        <div id="archivosForm">
+            <form action="#" method="post" {{ form_enctype(formulario) }}>
+                {{ form_widget(formulario) }}
+
+                <input type="submit" value="Subir archivo" />
+            </form>
+        </div>
+    </div>
+
+    {% if archivosAlmacenados|default %}
+        <div id="archivos">
+            <h1>Listado de Archivos</h1>
+            <table id="listado" border="1">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha de Creacion</th>
+                    <th>Acciones</th>
+                </tr>
+                {% for archivo in archivosAlmacenados %}
+                    <tr rel="{{ archivo.id }}">
+                        <td>{{ archivo.nombre }}</td>
+                        <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_calxfile', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="ajaxLink" rel="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_proceso_borrar') }}">Borrar</a>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Mensajes del proceso</h1>
+            <ul>
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+{% endblock content %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+    <script>
+        $( ".ajaxLink" ).click(function(event) {
+            event.preventDefault();
+            var id = $(this).prop('rel');
+            var url = $(this).prop( "href" );
+            //alert(url);
+            var posting = $.post( url, { id: id } );
+            //$("#archivos #listado tr[rel="+id+"]").remove();
+
+            posting.done(function( data ) {
+            //  var content = $( data ).find( "#content" );
+                if(!data.hasOwnProperty('exito')){
+                    alert ('El servidor no devolvio la respueta esperada')
+                    return false;
+                }
+                if(!data.hasOwnProperty('mensaje')){
+                    alert ('El servidor no devolvio mensaje')
+                    return false;
+                }
+                if(data.exito=='si'){
+                    $("#archivos #listado tr[rel="+id+"]").remove();
+                }else{
+                    //alert(data.mensaje);
+
+                };
+                $("#sessionFlash").empty().append(data.mensaje);
+            //
+            });
+        });
+    </script>
+{% endblock javascriptsfinal %}
+
+
+
+
+

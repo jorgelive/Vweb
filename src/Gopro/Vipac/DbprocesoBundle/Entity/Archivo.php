@@ -111,12 +111,9 @@ class Archivo
         if (null === $this->getFile()) {
             return;
         }
-
-        // check if we have an old image
         if (isset($this->temp)) {
             // delete the old image
             unlink($this->temp);
-            // clear the temp image path
             $this->temp = null;
         }
 
@@ -172,8 +169,6 @@ class Archivo
     {
         return 'carga/archivos';
     }
-
-
 
     /**
      * Get id
