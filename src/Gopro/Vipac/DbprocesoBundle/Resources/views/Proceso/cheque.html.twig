@@ -16,18 +16,26 @@
     {% if archivosAlmacenados|default %}
         <div id="archivos">
             <h1>Listado de Archivos</h1>
-
-            <table border="1">
+            <table id="listado">
+                <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Fecha de Creacion</th>
+                    <th>Fecha de creación</th>
+                    <th>Acciones</th>
                 </tr>
+                </thead>
+                <tbody>
                 {% for archivo in archivosAlmacenados %}
-                    <tr>
-                        <td><a href="{{ path('gopro_vipac_dbproceso_proceso_cheque', {'archivoEjecutar': archivo.id}) }}">{{ archivo.nombre }}</a></td>
+                    <tr rel="{{ archivo.id }}">
+                        <td class="nombre">{{ archivo.nombre }}</td>
                         <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_cheque', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="ajaxLink" rel="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_proceso_borrararchivo') }}">Borrar</a>
+                        </td>
                     </tr>
                 {% endfor %}
+                </tbody>
             </table>
         </div>
     {% endif %}

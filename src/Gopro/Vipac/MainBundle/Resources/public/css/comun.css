@@ -10,12 +10,16 @@ a:hover{text-decoration: underline;}
 body {color:#444; font-family: "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; font-size: 80%;}
 
 div#header {width: 100%; height: 40px; background: #FCBA15; padding:5px; display:block; position: relative; }
-div#header div#loginStatus {display:block; position: absolute; right:20px;}
+div#header div#titulo{color: #fff; margin-left: 10px;}
+div#header div#loginStatus {display:block; position: absolute; top: 0px; right:20px;}
 div#header div#loginStatus a{color:#eee;}
 div#header div#loginStatus a:hover{color:#fff;}
-div#sidebar{padding:10px; width:20%; display: inline-block;}
+div#sessionFlash{ display:block; width: 250px; margin: 10px auto;}
+div#sidebar{padding:10px; width:200px; display: inline-block; margin-right: 10px;}
 div#sidebar:empty{display:none;}
-div#sidebar ul{list-style-type: none;}
-div#sidebar ul li{text-align: center; background-color: #999; margin-right: 30px; width: 100%;line-height: 30px;}
+div#sidebar ul{ font-size: 80%; list-style-type: none;}
+div#sidebar ul li{width: 100%;line-height: 30px;}
+div#sidebar ul li a{font-weight: bold; color: #444; border: 1px #999 solid; display: block; padding: 2px 5px; margin: 5px; text-align: center; width: 100%;line-height: 30px; background: #a6c9e2}
+div#sidebar ul li a:hover{text-decoration: none;  border: 1px #444 solid;}
 
 div#container{padding:10px; width:75%; display: inline-block;}

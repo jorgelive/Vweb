@@ -6,6 +6,7 @@ use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -132,7 +133,7 @@ class ProcesoController extends Controller
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'proceso_calxfile')===true){
-            $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
+            $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_PRINCIPAL_MERCADO');
             $procesoArchivo->setParametros($tablaSpecs,null);
             $mensajes=$procesoArchivo->getMensajes();
 
@@ -194,7 +195,7 @@ class ProcesoController extends Controller
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'proceso_calxreserva')===true){
-            $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
+            $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_SERVICIOS_MERCADO');
             $procesoArchivo->setParametros($tablaSpecs,null);
             $mensajes=$procesoArchivo->getMensajes();
 
@@ -227,15 +228,42 @@ class ProcesoController extends Controller
     }
 
     /**
-     * @Route("/proceso/borrar", name="gopro_vipac_dbproceso_proceso_borrar")
+     * @Route("/proceso/borrararchivo", name="gopro_vipac_dbproceso_proceso_borrararchivo")
      * @Method({"POST"})
      * @Template()
      */
-    public function borrarAction(Request $request)
+    public function borrarArchivoAction(Request $request)
     {
         if (!$request->isXMLHttpRequest()){
+            throw new NotFoundHttpException("No se encontro la página");
+        }
 
+        $usuario=$this->get('security.context')->getToken()->getUser();
+        if(!is_string($usuario)){
+            $usuario=$usuario->getUsername();
+        }
+        $em = $this->getDoctrine()->getManager();
+        $archivo = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($request->request->get('id'));
 
+        if(empty($archivo)||$archivo->getUsuario()!=$usuario){
+            return new JsonResponse(array('exito'=>'no','mensaje'=>'No existe el archivo'));
+
+        }
+        $em->remove($archivo);
+        $em->flush();
+        return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
+    }
+
+    //TODO: implementar funcion
+    /**
+     * @Route("/proceso/editararchivo", name="gopro_vipac_dbproceso_proceso_editararchivo")
+     * @Method({"POST"})
+     * @Template()
+     */
+    public function editarArchivoAction(Request $request)
+    {
+        if (!$request->isXMLHttpRequest()){
+            throw new NotFoundHttpException("No se encontro la página");
         }
 
         $usuario=$this->get('security.context')->getToken()->getUser();

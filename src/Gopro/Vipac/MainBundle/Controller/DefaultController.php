@@ -24,7 +24,8 @@ class DefaultController extends Controller
     public function sidebarAction()
     {
         $items=array(
-            array('nombre'=>'Calculadora','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
+            array('nombre'=>'Calculadora por File','route'=>'gopro_vipac_dbproceso_proceso_calxfile'),
+            array('nombre'=>'Calculadora por Reserva','route'=>'gopro_vipac_dbproceso_proceso_calxreserva'),
             array('nombre'=>'Cheque','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
             array('nombre'=>'Cargador Generico','route'=>'gopro_vipac_dbproceso_carga_generico')
         );

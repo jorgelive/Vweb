@@ -20,7 +20,7 @@
 <body>
 {% block body %}
     <div id="header">
-        <div id='titulo'>{% block titulo %}{% endblock titulo %}</div>
+        <div id='titulo'><h1>{% block titulo %}{% endblock titulo %}</h1></div>
         <div id="loginStatus">
 
             {% if  is_granted("IS_AUTHENTICATED_REMEMBERED") %}

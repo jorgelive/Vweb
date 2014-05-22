@@ -1,5 +1,5 @@
 <ul>
     {% for item in items %}
-    <li>{{ item.nombre }}</li>
+    <li><a href="{{ path(item.route) }}">{{ item.nombre }}</a></li>
     {% endfor %}
 </ul>
