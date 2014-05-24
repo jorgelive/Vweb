@@ -11,7 +11,7 @@ class TransferenciaCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('extra:enviartransferencia')
+        $this->setName('extra:transferenciacb')
             ->setDescription('Enviar correos sobre operación');
     }
 
@@ -48,6 +48,7 @@ class TransferenciaCommand extends ContainerAwareCommand
                 'BENEFICIARIO',
                 'CONCEPTO',
                 'TIPO_MOV',
+                'CONTRIBUYENTE',
                 'PROVEEDOR',
                 'NOMBRE',
                 'ALIAS',
@@ -62,27 +63,39 @@ class TransferenciaCommand extends ContainerAwareCommand
         $columnaDT['NUMERO_ORIGEN']=array('nombre'=>'NUMERO_ORIGEN','llave'=>'si');
         $datosTransferencia->setParametros($tablaDT,$columnaDT,$datos->getExistenteRaw(),$this->getContainer()->get('doctrine.dbal.vipac_connection'));
         $datosTransferencia->ejecutar();
-        foreach($datosTransferencia->getExistenteRaw() as $linea):
-            $mails[$linea['PROVEEDOR']]['email']=$linea['E_MAIL'];
-            $mails[$linea['PROVEEDOR']]['nombre']=$linea['NOMBRE'];
-            $mails[$linea['PROVEEDOR']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['tipo']=$linea['TIPO_ORIGEN'];
-            $mails[$linea['PROVEEDOR']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['numero']=$linea['NUMERO_ORIGEN'];
-            $mails[$linea['PROVEEDOR']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['items'][$linea['CONSECUTIVO']]=$linea;
+        $resultado = $this->getContainer()->get('gopro_dbproceso_comun_variable')->utf($datosTransferencia->getExistenteRaw());
+
+        foreach($resultado as $linea):
+            if(!empty(trim($linea['E_MAIL']))){
+                $mails[$linea['CONTRIBUYENTE']]['email'][]=trim($linea['E_MAIL']);
+            }
+            if(!isset($mails[$linea['CONTRIBUYENTE']]['nombre'])){
+                $mails[$linea['CONTRIBUYENTE']]['nombre']=trim($linea['NOMBRE']);
+            }
+            if(!isset($mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['tipo'])){
+                $mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['tipo']=$linea['TIPO_ORIGEN'];
+            }
+            if(!isset($mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['numero'])){
+                $mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['numero']=$linea['NUMERO_ORIGEN'];
+            }
+            if(!isset($mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['items'][$linea['CONSECUTIVO']])){
+                $mails[$linea['CONTRIBUYENTE']]['operaciones'][$linea['TIPO_ORIGEN'].'|'.$linea['NUMERO_ORIGEN']]['items'][$linea['CONSECUTIVO']]=$linea;
+            }
         endforeach;
 
         foreach ($mails as $mail):
             $mailAdressCco=$this->getContainer()->getParameter('mailer.cco');
-            if(!empty($mail['email'])){
+            if(isset($mail['email'])&&count($mail['email'])!=0){
                 $mailAddress=$mail['email'];
             }else{
-                $mailAddress=$mailAdressCco;
+                $mailAddress=array($mailAdressCco);
             }
-            $mailAdressCco='jgomez@vipac.pe';
-            $mailAddress='jgomez@vipac.pe';
+            //$mailAdressCco='jgomez@vipac.pe';
+            //$mailAddress=array('jgomez@vipac.pe');
             $mensage = \Swift_Message::newInstance()
                 ->setSubject('Programacion de Pago')
                 ->setFrom(array($this->getContainer()->getParameter('mailer_user') => 'Contabilidad Viajes Pacífico'))
-                ->setTo($mailAddress)
+                ->setTo(array_unique($mailAddress))
                 ->setBcc($mailAdressCco)
                 ->setContentType("text/html")
                 ->setBody(
@@ -92,12 +105,11 @@ class TransferenciaCommand extends ContainerAwareCommand
                     )
                 )
             ;
-            $this->getContainer()->get('mailer')->send($mensage);
-            $output->writeln('Se ha realizado el envio a: '.$mail['nombre'].' con e-mail: '.$mailAddress);
-            //$output->writeln(print_r($mail));
+            //$this->getContainer()->get('mailer')->send($mensage);
+            $output->writeln('Se ha realizado el envio a: '.$mail['nombre'].' con e-mail: '.implode(', ',array_unique($mailAddress)));
         endforeach;
 
-        //$output->writeln('Se ha realizado el envio');
+        $output->writeln(print_r($datosTransferencia->getWhereSelectValores()));
     }
 }
 

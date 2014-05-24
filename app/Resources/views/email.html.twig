@@ -2,28 +2,24 @@
 <html>
 <head>
     <title>{% block title %}E-Mail{% endblock title %}</title>
-    <style type="text/css">
-        #header {background:#FCBA15; width:100%;height: 40px;}
-        #GoproViapacExtraBundle {width:100%;}
-        #GoproViapacExtraBundle #beneficiario {width:100%;}
-        #GoproViapacExtraBundle #beneficiario #nombre{ font-weight:bold; display:inline;}
-        #GoproViapacExtraBundle #mensajeGlobal{width:100%; margin-bottom: 10px;}
-        #GoproViapacExtraBundle #operaciones{width:100%;}
-        #GoproViapacExtraBundle #operaciones .operacion{ border: 1px solid #666; margin: 10px; padding:10px; width:100%;}
-        #GoproViapacExtraBundle #operaciones .operacion .detalle {width:100%;}
-        #GoproViapacExtraBundle #operaciones .operacion .detalle .tipo {font-weight:bold; float:left; width:45%;}
-        #GoproViapacExtraBundle #operaciones .operacion .detalle .codigo {float:right; width:45%;}
-        #GoproViapacExtraBundle #operaciones .operacion table.contenido {width:100%; border: 1px solid #666;}
-        #GoproViapacExtraBundle #operaciones .operacion table.contenido, #GoproViapacExtraBundle #operaciones .operacion table.contenido tr, #GoproViapacExtraBundle #operaciones .operacion table.contenido tr td{ padding:0; margin:0;}
-        #GoproViapacExtraBundle #operaciones .operacion table.contenido tr td{padding: 5px;}
-        #GoproViapacExtraBundle #operaciones .operacion table.contenido tr.tableHeader td{font-weight: bold;}
-    </style>
-
+    {% block stylesheets %}
+        <style type="text/css">
+            #header {border:#FCBA15 1px solid; width:90%; height: 110px; margin-bottom: 10px; padding:5px;}
+            #header #logo {width: 200px;}
+            #header #content {color:#FCBA15; width: 300px;}
+            #contenedor {width: 90%;}
+        </style>
+    {% endblock stylesheets %}
 </head>
 <body>
 <div id="header">
-
+    <span id="logo"><img width=175 height=100 src="http://vipac.pe/img/logo_175_100.png" /></span>
+    <span id="content">
+        {% block header %}{% endblock header %}
+    </span>
 </div>
+<div id="contenedor">
 {% block body %}{% endblock body %}
+</div>
 </body>
 </html>

@@ -1,7 +1,32 @@
 {% extends "::email.html.twig" %}
 {% block title %}Pago de servicios - {{ parent() }}{% endblock title %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style type="text/css">
+        #GoproViapacExtraBundle #noEnviado {margin:5px; padding: 5px; border: 2px solid #cc0000;}
+        #GoproViapacExtraBundle #beneficiario {width:100%;}
+        #GoproViapacExtraBundle #beneficiario #nombre { margin-bottom:10px; font-weight:bold; display:inline;}
+        #GoproViapacExtraBundle #mensajeGlobal {width:100%; margin-bottom: 10px;}
+        #GoproViapacExtraBundle #operaciones {width:100%;}
+        #GoproViapacExtraBundle #operaciones .operacion{ border: 1px solid #666; margin: 10px; padding:10px; width:100%;}
+        #GoproViapacExtraBundle #operaciones .operacion .detalle {width:100%;}
+        #GoproViapacExtraBundle #operaciones .operacion .detalle .tipo {font-weight:bold; float:left; width:45%;}
+        #GoproViapacExtraBundle #operaciones .operacion .detalle .codigo {float:right; width:45%;}
+        #GoproViapacExtraBundle #operaciones .operacion table.contenido {width:100%; border: 1px solid #666;}
+        #GoproViapacExtraBundle #operaciones .operacion table.contenido, #GoproViapacExtraBundle #operaciones .operacion table.contenido tr, #GoproViapacExtraBundle #operaciones .operacion table.contenido tr td{ padding:0; margin:0;}
+        #GoproViapacExtraBundle #operaciones .operacion table.contenido tr{border-bottom: 1px solid #666;}
+        #GoproViapacExtraBundle #operaciones .operacion table.contenido tr td{padding: 5px;}
+        #GoproViapacExtraBundle #operaciones .operacion table.contenido tr.tableHeader td{font-weight: bold;}
+    </style>
+{% endblock stylesheets %}
+{% block header %}
+    <h1>Pago de proveedores</h1>
+{% endblock header %}
 {% block body %}
 <div id="GoproViapacExtraBundle">
+    {% if contenido.email|default is empty %}
+        <div id="noEnviado">No enviado: No esta ingresada la dirección del destinatario en Exactus</div>
+    {% endif %}
     <div id="beneficiario">Sres: <div id="nombre">{{ contenido.nombre }}</div></div>
     <div id="mensajeGlobal">Viajes Pacífico ha realizado la programación de los pagos pendientes que se detallan a continuación</div>
     <div id="operaciones">
@@ -25,7 +50,7 @@
             {% for item in operacion.items %}
                 <tr>
                     <td>{{ item.CONCEPTO}}</td>
-                    <td>{{ item.MONEDA}} {{ item.MONTO_DESTINO}}</td>
+                    <td>{{ item.MONEDA}}. {{ item.MONTO_DESTINO}}</td>
                 </tr>
             {% endfor %}
             </table>
