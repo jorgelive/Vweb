@@ -9,7 +9,6 @@ class Cargador extends ContainerAware{
     private $columnaSpecs;
     private $valores;
     private $conn;
-    private $llaves;
     private $keysDiff;
     private $existenteRaw;
     private $existenteIndex;
@@ -103,8 +102,8 @@ class Cargador extends ContainerAware{
         $this->mensajes[]=$mensaje;
     }
 
-    private function getLlaves(){
-        return $this->llaves;
+    private function getKeysDiff(){
+        return $this->keysDiff;
     }
 
     private function setExistenteRaw($datos){
@@ -121,23 +120,6 @@ class Cargador extends ContainerAware{
 
     private function setExistenteIndex($datos){
         $this->existenteIndex=$datos;
-    }
-
-
-    private function setLlaves(){
-        $query[]="SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner";
-        $query[]="FROM all_constraints cons, all_cons_columns cols";
-        $query[]="WHERE cols.table_name = '".$this->tablaSpecs['nombre']."' AND cons.constraint_type = 'P'";
-        $query[]="AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner";
-        $query[]="AND cons.owner = '".$this->tablaSpecs['schema']."' ORDER BY cols.table_name, cols.position";
-        //print_r(implode(' ',$query));
-        $statement = $this->conn->query(implode(' ',$query));
-        $keysArray = $statement->fetchAll();
-        $keyInTable=array();
-        foreach($keysArray as $key):
-            $keyInTable[]=$key['COLUMN_NAME'];
-        endforeach;
-        $this->llaves=$keyInTable;
     }
 
     public function is_multi_array($array) {
@@ -177,45 +159,70 @@ class Cargador extends ContainerAware{
         return $statement;
     }
 
-    public function setWhereSelect($whereArray){
-
+    public function setQueryVariables($whereArray,$tipo='select'){
         if(empty($whereArray)){
             $this->setMensajes('No existe informacion para definir las condiciones');
             return false;
         }
 
         foreach($whereArray as $key => $valor):
-            if(is_array($valor)){
+            if(is_array($valor)&&($tipo!='act'||$tipo!='insert')){
                 foreach($valor as $subKey => $subValor):
-                    //echo $valor;
                     $wherePh[$key][]=$subKey.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28);
                     $whereValor[$key]['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
-
                 endforeach;
+            }elseif(is_array($valor)&&($tipo=='act'||$tipo=='insert')){
+                $this->setMensajes('El valor ingresado para "insert" o "act" no puede ser procesado');
+                return false;
             }else{
-                $wherePh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28);
-                $whereValor['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
-
+                if($tipo=='act'){
+                    $wherePh[]=$key.'= :'.$key;
+                    $whereValor[$key]=$valor;
+                }elseif($tipo=='insert'){
+                    $wherePh[]=':'.$key;
+                    $whereValor[$key]=$valor;
+                }else{
+                    $wherePh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28);
+                    $whereValor['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
+                }
             }
         endforeach;
         if(!isset($wherePh)||!isset($whereValor)){
             $this->setMensajes('No existe informacion para definir las condiciones');
             return false;
         }
-
-        $this->setWhereSelectPh($wherePh);
-        $this->setWhereSelectValores($whereValor);
+        if($tipo=='select'){
+            $this->setWhereSelectPh($wherePh);
+            $this->setWhereSelectValores($whereValor);
+        }elseif($tipo=='update'){
+            $this->setWhereUpdatePh($wherePh);
+            $this->setWhereUpdateValores($whereValor);
+        }elseif($tipo=='act'){
+            $this->setActUpdatePh($wherePh);
+            $this->setActUpdateValores($whereValor);
+        }
         return true;
     }
 
-    private function setExistentes(){
-        $this->setLlaves();
-
-        $this->keysDiff=array_diff($this->getLlaves(),$this->tablaSpecs['llaves']);
+    private function setKeysDiff(){
+        $query[]="SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner";
+        $query[]="FROM all_constraints cons, all_cons_columns cols";
+        $query[]="WHERE cols.table_name = '".$this->tablaSpecs['nombre']."' AND cons.constraint_type = 'P'";
+        $query[]="AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner";
+        $query[]="AND cons.owner = '".$this->tablaSpecs['schema']."' ORDER BY cols.table_name, cols.position";
+        $statement = $this->conn->query(implode(' ',$query));
+        $keysArray = $statement->fetchAll();
+        $keyInTable=array();
+        foreach($keysArray as $key):
+            $keyInTable[]=$key['COLUMN_NAME'];
+        endforeach;
+        $this->keysDiff=array_diff($keyInTable,$this->tablaSpecs['llaves']);
         if(!empty($this->keysDiff)){
             $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condici�n');
         }
-        $existente=array();
+    }
+
+    private function prepararSelect(){
         foreach ($this->valores as $rowNumber => $row):
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])&&$this->columnaSpecs[$col]['llave']=='si'){
@@ -223,26 +230,9 @@ class Cargador extends ContainerAware{
                  }
             endforeach;
         endforeach;
-
-        if(!$this->setWhereSelect($whereArray)){
+        if(!$this->setQueryVariables($whereArray)){
             return false;
         }
-
-        if(!$this->ejecutarSelectQuery()){
-            return false;
-        }
-        $registro=$this->ejecutarSelectQuery();
-        $this->setExistenteRaw($registro);
-
-        foreach($this->getExistenteRaw() as $linea):
-            $identArray=array();
-            foreach($this->tablaSpecs['llaves'] as $llave):
-                $identArray[]=$linea[$llave];
-            endforeach;
-            $existente[implode('|',$identArray)]=$linea;
-        endforeach;
-
-        $this->setExistenteIndex($existente);
     }
 
     public function ejecutarSelectQuery(){
@@ -251,8 +241,16 @@ class Cargador extends ContainerAware{
         $statement=$this->bindValues($statement,$this->getWhereSelectValores());
         $statement->execute();
         $registros=$statement->fetchAll();
-        return $registros;
-
+        $this->setExistenteRaw($registros);
+        foreach($this->getExistenteRaw() as $linea):
+            $identArray=array();
+            foreach($this->tablaSpecs['llaves'] as $llave):
+                $identArray[]=$linea[$llave];
+                unset($linea[$llave]);
+            endforeach;
+            $existente[implode('|',$identArray)]=$linea;
+        endforeach;
+        $this->setExistenteIndex($existente);
     }
 
     public function ejecutar(){
@@ -261,27 +259,25 @@ class Cargador extends ContainerAware{
             $this->setMensajes('El tipo de proceso no esta establecido o no es correcto');
             $procesar=false;
         }
-
         if(empty($this->valores)){
             $this->setMensajes('No existen valores para procesar');
             $procesar=false;
         }
-
         if(empty($this->tablaSpecs)){
             $this->setMensajes('Las especificaciones de la tabla no existen');
             $procesar=false;
         }
-
         if(empty($this->tablaSpecs)){
             $this->setMensajes('Las especificaciones de las columnas no existen');
             $procesar=false;
         }
-
         if($procesar===false){
             return false;
         }
-        $this->setExistentes();
-        if(empty($this->keysDiff)&&$this->tablaSpecs['tipo']!='S'){
+        $this->setKeysDiff();
+        $this->prepararSelect();
+        $this->ejecutarSelectQuery();
+        if(empty($this->getKeysDiff())&&$this->tablaSpecs['tipo']!='S'){
             $this->setMensajes('Se realizo la busqueda, se ejecutan los procesos de escritura');
             $this->dbProcess();
             return true;
@@ -299,78 +295,85 @@ class Cargador extends ContainerAware{
             $this->setMensajes('Solo se permite inserciones con tipo I');
             return false;
         }
-
         foreach ($this->valores as $rowNumber => $row):
             $whereArray=array();
-            $wherePH=array();
             $actArray=array();
-            $actPH=array();
             $insertPH=array();
             $insertArray=array();
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])){
                     if($this->columnaSpecs[$col]['llave']=='si'){
-                        $wherePH[]=$this->columnaSpecs[$col]['nombre'].'= :'.$this->columnaSpecs[$col]['nombre'];
                         $whereArray[$this->columnaSpecs[$col]['nombre']]=$valor;
                     }elseif(in_array($this->columnaSpecs[$col]['nombre'],$this->tablaSpecs['columnasProceso'])){
-                        $actPH[]=$this->columnaSpecs[$col]['nombre'].'= :'.$this->columnaSpecs[$col]['nombre'];
                         $actArray[$this->columnaSpecs[$col]['nombre']]=$valor;
                     }
                     if(in_array($this->columnaSpecs[$col]['nombre'],$this->tablaSpecs['columnasProceso'])){
-                        $insertPH[]=':'.$this->columnaSpecs[$col]['nombre'];
                         $insertArray[$this->columnaSpecs[$col]['nombre']]=$valor;
                     }
                 }
             endforeach;
-            $this->setWhereUpdateValores($whereArray);
-            $this->setWhereUpdatePh($wherePH);
-            $this->setActUpdateValores($actArray);
-            $this->setActUpdatePh($actPH);
-            $this->setInsertValores($insertArray);
-            $this->setInsertPh($insertPH);
+            if(!$this->setQueryVariables($whereArray,'update')){
+                return false;
+            }
+            if(!$this->setQueryVariables($actArray,'act')){
+                return false;
+            }
+            if(!$this->setQueryVariables($insertArray,'insert')){
+                return false;
+            }
             $this->dbRowProcess($rowNumber+1);
         endforeach;
+        return true;
+    }
 
+    public function ejecutarUpdateQuery(){
+        if(empty($this->getActUpdatePh())||empty($this->getWhereUpdatePh())){
+            $this->setMensajes('No existen los parametros de actualización');
+            return false;
+        }
+        $updateQuery='UPDATE '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' SET '.implode(', ',$this->getActUpdatePh()).' WHERE '.$this->getWherePhString($this->getWhereUpdatePh());//update
+        $statement = $this->conn->prepare($updateQuery);
+        $statement=$this->bindValues($statement,array_merge($this->getActUpdateValores(),$this->getWhereUpdateValores()));
+        $statement->execute();
+        return true;
+     }
+
+    public function ejecutarInsertQuery(){
+        if(empty($this->getInsertPh())||empty($this->getInsertValores())){
+            $this->setMensajes('No existen los parametros para insersión');
+            return false;
+        }
+        $addQuery='INSERT INTO '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' ('.implode(', ',$this->tablaSpecs['columnas']).') VALUES ('.implode(', ',$this->getInsertPh()).')';
+        $statement = $this->conn->prepare($addQuery);
+        $statement=$this->bindValues($statement,$this->getInsertValores());
+        $statement->execute();
         return true;
     }
 
     private function dbRowProcess($rowNumber){
-
         $busqueda=implode('|',$this->getWhereUpdateValores());
         if(array_key_exists($busqueda,$this->getExistenteIndex())===true){
             if($this->tablaSpecs['tipo']=='I'){
                 $this->setMensajes('La linea '.$rowNumber.' ya existe, estamos en modo solo insertar');
                 return false;
             }
-            foreach ($this->getWhereUpdateValores() as $whereKey => $whereValor):
-                unset($this->getExistenteIndex()[$busqueda][$whereKey]);
-            endforeach;
             $diferencia=array_diff_assoc($this->getExistenteIndex()[$busqueda],$this->getActUpdateValores());
             if(empty($diferencia)){
                 $this->setMensajes('Nada que actualizar para la linea: '.$rowNumber);
                 return true;
             }
-
-            $updateQuery='UPDATE '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' SET '.implode(', ',$this->getActUpdatePh()).' WHERE '.$this->getWherePhString($this->getWhereUpdatePh());//update
-            $statement = $this->conn->prepare($updateQuery);
-            $statement=$this->bindValues($statement,array_merge($this->getActUpdateValores(),$this->getWhereUpdateValores()));
-            $statement->execute();
-            $this->setMensajes('Actualizando para la linea: '.$rowNumber);
-            return true;
-
+            if($this->ejecutarUpdateQuery()){
+                $this->setMensajes('Actualizando para la linea: '.$rowNumber);
+            }
         }elseif(isset($insertArray)&&!empty($insertArray)){
             if ($this->tablaSpecs['tipo']=='U'){
                 $this->setMensajes('La linea '.$rowNumber. ' no existe, estamos en modo solo actualizar');
                 return false;
             }
-
-            $addQuery='INSERT INTO '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' ('.implode(', ',$this->tablaSpecs['columnas']).') VALUES ('.implode(', ',$this->getInsertPh()).')';
-            //echo $addQuery;
-            $statement = $this->conn->prepare($addQuery);
-            $statement=$this->bindValues($statement,$this->getInsertValores());
             try{
-                $statement->execute();
-                $this->setMensajes('Agregando para la linea: '.$rowNumber);
+                if($this->ejecutarUpdateQuery()){
+                    $this->setMensajes('Insertando para la linea: '.$rowNumber);
+                }
             }catch(\Exception $e){
                 preg_match('/ORA-00001/', $e->getMessage(), $coincidencias, PREG_OFFSET_CAPTURE);
                 if(!empty($coincidencias)){
@@ -381,12 +384,10 @@ class Cargador extends ContainerAware{
                 return false;
             }
             return true;
-
         }else{
             $this->setMensajes('No se actualizo nada, los parametros son errados');
             return false;
         }
-
     }
 
 }

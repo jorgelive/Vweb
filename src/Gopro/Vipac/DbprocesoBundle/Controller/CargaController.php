@@ -123,6 +123,11 @@ class CargaController extends Controller
                 $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $documentoCp->ejecutar();
                 $exiDocumentoCp=$documentoCp->getExistenteIndex();
+                if(empty($exiDocumentoCp)){
+                    $mensajes=array_merge($mensajes,array('No existen los asientos en Documentos CP'));
+                    return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
+
+                }
                 $tablaAsiDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'ASIENTO_DE_DIARIO',
@@ -139,7 +144,11 @@ class CargaController extends Controller
                 $asiDi->ejecutar();
 
                 $exiAsiDi=$asiDi->getExistenteIndex();
+                if(empty($exiAsiDi)){
+                    $mensajes=array_merge($mensajes,array('No existen los asientos en Asiento de Diario, posiblemente fueron mayorizados'));
+                    return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
 
+                }
                 $tablaDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'DIARIO',
@@ -156,6 +165,12 @@ class CargaController extends Controller
                 $di->ejecutar();
 
                 $exiDi=$di->getExistenteIndex();
+                if(empty($exiDi)){
+                    $mensajes=array_merge($mensajes,array('No existen los asientos en el Diario, posiblemente fueron mayorizados'));
+                    return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
+
+                }
+
                 foreach ($exiDi as $key => $valores):
                     $keyArray=explode('|',$key);
                     $resultado[$keyArray[0]]['DIARIO'][$keyArray[1]]=$valores;

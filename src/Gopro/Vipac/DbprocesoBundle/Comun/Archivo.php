@@ -173,7 +173,6 @@ class Archivo extends ContainerAware{
                                     $this->columnaSpecs[$nombre]['nombre']=$nombre;
                                     $this->tablaSpecs['columnas'][]=$nombre;
                                     $this->tablaSpecs['columnasProceso'][]=$nombre;
-
                                 endforeach;
                                 $procesandoNombre=true;
                             }elseif($procesandoNombre===true){
@@ -189,8 +188,6 @@ class Archivo extends ContainerAware{
                                 endforeach;
                             }
                             if($valorArray[0]=='llave'&&$valorArray[1]=='si'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
-                                //print_r($this->columnaSpecs);
-                                //print_r($this->validCols);
                                 if(preg_match("/-/i", $this->validCols[$col])){
                                     $nombres=explode('-',$this->validCols[$col]);
                                 }else{
@@ -198,7 +195,6 @@ class Archivo extends ContainerAware{
                                 }
                                 foreach($nombres as $nombre):
                                     $this->tablaSpecs['llaves'][]=$this->columnaSpecs[$nombre]['nombre'];
-
                                 endforeach;
                             }
                             if($valorArray[0]=='proceso'&&$valorArray[1]=='no'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
@@ -214,7 +210,6 @@ class Archivo extends ContainerAware{
                         if(isset($valorArray[1])){
                             $this->tablaSpecs[$valorArray[0]]=$valorArray[1];
                         }
-
                     }
                 }else{
                     if(!empty($this->validCols)&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
@@ -238,12 +233,10 @@ class Archivo extends ContainerAware{
                     }else{
                         $this->descartados[$arrayY][]=$value;
                     }
-
                 }
             }
             $arrayY ++;
         }
-        //print_r($this->tablaSpecs);
         $this->setValoresIndizados();
     }
 
