@@ -59,13 +59,9 @@ class CargaController extends Controller
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
 
         if($procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_generico')===true){
-
             $procesoArchivo->setParametros(null,null);
             $mensajes=$procesoArchivo->getMensajes();
-            //print_r($archivoProcesado);
             if($procesoArchivo->parseExcel()!==false){
-                //print_r($procesoArchivo->getTablaSpecs());
-                //print_r($procesoArchivo->getColumnaSpecs());
                 $carga=$this->get('gopro_dbproceso_comun_cargador');
                 $carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
                 $carga->ejecutar();
@@ -73,7 +69,6 @@ class CargaController extends Controller
             }else{
                 $mensajes=array_merge($mensajes,array('El archivo no se puede procesar'));
             }
-            //$mensajes = $this->get('gopro_dbproceso_comun_cargador')->cargadorGenerico($tablaSpecs,$columnaSpecs,$valores);
         }
         $mensajes=array_merge($mensajes,$procesoArchivo->getMensajes());
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
@@ -94,7 +89,6 @@ class CargaController extends Controller
 
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $usuario, 'operacion' => 'carga_arreglartc'),array('creado' => 'DESC'));
-
         $archivo = new Archivo();
         $formulario = $this->createFormBuilder($archivo)
             ->add('nombre')
@@ -131,18 +125,13 @@ class CargaController extends Controller
                 $tablaAsiDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'ASIENTO_DE_DIARIO',
-                    'tipo'=>'S',
-                    'columnasProceso'=>Array('ASIENTO','TOTAL_DEBITO_DOL','TOTAL_CREDITO_DOL','TOTAL_CONTROL_DOL','FECHA'),
-                    'llaves'=>Array('ASIENTO')
+                    'columnasProceso'=>Array('ASIENTO','TOTAL_DEBITO_DOL','TOTAL_CREDITO_DOL','TOTAL_CONTROL_DOL','FECHA')
                 );
                 $columnaAsiDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
-                $columnaAsiDi['TOTAL_DEBITO_DOL']=array('nombre'=>'TOTAL_DEBITO_DOL','llave'=>'no');
-                $columnaAsiDi['TOTAL_CREDITO_DOL']=array('nombre'=>'TOTAL_CREDITO_DOL','llave'=>'no');
-                $columnaAsiDi['TOTAL_CONTROL_DOL']=array('nombre'=>'TOTAL_CONTROL_DOL','llave'=>'no');
                 $asiDi=$this->get('gopro_dbproceso_comun_cargador');
                 $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
-                $asiDi->ejecutar();
-
+                $asiDi->prepararSelect();
+                $asiDi->ejecutarSelectQuery();
                 $exiAsiDi=$asiDi->getExistenteIndex();
                 if(empty($exiAsiDi)){
                     $mensajes=array_merge($mensajes,array('No existen los asientos en Asiento de Diario, posiblemente fueron mayorizados'));
@@ -152,17 +141,13 @@ class CargaController extends Controller
                 $tablaDi=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'DIARIO',
-                    'tipo'=>'S',
-                    'columnasProceso'=>Array('ASIENTO','CONSECUTIVO','DEBITO_DOLAR','CREDITO_DOLAR'),
-                    'llaves'=>Array('ASIENTO','CONSECUTIVO')
+                    'columnasProceso'=>Array('ASIENTO','CONSECUTIVO','DEBITO_DOLAR','CREDITO_DOLAR')
                 );
                 $columnaDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
-                $columnaDi['CONSECUTIVO']=array('nombre'=>'CONSECUTIVO','llave'=>'no');//no en lista
-                $columnaDi['DEBITO_DOLAR']=array('nombre'=>'DEBITO_DOLAR','llave'=>'no');
-                $columnaDi['CREDITO_DOLAR']=array('nombre'=>'CREDITO_DOLAR','llave'=>'no');
                 $di=$this->get('gopro_dbproceso_comun_cargador');
                 $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
-                $di->ejecutar();
+                $di->prepararSelect();
+                $di->ejecutarSelectQuery();
 
                 $exiDi=$di->getExistenteIndex();
                 if(empty($exiDi)){
@@ -170,7 +155,6 @@ class CargaController extends Controller
                     return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
 
                 }
-
                 foreach ($exiDi as $key => $valores):
                     $keyArray=explode('|',$key);
                     $resultado[$keyArray[0]]['DIARIO'][$keyArray[1]]=$valores;
@@ -189,16 +173,13 @@ class CargaController extends Controller
                 $tablaTc=array(
                     'schema'=>'VIAPAC',
                     'nombre'=>'TIPO_CAMBIO_HIST',
-                    'tipo'=>'S',
-                    'columnasProceso'=>Array('FECHA','TIPO_CAMBIO','MONTO'),
-                    'llaves'=>Array('FECHA')
+                    'columnasProceso'=>Array('FECHA','TIPO_CAMBIO','MONTO')
                 );
                 $columnaTc['FECHA']=array('nombre'=>'FECHA','llave'=>'si');
-                $columnaTc['TIPO_CAMBIO']=array('nombre'=>'TIPO_CAMBIO','llave'=>'si');//en lista no llave
-                $columnaTc['MONTO']=array('nombre'=>'MONTO','llave'=>'no');
                 $tc=$this->get('gopro_dbproceso_comun_cargador');
                 $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
-                $tc->ejecutar();
+                $tc->prepararSelect();
+                $tc->ejecutarSelectQuery();
                 $exiTc=$tc->getExistenteIndex();
                 foreach ($resultado as $codigoAsiento => $procesoTablas):
                     $procesar='si';
@@ -222,7 +203,6 @@ class CargaController extends Controller
                         foreach($procesoTablas as $tablaNombre => $contenido):
                             if($tablaNombre=='DOCUMENTOS_CP'){
                                 $monto = round($contenido['MONTO']*$tipoCambio,2);
-                                //echo $monto.'<br>';
                                 $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set MONTO_LOCAL=:MONTO, SALDO_LOCAL=:MONTO, TIPO_CAMBIO_MONEDA=:TC, TIPO_CAMBIO_DOLAR=:TC, TIPO_CAMBIO_PROV=:TC, TIPO_CAMB_ACT_LOC=:TC, TIPO_CAMB_ACT_DOL=:TC, TIPO_CAMB_ACT_PROV=:TC WHERE ASIENTO=:ASIENTO';
                                 $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                 $statement->bindValue('MONTO',$monto);
@@ -230,7 +210,6 @@ class CargaController extends Controller
                                 $statement->bindValue('ASIENTO',$codigoAsiento);
                                 $statement->execute();
                                 $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para:'.$codigoAsiento));
-
                             }elseif($tablaNombre=='ASIENTO_DE_DIARIO'){
                                 $montoDebito = round($contenido['TOTAL_DEBITO_DOL']*$tipoCambio,2);
                                 $montoCredito = round($contenido['TOTAL_CREDITO_DOL']*$tipoCambio,2);
@@ -249,11 +228,12 @@ class CargaController extends Controller
                                     $mensajes=array_merge($mensajes,array('No se actualiza: '.$tablaNombre.', para:'.$codigoAsiento.', el primer item no es credito'));
                                 }else{
                                     $contador=1;
+                                    $montoTotalCredito=0;
+                                    $montoTotalDebito=0;
                                     foreach($contenido as $consecutivo => $item):
                                         if(empty($item['DEBITO_DOLAR'])){
                                             $monto = round($item['CREDITO_DOLAR']*$tipoCambio,2);
                                             $montoTotalCredito=$monto;
-                                            $montoTotalDebito=0;
                                             $updateQuery='UPDATE VIAPAC.'.$tablaNombre.' set CREDITO_LOCAL=:CREDITO_LOCAL WHERE ASIENTO=:ASIENTO AND CONSECUTIVO=:CONSECUTIVO';
                                             $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($updateQuery);
                                             $statement->bindValue('CREDITO_LOCAL',$monto);
@@ -276,8 +256,6 @@ class CargaController extends Controller
                                             $statement->bindValue('CONSECUTIVO',$consecutivo);
                                             $statement->execute();
                                             $mensajes=array_merge($mensajes,array('Actualizando en: '.$tablaNombre.', para: '.$codigoAsiento.' ,item:'.$consecutivo));
-
-
                                         }
                                         $contador++;
                                     endforeach;

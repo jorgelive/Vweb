@@ -233,6 +233,9 @@ class Cargador extends ContainerAware{
         if(!$this->setQueryVariables($whereArray)){
             return false;
         }
+
+
+
     }
 
     public function ejecutarSelectQuery(){
@@ -295,10 +298,10 @@ class Cargador extends ContainerAware{
             $this->setMensajes('Solo se permite inserciones con tipo I');
             return false;
         }
+        //@todo independizar funcion set*paramters
         foreach ($this->valores as $rowNumber => $row):
             $whereArray=array();
             $actArray=array();
-            $insertPH=array();
             $insertArray=array();
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])){

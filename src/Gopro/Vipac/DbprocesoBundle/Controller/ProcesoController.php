@@ -254,7 +254,7 @@ class ProcesoController extends Controller
         return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
     }
 
-    //TODO: implementar funcion
+    //@TODO: implementar funcion
     /**
      * @Route("/proceso/editararchivo", name="gopro_vipac_dbproceso_proceso_editararchivo")
      * @Method({"POST"})
