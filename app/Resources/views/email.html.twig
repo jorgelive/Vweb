@@ -5,18 +5,22 @@
     {% block stylesheets %}
         <style type="text/css">
             #header {border:#FCBA15 1px solid; width:90%; height: 110px; margin-bottom: 10px; padding:5px;}
-            #header #logo {width: 200px;}
-            #header #content {color:#FCBA15; width: 300px;}
+            #header table, #header table tr, #header table td{border-collapse: collapse; border: none; width: 100%;}
+            #header table td.logo {width: 200px;}
+            #header table td.content{color:#FCBA15; width: 300px; text-align: right;}
             #contenedor {width: 90%;}
         </style>
     {% endblock stylesheets %}
 </head>
 <body>
 <div id="header">
-    <span id="logo"><img width=175 height=100 src="http://vipac.pe/img/logo_175_100.png" /></span>
-    <span id="content">
-        {% block header %}{% endblock header %}
-    </span>
+    <table>
+        <tr>
+            <td class="logo"><img width=175 height=100 src="http://vipac.pe/img/logo_175_100.png" /></td>
+            <td class="content">{% block header %}{% endblock header %}</td>
+        </tr>
+    </table>
+
 </div>
 <div id="contenedor">
 {% block body %}{% endblock body %}

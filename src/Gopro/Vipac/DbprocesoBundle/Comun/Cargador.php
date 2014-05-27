@@ -60,7 +60,7 @@ class Cargador extends ContainerAware{
         $this->getProceso()->setCamposInsert($tablaSpecs['columnas']);
         $this->getProceso()->setCamposSelect($tablaSpecs['columnasProceso']);
         $this->getProceso()->setLlaves($tablaSpecs['llaves']);
-        if(!isset($tablaSpecs['tipo'])||!is_string($tablaSpecs['tipo'])||!in_array($tablaSpecs['tipo'],Array('S','IU','UI','I','U'))){
+        if(!isset($tablaSpecs['tipo'])||!is_string($tablaSpecs['tipo'])||!in_array($tablaSpecs['tipo'],['S','IU','UI','I','U'])){
             $this->setMensajes('El tipo de proceso se establece al valor por defecto');
             $tablaSpecs['tipo']='S';
         }
@@ -101,7 +101,7 @@ class Cargador extends ContainerAware{
         }
     }
 
-    private function prepararSelect(){
+    public function prepararSelect(){
         foreach ($this->valores as $rowNumber => $row):
             foreach ($row as $col => $valor):
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])&&$this->columnaSpecs[$col]['llave']=='si'){
@@ -170,7 +170,7 @@ class Cargador extends ContainerAware{
 
     private function dbRowProcess($rowNumber){
         $busqueda=implode('|',$this->getProceso()->getWhereUpdateValores());
-        if(array_key_exists($busqueda,$this->getProceso()->getExistenteIndex())===true){
+        if(array_key_exists($busqueda,$this->getProceso()->getExistenteIndex())===true){//todo mejor comparacion
             if($this->getTipo()=='I'){
                 $this->setMensajes('La linea '.$rowNumber.' ya existe, estamos en modo solo insertar');
                 return false;
@@ -189,7 +189,7 @@ class Cargador extends ContainerAware{
                 return false;
             }
             try{
-                if($this->ejecutarUpdateQuery()){
+                if($this->getProceso()->ejecutarInsertQuery()){
                     $this->setMensajes('Insertando para la linea: '.$rowNumber);
                 }
             }catch(\Exception $e){

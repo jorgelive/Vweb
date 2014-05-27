@@ -11,58 +11,67 @@ class TransferenciaCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
-        $this->setName('extra:transferenciacb')
+        $this->setName('gopro:extra:transferenciacb')
             ->setDescription('Enviar correos sobre operación');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $datos=$this->getContainer()->get('gopro_dbproceso_comun_cargador');
-        $tablaD=array(
-            'schema'=>'VWEB',
-            'nombre'=>'EXTRA_TRANSFERENCIA_CB',
-            'tipo'=>'S',
-            'columnasProceso'=>Array('ID','CUENTA_ORIGEN','TIPO_ORIGEN','NUMERO_ORIGEN','MONTO_ORIGEN','FCH_HORA_CREACION','IND_PROCESO'),
-            'llaves'=>Array('IND_PROCESO')
-        );
-        $columnaD['IND_PROCESO']=array('nombre'=>'IND_PROCESO','llave'=>'si');
-        $valoresD[0]=array('IND_PROCESO'=>'n');
-        $datos->setParametros($tablaD,$columnaD,$valoresD,$this->getContainer()->get('doctrine.dbal.vipac_connection'));
-        $datos->ejecutar();
-        if(empty($datos->getExistenteRaw())){
+
+        $datos=$this->getContainer()->get('gopro_dbproceso_comun_proceso');
+        $datos->setConexion($this->getContainer()->get('doctrine.dbal.vipac_connection'));
+        $datos->setTabla('EXTRA_TRANSFERENCIA_CB');
+        $datos->setSchema('VWEB');
+        $datos->setCamposSelect([
+            'ID',
+            'CUENTA_ORIGEN',
+            'TIPO_ORIGEN',
+            'NUMERO_ORIGEN',
+            'MONTO_ORIGEN',
+            'FCH_HORA_CREACION',
+            'IND_PROCESO'
+        ]);
+        $datos->setCamposCustom([
+            'CUENTA_ORIGEN',
+            'TIPO_ORIGEN',
+            'NUMERO_ORIGEN'
+        ]);
+        $datos->setQueryVariables(['IND_PROCESO'=>'n']);
+
+        if(!$datos->ejecutarSelectQuery()||empty($datos->getExistenteRaw())){
             $output->writeln('No hay datos que procesar');
             return false;
         }
-        $datosTransferencia=$this->getContainer()->get('gopro_dbproceso_comun_cargador');
-        $tablaDT=array(
-            'schema'=>'VIAPAC',
-            'nombre'=>'VVW_TRANSFERENCIA_CB',
-            'tipo'=>'S',
-            'columnasProceso'=>Array('CONSECUTIVO',
-                'CUENTA_ORIGEN',
-                'TIPO_ORIGEN',
-                'NUMERO_ORIGEN',
-                'CUENTA_DESTINO',
-                'MONTO_DESTINO',
-                'MONEDA',
-                'BENEFICIARIO',
-                'CONCEPTO',
-                'TIPO_MOV',
-                'CONTRIBUYENTE',
-                'PROVEEDOR',
-                'NOMBRE',
-                'ALIAS',
-                'E_MAIL',
-                'CATEGORIA_PROVEED',
-                'PAIS'
-            ),
-            'llaves'=>Array('CUENTA_ORIGEN','TIPO_ORIGEN','NUMERO_ORIGEN')
-        );
-        $columnaDT['CUENTA_ORIGEN']=array('nombre'=>'CUENTA_ORIGEN','llave'=>'si');
-        $columnaDT['TIPO_ORIGEN']=array('nombre'=>'TIPO_ORIGEN','llave'=>'si');
-        $columnaDT['NUMERO_ORIGEN']=array('nombre'=>'NUMERO_ORIGEN','llave'=>'si');
-        $datosTransferencia->setParametros($tablaDT,$columnaDT,$datos->getExistenteRaw(),$this->getContainer()->get('doctrine.dbal.vipac_connection'));
-        $datosTransferencia->ejecutar();
+        $datosTransferencia=$this->getContainer()->get('gopro_dbproceso_comun_proceso');
+        $datosTransferencia->setConexion($this->getContainer()->get('doctrine.dbal.vipac_connection'));
+        $datosTransferencia->setTabla('VVW_TRANSFERENCIA_CB');
+        $datosTransferencia->setSchema('VIAPAC');
+        $datosTransferencia->setCamposSelect([
+            'CONSECUTIVO',
+            'CUENTA_ORIGEN',
+            'TIPO_ORIGEN',
+            'NUMERO_ORIGEN',
+            'CUENTA_DESTINO',
+            'MONTO_DESTINO',
+            'MONEDA',
+            'BENEFICIARIO',
+            'CONCEPTO',
+            'TIPO_MOV',
+            'CONTRIBUYENTE',
+            'PROVEEDOR',
+            'NOMBRE',
+            'ALIAS',
+            'E_MAIL',
+            'CATEGORIA_PROVEED',
+            'PAIS'
+        ]);
+        $datosTransferencia->setQueryVariables($datos->getExistenteCustom());
+
+        if(!$datosTransferencia->ejecutarSelectQuery()||empty($datosTransferencia->getExistenteRaw())){
+            $output->writeln('No hay datos coincidentes con la tabla de proceso');
+            return false;
+        }
+
         $resultado = $this->getContainer()->get('gopro_dbproceso_comun_variable')->utf($datosTransferencia->getExistenteRaw());
 
         foreach($resultado as $linea):
@@ -90,6 +99,7 @@ class TransferenciaCommand extends ContainerAwareCommand
             }else{
                 $mailAddress=array($mailAdressCco);
             }
+
             //$mailAdressCco='jgomez@vipac.pe';
             //$mailAddress=array('jgomez@vipac.pe');
             $mensage = \Swift_Message::newInstance()
@@ -105,11 +115,14 @@ class TransferenciaCommand extends ContainerAwareCommand
                     )
                 )
             ;
-            //$this->getContainer()->get('mailer')->send($mensage);
+            $this->getContainer()->get('mailer')->send($mensage);
             $output->writeln('Se ha realizado el envio a: '.$mail['nombre'].' con e-mail: '.implode(', ',array_unique($mailAddress)));
         endforeach;
 
-        $output->writeln(print_r($datosTransferencia->getWhereSelectValores()));
+        $datos->setWhereUpdateValores($datosTransferencia->getWhereSelectValores());
+        $datos->setWhereUpdatePh($datosTransferencia->getWhereSelectPh());
+        $datos->setQueryVariables(['IND_PROCESO'=>'s'],'valoresUpdate');
+        $datos->ejecutarUpdateQuery();
     }
 }
 

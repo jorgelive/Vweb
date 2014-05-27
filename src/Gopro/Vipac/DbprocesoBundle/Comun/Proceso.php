@@ -13,6 +13,9 @@ class Proceso extends ContainerAware{
     private $whereSelectValores;
     private $whereSelectPh;
     private $camposSelect;
+    private $camposCustom;
+    private $existenteCustom;
+    private $llaves;
 
     //valores temporales por fila
     private $whereUpdateValores;
@@ -159,6 +162,22 @@ class Proceso extends ContainerAware{
         $this->llaves=$llaves;
     }
 
+    public function getCamposCustom(){
+        return $this->camposCustom;
+    }
+
+    public function setCamposCustom($campos){
+        $this->camposCustom=$campos;
+    }
+
+    public function getExistenteCustom(){
+        return $this->existenteCustom;
+    }
+
+    public function setExistenteCustom($existente){
+        $this->existenteCustom=$existente;
+    }
+
     private function getSerializedPhString($phArray){
         if(empty($phArray) ||!is_array($phArray)){
             $this->setMensajes('No hay información para crear las condiciones de busqueda');
@@ -204,6 +223,7 @@ class Proceso extends ContainerAware{
                 foreach($valor as $subKey => $subValor):
                     $procesoPh[$key][]=$subKey.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28);
                     $procesoValor[$key]['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
+                    $selectKeys[]=$subKey;
                 endforeach;
             }elseif(is_array($valor)&&($tipo=='valoresUpdate'||$tipo=='valoresInsert'||$tipo!='camposInsert' || $tipo=='camposselect')){
                 $this->setMensajes('El valor ingresado para "insert" o "act" no puede ser procesado');
@@ -211,7 +231,7 @@ class Proceso extends ContainerAware{
             }else{
                 if($tipo=='camposInsert' || $tipo=='camposselect'){
                     $procesoValor=$valor;
-                }elseif($tipo=='valoresUpdate'){
+                }elseif($tipo=='valoresUpdate' || $tipo=='whereUpdate'){ //todo quitar el whereupdate para el generico
                     $procesoPh[]=$key.'= :'.$key;
                     $procesoValor[$key]=$valor;
                 }elseif($tipo=='valoresInsert'){
@@ -220,6 +240,7 @@ class Proceso extends ContainerAware{
                 }else{
                     $procesoPh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28);
                     $procesoValor['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
+                    $selectKeys[]=$key;
                 }
             }
         endforeach;
@@ -230,6 +251,7 @@ class Proceso extends ContainerAware{
         if($tipo=='whereSelect'){
             $this->setWhereSelectPh($procesoPh);
             $this->setWhereSelectValores($procesoValor);
+            $this->setLlaves(array_unique($selectKeys));
         }elseif($tipo=='whereUpdate'){
             $this->setWhereUpdatePh($procesoPh);
             $this->setWhereUpdateValores($procesoValor);
@@ -248,7 +270,12 @@ class Proceso extends ContainerAware{
     }
 
     public function ejecutarSelectQuery(){
-        if(empty($this->getWhereSelectPh())||empty($this->getWhereSelectValores())||empty($this->getCamposSelect())){
+        if(
+            !is_object($this->getConexion())
+            ||empty($this->getWhereSelectPh())
+            ||empty($this->getWhereSelectValores())
+            ||empty($this->getCamposSelect())
+        ){
             $this->setMensajes('No existen los parametros para el select');
             return false;
         }
@@ -260,20 +287,38 @@ class Proceso extends ContainerAware{
         }
         $registros=$statement->fetchAll();
         $this->setExistenteRaw($registros);
-        foreach($this->getExistenteRaw() as $linea):
+        foreach($this->getExistenteRaw() as $nroLinea => $linea):
             $identArray=array();
             foreach($this->getLlaves() as $llave):
-                $identArray[]=$linea[$llave];
-                unset($linea[$llave]);
+                if(isset($linea[$llave])){
+                    $identArray[]=$linea[$llave];
+                    unset($linea[$llave]);
+                }
             endforeach;
             $existente[implode('|',$identArray)]=$linea;
+            if(!empty($this->getCamposCustom())){
+                foreach($this->getCamposCustom() as $campo):
+                    if(isset($linea[$campo])){
+                        $existenteCustom[$nroLinea][$campo]=$linea[$campo];
+                    }
+                endforeach;
+            }
         endforeach;
         $this->setExistenteIndex($existente);
+        if(isset($existenteCustom)){
+            $this->setExistenteCustom($existenteCustom);
+        }
         return true;
     }
 
     public function ejecutarUpdateQuery(){
-        if(empty($this->getValoresUpdatePh())||empty($this->getWhereUpdatePh())||empty($this->getValoresUpdateValores())||empty($this->getWhereUpdateValores())){
+        if(
+            !is_object($this->getConexion())
+            ||empty($this->getValoresUpdatePh())
+            ||empty($this->getValoresUpdateValores())
+            ||empty($this->getWhereUpdatePh())
+            ||empty($this->getWhereUpdateValores())
+        ){
             $this->setMensajes('No existen los parametros de actualización');
             return false;
         }
@@ -284,7 +329,12 @@ class Proceso extends ContainerAware{
     }
 
     public function ejecutarInsertQuery(){
-        if(empty($this->getValoresInsertPh())||empty($this->getValoresInsertValores())||empty($this->getCamposInsert())){
+        if(
+            !is_object($this->getConexion())
+            ||empty($this->getValoresInsertPh())
+            ||empty($this->getValoresInsertValores())
+            ||empty($this->getCamposInsert())
+        ){
             $this->setMensajes('No existen los parametros para insersión');
             return false;
         }
