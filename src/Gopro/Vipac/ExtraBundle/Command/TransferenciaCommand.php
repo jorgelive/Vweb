@@ -110,7 +110,7 @@ class TransferenciaCommand extends ContainerAwareCommand
                 ->setContentType("text/html")
                 ->setBody(
                     $this->getContainer()->get('templating')->render(
-                        'GoproVipacExtraBundle:transferencia:transferencia.html.twig',
+                        'GoproVipacExtraBundle:Transferencia:transferencia.html.twig',
                         array('contenido' => $mail)
                     )
                 )
