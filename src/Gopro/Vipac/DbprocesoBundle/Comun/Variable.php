@@ -54,4 +54,8 @@ class Variable extends ContainerAware{
         }
         return null;
     }
+
+    public function is_multi_array($array) {
+        return (count($array) != count($array, 1));
+    }
 }

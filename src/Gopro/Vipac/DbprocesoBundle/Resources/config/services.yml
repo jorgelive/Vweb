@@ -2,12 +2,14 @@ parameters:
     archivo.class:  Gopro\Vipac\DbprocesoBundle\Comun\Archivo
     cargador.class:  Gopro\Vipac\DbprocesoBundle\Comun\Cargador
     variable.class:  Gopro\Vipac\DbprocesoBundle\Comun\Variable
+    proceso.class:  Gopro\Vipac\DbprocesoBundle\Comun\Proceso
 
 services:
     gopro_dbproceso_comun_archivo:
         class: %archivo.class%
         calls:
             - [ setContainer,[ @service_container ] ]
+        scope: prototype
     gopro_dbproceso_comun_cargador:
         class: %cargador.class%
         calls:
@@ -17,4 +19,9 @@ services:
         class: %variable.class%
         calls:
             - [ setContainer,[ @service_container ] ]
+    gopro_dbproceso_comun_proceso:
+        class: %proceso.class%
+        calls:
+            - [ setContainer,[ @service_container ] ]
+        scope: prototype
 

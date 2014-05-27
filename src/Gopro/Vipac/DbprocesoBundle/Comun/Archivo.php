@@ -66,14 +66,12 @@ class Archivo extends ContainerAware{
             foreach($setColumnaSpecs as $columna):
                 if(isset($columna['nombre'])){
                     $this->validCols[]=$columna['nombre'];
-
                     if (preg_match("/-/i", $columna['nombre'])) {
                         $nombres=explode('-',$columna['nombre']);
 
                     }else{
                         $nombres=array($columna['nombre']);
                     }
-
                     unset($columna['nombre']);
                     foreach($nombres as $nombre):
                         $this->columnaSpecs[$nombre]=$columna;
@@ -111,7 +109,6 @@ class Archivo extends ContainerAware{
 
     public function parseExcel(){
 
-        //$filename='/Volumes/Archivo/prueba.xlsx';
         if($this->parsed=='si'){
             $this->setMensajes('El archivo ya fue procesado anteriormente');
             return true;
@@ -237,7 +234,7 @@ class Archivo extends ContainerAware{
             }
             $arrayY ++;
         }
-        $this->setValoresIndizados();
+        return ($this->setValoresIndizados());
     }
 
     private function setValoresIndizados(){
@@ -252,6 +249,7 @@ class Archivo extends ContainerAware{
             endforeach;
             $this->valoresIndizados[implode('|',$indice)][]=$valor;
         endforeach;
+        return true;
     }
 
     public function escribirExcel($archivo,$encabezados,$datos,$tipo='xlsx'){
@@ -277,7 +275,6 @@ class Archivo extends ContainerAware{
         return $response;
     }
 
-
     public function validarArchivo($repositorio,$archivoEjecutar,$funcionArchivo){
         $ejecutar=false;
         if($archivoEjecutar!==null){
@@ -290,7 +287,6 @@ class Archivo extends ContainerAware{
         }elseif($ejecutar===true){
             $this->archivoValido=$archivoAlmacenado;
         }
-
         return $ejecutar;
     }
 }

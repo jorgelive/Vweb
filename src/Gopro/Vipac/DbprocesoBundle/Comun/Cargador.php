@@ -5,97 +5,74 @@ use \Symfony\Component\DependencyInjection\ContainerAware;
 class Cargador extends ContainerAware{
 
     private $mensajes=array();
-    private $tablaSpecs;
     private $columnaSpecs;
     private $valores;
-    private $conn;
-    private $keysDiff;
-    private $existenteRaw;
-    private $existenteIndex;
-    private $whereSelectValores;
-    private $whereSelectPh;
-    //valores temporales por fila
-    private $whereUpdateValores;
-    private $whereUpdatePh;
-    private $actUpdateValores;
-    private $actUpdatePh;
-    private $insertValores;
-    private $insertPh;
+    private $proceso;
+    private $tipo;
 
-    public function getWhereSelectValores(){
-        return $this->whereSelectValores;
+    public function getProceso(){
+        return $this->proceso;
     }
 
-    private function setWhereSelectValores($where){
-        $this->whereSelectValores=$where;
+    private function setProceso(){
+        $this->proceso=$this->container->get('gopro_dbproceso_comun_proceso');
     }
 
-    public function getWhereSelectPh(){
-        return $this->whereSelectPh;
+    public function getTipo(){
+        return $this->tipo;
     }
 
-    private function setWhereSelectPh($wherePh){
-        $this->whereSelectPh=$wherePh;
+    private function setTipo($tipo){
+        $this->tipo=$tipo;
     }
 
-    private function getWhereUpdateValores(){
-        return $this->whereUpdateValores;
-    }
+    public function setParametros($tablaSpecs,$columnaSpecs,$valores,$conexion){
 
-    private function setWhereUpdateValores($where){
-        $this->whereUpdateValores=$where;
-    }
+        if(empty($tablaSpecs)
+            ||!is_array($tablaSpecs)
+            ||!isset($tablaSpecs['nombre'])
+            ||!isset($tablaSpecs['schema'])
+            ||!isset($tablaSpecs['llaves'])
+            ||!isset($tablaSpecs['columnas'])
+            ||!isset($tablaSpecs['columnasProceso'])
+        ){
+            $this->setMensajes('Las especificaciones de la tabla son inválidas');
+            return false;
+        }
 
-    public function getWhereUpdatePh(){
-        return $this->whereUpdatePh;
-    }
+        if(empty($columnaSpecs)||!is_array($columnaSpecs)){
+            $this->setMensajes('Las especificaciones de las columnas son inválidos');
+            return false;
+        }
 
-    private function setWhereUpdatePh($wherePh){
-        $this->whereUpdatePh=$wherePh;
-    }
+        if(empty($valores)||!is_array($valores)){
+            $this->setMensajes('No se han ingresado los valores');
+            return false;
+        }
 
-    public function getActUpdateValores(){
-        return $this->actUpdateValores;
-    }
-
-    private function setActUpdateValores($act){
-        $this->actUpdateValores=$act;
-    }
-
-    public function getActUpdatePh(){
-        return $this->actUpdatePh;
-    }
-
-    private function setActUpdatePh($actPh){
-        $this->actUpdatePh=$actPh;
-    }
-
-    public function getInsertValores(){
-        return $this->insertValores;
-    }
-
-    private function setInsertValores($insert){
-        $this->insertValores=$insert;
-    }
-
-    public function getInsertPh(){
-        return $this->insertPh;
-    }
-
-    private function setInsertPh($insertPh){
-        $this->insertPh=$insertPh;
-    }
-
-    public function setParametros($tablaSpecs,$columnaSpecs,$valores,$conn){
-        $this->tablaSpecs=$tablaSpecs;
+        if(empty($conexion)||!is_object($conexion)){
+            $this->setMensajes('La conexión no es válida');
+            return false;
+        }
+        $this->setProceso();
+        $this->getProceso()->setTabla($tablaSpecs['nombre']);
+        $this->getProceso()->setSchema($tablaSpecs['schema']);
+        $this->getProceso()->setCamposInsert($tablaSpecs['columnas']);
+        $this->getProceso()->setCamposSelect($tablaSpecs['columnasProceso']);
+        $this->getProceso()->setLlaves($tablaSpecs['llaves']);
+        if(!isset($tablaSpecs['tipo'])||!is_string($tablaSpecs['tipo'])||!in_array($tablaSpecs['tipo'],Array('S','IU','UI','I','U'))){
+            $this->setMensajes('El tipo de proceso se establece al valor por defecto');
+            $tablaSpecs['tipo']='S';
+        }
+        $this->setTipo($tablaSpecs['tipo']);
         $this->columnaSpecs=$columnaSpecs;
         $this->valores=$valores;
-        $this->conn=$conn;
-        $this->mensajes=array();
+        $this->getProceso()->setConexion($conexion);
+        return true;
     }
 
     public function getMensajes(){
-        return $this->mensajes;
+        return array_merge($this->getProceso()->getMensajes(),$this->mensajes);
     }
 
     private function setMensajes($mensaje){
@@ -106,119 +83,21 @@ class Cargador extends ContainerAware{
         return $this->keysDiff;
     }
 
-    private function setExistenteRaw($datos){
-        $this->existenteRaw=$datos;
-    }
-
-    public function getExistenteRaw(){
-        return $this->existenteRaw;
-    }
-
-    public function getExistenteIndex(){
-        return $this->existenteIndex;
-    }
-
-    private function setExistenteIndex($datos){
-        $this->existenteIndex=$datos;
-    }
-
-    public function is_multi_array($array) {
-        return (count($array) != count($array, 1));
-    }
-
-    private function getWherePhString($phArray){
-        if(empty($phArray) ||!is_array($phArray)){
-            $this->setMensajes('No hay información para crear las condiciones de busqueda');
-            return false;
-        }
-        if(!$this->is_multi_array($phArray)){
-            return implode(' AND ', $phArray);
-        }
-        foreach ($phArray as $row):
-            if(is_array($row)){
-                $wherePH[]='('.implode(' AND ', $row).')';
-            }
-        endforeach;
-        return implode(' OR ', $wherePH);
-    }
-
-    private function bindValues($statement,$values){
-        if(empty($values) ||!is_array($values)){
-            $this->setMensajes('No hay valores para asignar');
-            return false;
-        }
-        foreach($values as $whereKey=>$whereValor):
-            if(is_array($whereValor)){
-                foreach ($whereValor as $whereSubKey => $whereSubValor):
-                    $statement->bindValue($whereSubKey,$whereSubValor);
-                endforeach;
-            }else{
-                $statement->bindValue($whereKey,$whereValor);
-            }
-        endforeach;
-        return $statement;
-    }
-
-    public function setQueryVariables($whereArray,$tipo='select'){
-        if(empty($whereArray)){
-            $this->setMensajes('No existe informacion para definir las condiciones');
-            return false;
-        }
-
-        foreach($whereArray as $key => $valor):
-            if(is_array($valor)&&($tipo!='act'||$tipo!='insert')){
-                foreach($valor as $subKey => $subValor):
-                    $wherePh[$key][]=$subKey.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28);
-                    $whereValor[$key]['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
-                endforeach;
-            }elseif(is_array($valor)&&($tipo=='act'||$tipo=='insert')){
-                $this->setMensajes('El valor ingresado para "insert" o "act" no puede ser procesado');
-                return false;
-            }else{
-                if($tipo=='act'){
-                    $wherePh[]=$key.'= :'.$key;
-                    $whereValor[$key]=$valor;
-                }elseif($tipo=='insert'){
-                    $wherePh[]=':'.$key;
-                    $whereValor[$key]=$valor;
-                }else{
-                    $wherePh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28);
-                    $whereValor['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
-                }
-            }
-        endforeach;
-        if(!isset($wherePh)||!isset($whereValor)){
-            $this->setMensajes('No existe informacion para definir las condiciones');
-            return false;
-        }
-        if($tipo=='select'){
-            $this->setWhereSelectPh($wherePh);
-            $this->setWhereSelectValores($whereValor);
-        }elseif($tipo=='update'){
-            $this->setWhereUpdatePh($wherePh);
-            $this->setWhereUpdateValores($whereValor);
-        }elseif($tipo=='act'){
-            $this->setActUpdatePh($wherePh);
-            $this->setActUpdateValores($whereValor);
-        }
-        return true;
-    }
-
     private function setKeysDiff(){
         $query[]="SELECT cols.table_name, cols.column_name, cols.position, cons.status, cons.owner";
         $query[]="FROM all_constraints cons, all_cons_columns cols";
-        $query[]="WHERE cols.table_name = '".$this->tablaSpecs['nombre']."' AND cons.constraint_type = 'P'";
+        $query[]="WHERE cols.table_name = '".$this->getProceso()->getTabla()."' AND cons.constraint_type = 'P'";
         $query[]="AND cons.constraint_name = cols.constraint_name AND cons.owner = cols.owner";
-        $query[]="AND cons.owner = '".$this->tablaSpecs['schema']."' ORDER BY cols.table_name, cols.position";
-        $statement = $this->conn->query(implode(' ',$query));
+        $query[]="AND cons.owner = '".$this->getProceso()->getSchema()."' ORDER BY cols.table_name, cols.position";
+        $statement = $this->getProceso()->getConexion()->query(implode(' ',$query));
         $keysArray = $statement->fetchAll();
         $keyInTable=array();
         foreach($keysArray as $key):
             $keyInTable[]=$key['COLUMN_NAME'];
         endforeach;
-        $this->keysDiff=array_diff($keyInTable,$this->tablaSpecs['llaves']);
+        $this->keysDiff=array_diff($keyInTable,$this->getProceso()->getLlaves());
         if(!empty($this->keysDiff)){
-            $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condici�n');
+            $this->setMensajes('Existe diferencia entre las llaves ingresadas y las existentes, no se permite update e insert con esta condición');
         }
     }
 
@@ -230,75 +109,34 @@ class Cargador extends ContainerAware{
                  }
             endforeach;
         endforeach;
-        if(!$this->setQueryVariables($whereArray)){
-            return false;
-        }
-
-
-
-    }
-
-    public function ejecutarSelectQuery(){
-        $selectQuery='SELECT '.implode(', ',$this->tablaSpecs['columnasProceso']).' FROM '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' WHERE '.$this->getWherePhString($this->getWhereSelectPh());
-        $statement = $this->conn->prepare($selectQuery);
-        $statement=$this->bindValues($statement,$this->getWhereSelectValores());
-        $statement->execute();
-        $registros=$statement->fetchAll();
-        $this->setExistenteRaw($registros);
-        foreach($this->getExistenteRaw() as $linea):
-            $identArray=array();
-            foreach($this->tablaSpecs['llaves'] as $llave):
-                $identArray[]=$linea[$llave];
-                unset($linea[$llave]);
-            endforeach;
-            $existente[implode('|',$identArray)]=$linea;
-        endforeach;
-        $this->setExistenteIndex($existente);
+        return $whereArray;
     }
 
     public function ejecutar(){
-        $procesar=true;
-        if(!isset($this->tablaSpecs['tipo'])||!in_array($this->tablaSpecs['tipo'],Array('S','IU','UI','I','U'))){
-            $this->setMensajes('El tipo de proceso no esta establecido o no es correcto');
-            $procesar=false;
-        }
-        if(empty($this->valores)){
-            $this->setMensajes('No existen valores para procesar');
-            $procesar=false;
-        }
-        if(empty($this->tablaSpecs)){
-            $this->setMensajes('Las especificaciones de la tabla no existen');
-            $procesar=false;
-        }
-        if(empty($this->tablaSpecs)){
-            $this->setMensajes('Las especificaciones de las columnas no existen');
-            $procesar=false;
-        }
-        if($procesar===false){
+        $whereArray=$this->prepararSelect();
+        if(!$this->getProceso()->setQueryVariables($whereArray)){
             return false;
         }
         $this->setKeysDiff();
-        $this->prepararSelect();
-        $this->ejecutarSelectQuery();
-        if(empty($this->getKeysDiff())&&$this->tablaSpecs['tipo']!='S'){
+        $this->getProceso()->ejecutarSelectQuery();
+        if(empty($this->getKeysDiff())&&$this->getTipo()!='S'){
             $this->setMensajes('Se realizo la busqueda, se ejecutan los procesos de escritura');
             $this->dbProcess();
             return true;
-        }elseif($this->tablaSpecs['tipo']=='S'){
+        }elseif($this->getTipo()=='S'){
             $this->setMensajes('Se realizo la busqueda, no se ejecuta ningun proceso extra');
             return true;
         }else{
-            $this->setMensajes('Existen diferencias en las llaves, no se hara el proceso');
+            $this->setMensajes('Existen diferencias en las llaves, no se hará el proceso');
             return false;
         }
     }
 
     public function dbProcess(){
-        if(empty($this->getExistenteIndex())&&$this->tablaSpecs['tipo']!='I'){
+        if(empty($this->getProceso()->getExistenteIndex())&&$this->getTipo()!='I'){
             $this->setMensajes('Solo se permite inserciones con tipo I');
             return false;
         }
-        //@todo independizar funcion set*paramters
         foreach ($this->valores as $rowNumber => $row):
             $whereArray=array();
             $actArray=array();
@@ -307,69 +145,46 @@ class Cargador extends ContainerAware{
                 if(isset($this->columnaSpecs[$col]['nombre'])&&isset($this->columnaSpecs[$col]['llave'])){
                     if($this->columnaSpecs[$col]['llave']=='si'){
                         $whereArray[$this->columnaSpecs[$col]['nombre']]=$valor;
-                    }elseif(in_array($this->columnaSpecs[$col]['nombre'],$this->tablaSpecs['columnasProceso'])){
+                    }elseif(in_array($this->columnaSpecs[$col]['nombre'],$this->getProceso()->getCamposSelect())){
                         $actArray[$this->columnaSpecs[$col]['nombre']]=$valor;
                     }
-                    if(in_array($this->columnaSpecs[$col]['nombre'],$this->tablaSpecs['columnasProceso'])){
+                    if(in_array($this->columnaSpecs[$col]['nombre'],$this->getProceso()->getCamposInsert())){
                         $insertArray[$this->columnaSpecs[$col]['nombre']]=$valor;
                     }
                 }
             endforeach;
-            if(!$this->setQueryVariables($whereArray,'update')){
+            if(!$this->getProceso()->setQueryVariables($whereArray,'whereUpdate')){
                 return false;
             }
-            if(!$this->setQueryVariables($actArray,'act')){
+            if(!$this->getProceso()->setQueryVariables($actArray,'valoresUpdate')){
                 return false;
             }
-            if(!$this->setQueryVariables($insertArray,'insert')){
+            if(!$this->getProceso()->setQueryVariables($insertArray,'valoresInsert')){
                 return false;
             }
+            print_r($this->getTipo());
             $this->dbRowProcess($rowNumber+1);
         endforeach;
         return true;
     }
 
-    public function ejecutarUpdateQuery(){
-        if(empty($this->getActUpdatePh())||empty($this->getWhereUpdatePh())){
-            $this->setMensajes('No existen los parametros de actualización');
-            return false;
-        }
-        $updateQuery='UPDATE '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' SET '.implode(', ',$this->getActUpdatePh()).' WHERE '.$this->getWherePhString($this->getWhereUpdatePh());//update
-        $statement = $this->conn->prepare($updateQuery);
-        $statement=$this->bindValues($statement,array_merge($this->getActUpdateValores(),$this->getWhereUpdateValores()));
-        $statement->execute();
-        return true;
-     }
-
-    public function ejecutarInsertQuery(){
-        if(empty($this->getInsertPh())||empty($this->getInsertValores())){
-            $this->setMensajes('No existen los parametros para insersión');
-            return false;
-        }
-        $addQuery='INSERT INTO '.$this->tablaSpecs['schema'].'.'.$this->tablaSpecs['nombre'].' ('.implode(', ',$this->tablaSpecs['columnas']).') VALUES ('.implode(', ',$this->getInsertPh()).')';
-        $statement = $this->conn->prepare($addQuery);
-        $statement=$this->bindValues($statement,$this->getInsertValores());
-        $statement->execute();
-        return true;
-    }
-
     private function dbRowProcess($rowNumber){
-        $busqueda=implode('|',$this->getWhereUpdateValores());
-        if(array_key_exists($busqueda,$this->getExistenteIndex())===true){
-            if($this->tablaSpecs['tipo']=='I'){
+        $busqueda=implode('|',$this->getProceso()->getWhereUpdateValores());
+        if(array_key_exists($busqueda,$this->getProceso()->getExistenteIndex())===true){
+            if($this->getTipo()=='I'){
                 $this->setMensajes('La linea '.$rowNumber.' ya existe, estamos en modo solo insertar');
                 return false;
             }
-            $diferencia=array_diff_assoc($this->getExistenteIndex()[$busqueda],$this->getActUpdateValores());
+            $diferencia=array_diff_assoc($this->getProceso()->getExistenteIndex()[$busqueda],$this->getProceso()->getValoresUpdateValores());
             if(empty($diferencia)){
                 $this->setMensajes('Nada que actualizar para la linea: '.$rowNumber);
                 return true;
             }
-            if($this->ejecutarUpdateQuery()){
+            if($this->getProceso()->ejecutarUpdateQuery()){
                 $this->setMensajes('Actualizando para la linea: '.$rowNumber);
             }
         }elseif(isset($insertArray)&&!empty($insertArray)){
-            if ($this->tablaSpecs['tipo']=='U'){
+            if ($this->getTipo()=='U'){
                 $this->setMensajes('La linea '.$rowNumber. ' no existe, estamos en modo solo actualizar');
                 return false;
             }
