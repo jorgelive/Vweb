@@ -503,5 +503,27 @@ class ProcesoController extends BaseController
         return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
     }
 
+    public function agregarArchivoAction(Request $request)
+    {
+        if (!$request->isXMLHttpRequest()){
+            throw new NotFoundHttpException("No se encontro la página");
+        }
+        $archivo = new Archivo();
+        $formulario = $this->createFormBuilder($archivo)
+            ->add('nombre')
+            ->add('file')
+            ->getForm();
+        $formulario->handleRequest($request);
+
+        if ($formulario->isValid()){
+            $archivo->setUsuario($this->getUserName());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($archivo);
+            $em->flush();
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+        }
+    }
+
+
 
 }

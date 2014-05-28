@@ -9,7 +9,7 @@
 {% endblock stylesheets%}
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts '@GoproVipacExtraBundle/Resources/public/js/*' %}
+    {% javascripts '@GoproVipacExtraBundle/Resources/public/js/inicio/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascripts %}
@@ -23,5 +23,8 @@
     </div>
 {% endblock container %}
 {% block javascriptsfinal %}
+    {% javascripts '@GoproVipacExtraBundle/Resources/public/js/fin/*'%}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     {{ parent() }}
 {% endblock javascriptsfinal %}

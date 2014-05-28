@@ -3,13 +3,13 @@
 {% block titulo %}{% endblock titulo %}
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='cssrewrite' %}
+    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='css_url_rewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock stylesheets%}
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/*' %}
+    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/inicio/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascripts %}
@@ -23,35 +23,8 @@
     </div>
 {% endblock container %}
 {% block javascriptsfinal %}
+    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/fin/*'%}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
     {{ parent() }}
-    <script>
-        $( ".ajaxLink" ).click(function(event) {
-            event.preventDefault();
-            var id = $(this).prop('rel');
-            var url = $(this).prop( "href" );
-            //alert(url);
-            var posting = $.post( url, { id: id } );
-            //$("#archivos #listado tr[rel="+id+"]").remove();
-
-            posting.done(function( data ) {
-                //  var content = $( data ).find( "#content" );
-                if(!data.hasOwnProperty('exito')){
-                    alert ('El servidor no devolvio la respueta esperada')
-                    return false;
-                }
-                if(!data.hasOwnProperty('mensaje')){
-                    alert ('El servidor no devolvio mensaje')
-                    return false;
-                }
-                if(data.exito=='si'){
-                    $("#archivos #listado tr[rel="+id+"]").remove();
-                }else{
-                    //alert(data.mensaje);
-
-                };
-                $("#sessionFlash").empty().append(data.mensaje);
-                //
-            });
-        });
-    </script>
 {% endblock javascriptsfinal %}

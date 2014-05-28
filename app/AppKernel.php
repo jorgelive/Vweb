@@ -30,6 +30,7 @@ class AppKernel extends Kernel
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Gopro\Vipac\ExtraBundle\GoproVipacExtraBundle(),
             new Gopro\Vipac\MainBundle\GoproVipacMainBundle(),
+            new Fkr\CssURLRewriteBundle\FkrCssURLRewriteBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
