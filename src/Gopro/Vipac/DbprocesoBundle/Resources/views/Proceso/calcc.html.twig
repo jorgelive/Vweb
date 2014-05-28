@@ -1,0 +1,58 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Calculadora de centros de costo y cuentas por asiento{% endblock title %}
+{% block titulo %}Calculadora de centros de costo y cuentas por asiento{% endblock titulo %}
+{% block content %}
+    <div id="carga">
+        <h1>Agregar archivo</h1>
+        <div id="archivosForm">
+            <form action="#" method="post" {{ form_enctype(formulario) }}>
+                {{ form_widget(formulario) }}
+
+                <input type="submit" value="Subir archivo" />
+            </form>
+        </div>
+    </div>
+
+    {% if archivosAlmacenados|default %}
+        <div id="archivos">
+            <h1>Listado de Archivos</h1>
+            <table id="listado">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Fecha de creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for archivo in archivosAlmacenados %}
+                    <tr rel="{{ archivo.id }}">
+                        <td class="nombre">{{ archivo.nombre }}</td>
+                        <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_calcc', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="ajaxLink" rel="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_proceso_borrararchivo') }}">Borrar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Mensajes del proceso</h1>
+            <ul>
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+{% endblock content %}
+
+
+
+
+

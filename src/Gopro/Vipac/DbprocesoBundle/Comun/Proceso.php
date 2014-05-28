@@ -10,6 +10,7 @@ class Proceso extends ContainerAware{
     private $mensajes=array();
     private $existenteRaw;
     private $existenteIndex;
+    private $existenteIndexMulti;
     private $whereSelectValores;
     private $whereSelectPh;
     private $camposSelect;
@@ -138,12 +139,12 @@ class Proceso extends ContainerAware{
         $this->mensajes[]=$mensaje;
     }
 
-    private function setExistenteRaw($datos){
-        $this->existenteRaw=$datos;
-    }
-
     public function getExistenteRaw(){
         return $this->existenteRaw;
+    }
+
+    private function setExistenteRaw($datos){
+        $this->existenteRaw=$datos;
     }
 
     public function getExistenteIndex(){
@@ -152,6 +153,14 @@ class Proceso extends ContainerAware{
 
     private function setExistenteIndex($datos){
         $this->existenteIndex=$datos;
+    }
+
+    public function getExistenteIndexMulti(){
+        return $this->existenteIndexMulti;
+    }
+
+    private function setExistenteIndexMulti($datos){
+        $this->existenteIndexMulti=$datos;
     }
 
     public function getLlaves(){
@@ -280,6 +289,7 @@ class Proceso extends ContainerAware{
             return false;
         }
         $selectQuery='SELECT '.implode(', ',$this->getCamposSelect()).' FROM '.$this->getSchema().'.'.$this->getTabla().' WHERE '.$this->getSerializedPhString($this->getWhereSelectPh());
+
         $statement = $this->getConexion()->prepare($selectQuery);
         $statement=$this->bindValues($statement,$this->getWhereSelectValores());
         if(!$statement->execute()){
@@ -288,14 +298,15 @@ class Proceso extends ContainerAware{
         $registros=$statement->fetchAll();
         $this->setExistenteRaw($registros);
         foreach($this->getExistenteRaw() as $nroLinea => $linea):
-            $identArray=array();
+            $indexedArray=array();
             foreach($this->getLlaves() as $llave):
                 if(isset($linea[$llave])){
-                    $identArray[]=$linea[$llave];
+                    $indexedArray[]=$linea[$llave];
                     unset($linea[$llave]);
                 }
             endforeach;
-            $existente[implode('|',$identArray)]=$linea;
+            $existente[implode('|',$indexedArray)]=$linea;
+            $existenteMulti[implode('|',$indexedArray)][]=$linea;
             if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $campo):
                     if(isset($linea[$campo])){
@@ -305,6 +316,7 @@ class Proceso extends ContainerAware{
             }
         endforeach;
         $this->setExistenteIndex($existente);
+        $this->setExistenteIndexMulti($existenteMulti);
         if(isset($existenteCustom)){
             $this->setExistenteCustom($existenteCustom);
         }
