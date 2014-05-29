@@ -17,9 +17,15 @@ class Archivo extends ContainerAware{
 
     private $tablaSpecs;
     private $columnaSpecs;
-    private $valores;
+    private $valoresRaw;
     private $valoresIndizados;
-    private $descartados;
+    private $valoresIndizadosMulti;
+    private $valoresCustom;
+    private $valoresCustomIndizados;
+    private $valoresCustomIndizadosMulti;
+    private $valoresDescartados;
+    private $camposCustom;
+    private $camposCustomIndizados;
     private $archivoValido;
 
     public function getTablaSpecs(){
@@ -30,20 +36,80 @@ class Archivo extends ContainerAware{
         return $this->columnaSpecs;
     }
 
-    public function getValores(){
-        return $this->valores;
+    public function getArchivoValido(){
+        return $this->archivoValido;
+    }
+
+    public function getMensajes(){
+        return $this->mensajes;
+    }
+
+    private function setMensajes($mensaje){
+        $this->mensajes[]=$mensaje;
+    }
+
+    public function getValoresRaw(){
+        return $this->valoresRaw;
     }
 
     public function getValoresIndizados(){
         return $this->valoresIndizados;
     }
 
-    public function getDescartados(){
-        return $this->descartados;
+    private function setValoresIndizados($valoresIndizados){
+        $this->valoresIndizados=$valoresIndizados;
     }
 
-    public function getArchivoValido(){
-        return $this->archivoValido;
+    public function getValoresIndizadosMulti(){
+        return $this->valoresIndizadosMulti;
+    }
+
+    private function setValoresIndizadosMulti($valoresIndizadosMulti){
+        $this->valoresIndizadosMulti=$valoresIndizadosMulti;
+    }
+
+    private function setValoresRaw($valores){
+        $this->valoresRaw=$valores;
+    }
+
+    public function setCamposCustom($campos){
+        $this->camposCustom=$campos;
+    }
+
+    public function getCamposCustom(){
+        return $this->camposCustom;
+    }
+
+    public function getValoresCustomIndizados(){
+        return $this->valoresCustomIndizados;
+    }
+
+    private function setValoresCustomIndizados($valoresCustomIndizados){
+        $this->valoresCustomIndizados=$valoresCustomIndizados;
+    }
+
+    public function getValoresCustomIndizadosMulti(){
+        return $this->valoresCustomIndizadosMulti;
+    }
+
+    private function setValoresCustomIndizadosMulti($valoresCustomIndizadosMulti){
+        $this->valoresCustomIndizadosMulti=$valoresCustomIndizadosMulti;
+    }
+
+    public function getValoresCustom(){
+        return $this->valoresCustom;
+    }
+
+    private function setValoresCustom($valoresCustom){
+        $this->valoresCustom=$valoresCustom;
+    }
+
+    public function getValoresDescartados(){
+        return $this->valoresDescartados;
+    }
+
+    public function setValoresDescartados($valoresDescartados){
+       $this->valoresDescartados=$valoresDescartados;
     }
 
     public function setParametros($setTablaSpecs,$setColumnaSpecs){
@@ -99,14 +165,6 @@ class Archivo extends ContainerAware{
         $this->parsed='no';
     }
 
-    public function getMensajes(){
-        return $this->mensajes;
-    }
-
-    private function setMensajes($mensaje){
-        $this->mensajes[]=$mensaje;
-    }
-
     public function parseExcel(){
 
         if($this->parsed=='si'){
@@ -133,6 +191,9 @@ class Archivo extends ContainerAware{
         $arrayY=0;
         $specRow=false;
         $specRowType='';
+        $valores=array();
+        $valoresIndizados=array();
+        $valoresIndizadosMulti=array();
         for ($row = 1; $row <= $highestRow;++$row)
         {
             $procesandoNombre=false;
@@ -225,30 +286,64 @@ class Archivo extends ContainerAware{
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-                            $this->valores[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            $valores[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
                         endforeach;
                     }else{
-                        $this->descartados[$arrayY][]=$value;
+                        $descartados[$arrayY][]=$value;
                     }
                 }
             }
             $arrayY ++;
-        }
-        return ($this->setValoresIndizados());
-    }
 
-    private function setValoresIndizados(){
-        if(empty($this->valores)){
+        }
+
+        if(empty($valores)){
             $this->setMensajes('No hay valores que procesar');
             return false;
         }
-        foreach ($this->valores as $valor):
+
+        foreach ($valores as $nroLinea=>$valor):
             $indice=array();
             foreach($this->tablaSpecs['llaves'] as $llave):
                 $indice[]=$valor[$llave];
+                unset($valor[$llave]);
+
             endforeach;
-            $this->valoresIndizados[implode('|',$indice)][]=$valor;
+            $valoresIndizados[implode('|',$indice)]=$valor;
+            $valoresIndizadosMulti[implode('|',$indice)][]=$valor;
+            if(!empty($this->getCamposCustom())){
+                $i=0;
+                foreach($this->getCamposCustom() as $llaveCustom):
+                    if(isset($valor[$llaveCustom])){
+                        $valoresCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
+                        $valoresCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
+
+                    }
+                    $i++;
+                endforeach;
+            }
+            if(!empty($this->getCamposCustom())){
+                foreach($this->getCamposCustom() as $llaveCustom):
+                    if(isset($valor[$llaveCustom])){
+                        $valoresCustom[$nroLinea][$llaveCustom]=$valor[$llaveCustom];
+                    }
+                endforeach;
+            }
         endforeach;
+
+        $this->setValoresRaw($valores);
+        $this->setValoresIndizados($valoresIndizados);
+        $this->setValoresIndizadosMulti($valoresIndizadosMulti);
+        if(isset($valoresCustomIndizados)&&!empty($valoresCustomIndizados)){
+            $this->setValoresCustomIndizados($valoresCustomIndizados);
+        }
+        if(isset($valoresCustomIndizadosMulti)&&!empty($valoresCustomIndizadosMulti)){
+            $this->setValoresCustomIndizadosMulti($valoresCustomIndizadosMulti);
+        }
+        if(isset($valoresCustom)&&!empty($valoresCustom)){
+            $this->setValoresCustom($valoresCustom);
+        }
+
         return true;
     }
 

@@ -16,6 +16,8 @@ class Proceso extends ContainerAware{
     private $camposSelect;
     private $camposCustom;
     private $existenteCustom;
+    private $existenteCustomIndizado;
+    private $existenteCustomIndizadoMulti;
     private $llaves;
 
     //valores temporales por fila
@@ -187,6 +189,22 @@ class Proceso extends ContainerAware{
         $this->existenteCustom=$existente;
     }
 
+    public function getExistenteCustomIndizado(){
+        return $this->existenteCustomIndizado;
+    }
+
+    public function setExistenteCustomIndizado($existente){
+        $this->existenteCustomIndizado=$existente;
+    }
+
+    public function getExistenteCustomIndizadoMulti(){
+        return $this->existenteCustomIndizado;
+    }
+
+    public function setExistenteCustomIndizadoMulti($existente){
+        $this->existenteCustomIndizadoMulti=$existente;
+    }
+
     private function getSerializedPhString($phArray){
         if(empty($phArray) ||!is_array($phArray)){
             $this->setMensajes('No hay información para crear las condiciones de busqueda');
@@ -308,17 +326,34 @@ class Proceso extends ContainerAware{
             $existente[implode('|',$indexedArray)]=$linea;
             $existenteMulti[implode('|',$indexedArray)][]=$linea;
             if(!empty($this->getCamposCustom())){
+                $i=0;
+                foreach($this->getCamposCustom() as $campo):
+                    if(isset($linea[$campo])){
+                        $existenteCustomIndizadoMulti[implode('|',$indexedArray)][$i][$campo]=$linea[$campo];
+                        $existenteCustomIndizado[implode('|',$indexedArray)][$campo]=$linea[$campo];
+                    }
+                $i++;
+                endforeach;
+            }
+            if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $campo):
                     if(isset($linea[$campo])){
                         $existenteCustom[$nroLinea][$campo]=$linea[$campo];
                     }
                 endforeach;
             }
+
         endforeach;
         $this->setExistenteIndex($existente);
         $this->setExistenteIndexMulti($existenteMulti);
         if(isset($existenteCustom)){
             $this->setExistenteCustom($existenteCustom);
+        }
+        if(isset($existenteCustomIndizado)){
+            $this->setExistenteCustomIndizado($existenteCustomIndizado);
+        }
+        if(isset($existenteCustomIndizadoMulti)){
+            $this->setExistenteCustomIndizadoMulti($existenteCustomIndizadoMulti);
         }
         return true;
     }
