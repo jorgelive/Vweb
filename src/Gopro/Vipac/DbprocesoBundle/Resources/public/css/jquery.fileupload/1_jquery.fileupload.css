@@ -10,11 +10,11 @@
  * http://www.opensource.org/licenses/MIT
  */
 
-.fileinput-button {
+#fileUpload .fileinput-button {
   position: relative;
   overflow: hidden;
 }
-.fileinput-button input {
+#fileUpload .fileinput-button input {
   position: absolute;
   top: 0;
   right: 0;
@@ -34,3 +34,19 @@
     height: 100%;
   }
 }
+
+#fileUpload table {
+    width: 100%;
+    margin: 10px 0;
+}
+
+#fileUpload .fileupload-progress {
+    margin: 10px 0;
+}
+#fileUpload .fileupload-progress .progress-extended {
+    margin-top: 5px;
+}
+#fileUpload .error {
+    color: red;
+}
+

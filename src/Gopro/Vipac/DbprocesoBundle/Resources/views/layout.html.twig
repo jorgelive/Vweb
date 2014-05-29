@@ -3,13 +3,13 @@
 {% block titulo %}{% endblock titulo %}
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='css_url_rewrite' %}
+    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' '@GoproVipacDbprocesoBundle/Resources/public/css/jquery.fileupload/*' filter='css_url_rewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock stylesheets%}
 {% block javascripts %}
     {{ parent() }}
-    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/inicio/*' %}
+    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/inicio/*' '@GoproVipacDbprocesoBundle/Resources/public/js/jquery.fileUpload/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascripts %}
@@ -22,7 +22,14 @@
         {% endblock content %}
     </div>
 {% endblock container %}
+
 {% block javascriptsfinal %}
+    <script id="template-download" type="text/x-tmpl">
+        {{ source("GoproVipacDbprocesoBundle:Jstemplates:fileUploadTemplateDownload.js.twig") }}
+    </script>
+    <script id="template-upload" type="text/x-tmpl">
+        {{ source("GoproVipacDbprocesoBundle:Jstemplates:fileUploadTemplateUpload.js.twig") }}
+    </script>
     {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}

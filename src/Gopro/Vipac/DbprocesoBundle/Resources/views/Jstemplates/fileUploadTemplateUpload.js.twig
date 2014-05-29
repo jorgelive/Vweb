@@ -1,0 +1,23 @@
+{% for (var i=0, file; file=o.files[i]; i++) { %}
+    <tr class="template-upload fade">
+        <td>
+            <span class="preview"></span>
+        </td>
+        <td>
+            <p class="name">{%=file.name%}</p>
+            <strong class="error"></strong>
+        </td>
+        <td>
+            <p class="size">Procesando...</p>
+            <div class="progress"></div>
+        </td>
+        <td>
+            {% if (!i && !o.options.autoUpload) { %}
+            <button class="start" disabled>Inicio</button>
+            {% } %}
+            {% if (!i) { %}
+            <button class="cancel">Cancelar</button>
+            {% } %}
+        </td>
+    </tr>
+{% } %}

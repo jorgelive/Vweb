@@ -4,28 +4,14 @@
     <title>{% block title %}Bienvenidos! - VWeb{% endblock title %}</title>
 
     {% block stylesheets %}
-        <script src="http://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
-        <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
-        <script src="http://blueimp.github.io/JavaScript-Load-Image/js/load-image.min.js"></script>
-        <!-- The Canvas to Blob plugin is included for image resizing functionality -->
-        <script src="http://blueimp.github.io/JavaScript-Canvas-to-Blob/js/canvas-to-blob.min.js"></script>
-        <!-- blueimp Gallery script -->
-        <script src="http://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
-        {% stylesheets filter='css_url_rewrite'
-            '@GoproVipacMainBundle/Resources/public/css/*'
-            '@GoproVipacMainBundle/Resources/public/css/jquery.ui.vipac/*'
-            '@GoproVipacMainBundle/Resources/public/css/jquery.fileupload/*'
-        %}
+        {% stylesheets filter='css_url_rewrite' '@GoproVipacMainBundle/Resources/public/css/*' '@GoproVipacMainBundle/Resources/public/css/jquery.ui.vipac/*' %}
             <link rel="stylesheet" href="{{ asset_url }}" rel="stylesheet" media="screen"/>
         {% endstylesheets %}
 
     {% endblock stylesheets%}
 
     {% block javascripts %}
-        {% javascripts
-           '@GoproVipacMainBundle/Resources/public/js/inicio/*'
-           '@GoproVipacMainBundle/Resources/public/js/jquery.fileUpload/*'
-        %}
+        {% javascripts '@GoproVipacMainBundle/Resources/public/js/inicio/*' %}
             <script type="text/javascript" src="{{ asset_url }}"></script>
         {% endjavascripts %}
     {% endblock javascripts %}
