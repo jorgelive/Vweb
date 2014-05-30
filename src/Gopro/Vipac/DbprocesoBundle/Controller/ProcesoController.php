@@ -176,7 +176,7 @@ class ProcesoController extends BaseController
         $columnaspecs[23]=array('nombre'=>'MONTO_DOLAR','llave'=>'no');
 
         $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
-        $procesoArchivo->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR']);
+        $procesoArchivo->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DOCUMENTO']);
 
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -184,6 +184,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
+        //print_r($procesoArchivo->getValoresCustomIndizados());
         $carga=$this->get('gopro_dbproceso_comun_cargador');
         if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -240,9 +241,17 @@ class ProcesoController extends BaseController
         }
         //print_r($procesoArchivo->getValoresCustomIndizados());
         foreach($carga->getProceso()->getExistenteRaw() as $valor):
-            if(isset($serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])&&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']])){
+            //print_r($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]);
+            if(
+                isset($serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
+                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']])
+                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
+                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
+                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
+            ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]);
+                //print_r($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], array($this, 'setMonto'),'MONTO');
 
@@ -265,7 +274,6 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $i=0;
-        //print_r($preResultado);
         foreach($preResultado as $valor):
             foreach($valor['items'] as $item):
                 $resultado[$i]=$item;
@@ -276,6 +284,7 @@ class ProcesoController extends BaseController
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
                 $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
                 $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
+                $resultado[$i]['DOCUMENTO']=$valor['DOCUMENTO'];
                 $resultado[$i]['MONTO_PRORRATEADO']=$item['MONTO']*$valor['coeficiente'];
                 $resultado[$i]['MONTO_PRORRATEADO_LOCAL']=$resultado[$i]['MONTO_PRORRATEADO']*$valor['CREDITO_LOCAL']/$valor['CREDITO_DOLAR'];
                 $resultado[$i]['COEFICIENTE']=$valor['coeficiente'];
