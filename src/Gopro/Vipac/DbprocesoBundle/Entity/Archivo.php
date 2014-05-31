@@ -160,6 +160,19 @@ class Archivo
             : $this->getUploadDir() . '/'.$this->id.'.'.$this->extension;
     }
 
+    public function getThumbPath()
+    {
+        if($this->extension===null){
+            return null;
+        }
+        if(in_array($this->extension,['jpg','jpeg','png',''])){
+            return $this->getUploadDir() . '/thumb/'.$this->id.'.'.$this->extension;
+
+        }else{
+            return $this->getUploadDir() . '/bundles/goprovipacmain/img/iconos/'.$this->extension.'.png';
+        }
+    }
+
     protected function getUploadRootDir()
     {
         return __DIR__ . '/../../../../../web/' . $this->getUploadDir();

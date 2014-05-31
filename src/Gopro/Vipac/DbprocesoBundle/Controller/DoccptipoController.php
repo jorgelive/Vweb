@@ -11,16 +11,12 @@ use Gopro\Vipac\DbprocesoBundle\Entity\Doccptipo;
 use Gopro\Vipac\DbprocesoBundle\Form\DoccptipoType;
 
 /**
- * Doccptipo controller.
- *
  * @Route("/doccptipo")
  */
 class DoccptipoController extends Controller
 {
 
     /**
-     * Lists all Doccptipo entities.
-     *
      * @Route("/", name="gopro_vipac_dbproceso_doccptipo")
      * @Method("GET")
      * @Template()
@@ -36,8 +32,6 @@ class DoccptipoController extends Controller
         );
     }
     /**
-     * Creates a new Doccptipo entity.
-     *
      * @Route("/", name="gopro_vipac_dbproceso_doccptipo_create")
      * @Method("POST")
      * @Template("GoproVipacDbprocesoBundle:Doccptipo:new.html.twig")
@@ -63,10 +57,7 @@ class DoccptipoController extends Controller
     }
 
     /**
-    * Creates a form to create a Doccptipo entity.
-    *
     * @param Doccptipo $entity The entity
-    *
     * @return \Symfony\Component\Form\Form The form
     */
     private function createCreateForm(Doccptipo $entity)
@@ -82,8 +73,6 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * Displays a form to create a new Doccptipo entity.
-     *
      * @Route("/new", name="gopro_vipac_dbproceso_doccptipo_new")
      * @Method("GET")
      * @Template()
@@ -100,8 +89,6 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * Finds and displays a Doccptipo entity.
-     *
      * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_show")
      * @Method("GET")
      * @Template()
@@ -125,8 +112,6 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Doccptipo entity.
-     *
      * @Route("/{id}/edit", name="gopro_vipac_dbproceso_doccptipo_edit")
      * @Method("GET")
      * @Template()
@@ -152,10 +137,7 @@ class DoccptipoController extends Controller
     }
 
     /**
-    * Creates a form to edit a Doccptipo entity.
-    *
     * @param Doccptipo $entity The entity
-    *
     * @return \Symfony\Component\Form\Form The form
     */
     private function createEditForm(Doccptipo $entity)
@@ -170,8 +152,6 @@ class DoccptipoController extends Controller
         return $form;
     }
     /**
-     * Edits an existing Doccptipo entity.
-     *
      * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_update")
      * @Method("PUT")
      * @Template("GoproVipacDbprocesoBundle:Doccptipo:edit.html.twig")
@@ -203,8 +183,6 @@ class DoccptipoController extends Controller
         );
     }
     /**
-     * Deletes a Doccptipo entity.
-     *
      * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_delete")
      * @Method("DELETE")
      */
@@ -229,11 +207,8 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * Creates a form to delete a Doccptipo entity by id.
-     *
-     * @param mixed $id The entity id
-     *
-     * @return \Symfony\Component\Form\Form The form
+     * @param mixed $id el id de la entidad
+     * @return \Symfony\Component\Form\Form el formulario
      */
     private function createDeleteForm($id)
     {

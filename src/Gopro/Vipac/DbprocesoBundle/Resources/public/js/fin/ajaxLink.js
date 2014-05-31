@@ -2,9 +2,7 @@ $( ".ajaxLink" ).click(function(event) {
     event.preventDefault();
     var id = $(this).prop('rel');
     var url = $(this).prop( "href" );
-    //alert(url);
     var posting = $.post( url, { id: id } );
-    //$("#archivos #listado tr[rel="+id+"]").remove();
 
     posting.done(function( data ) {
         //  var content = $( data ).find( "#content" );
