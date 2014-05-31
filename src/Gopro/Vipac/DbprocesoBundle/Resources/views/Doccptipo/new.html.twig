@@ -1,0 +1,14 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Creación de tipos</h1>
+
+    {{ form(form) }}
+
+    <ul class="record_actions">
+    <li>
+        <a href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">
+            Volver a la lista
+        </a>
+    </li>
+</ul>
+{% endblock content %}

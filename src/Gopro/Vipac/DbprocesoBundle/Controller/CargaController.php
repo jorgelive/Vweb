@@ -10,10 +10,15 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 
+/**
+ * Doccptipo controller.
+ *
+ * @Route("/carga")
+ */
 class CargaController extends BaseController
 {
     /**
-     * @Route("/carga/index/{name}", name="gopro_vipac_dbproceso_carga_index")
+     * @Route("/index/{name}", name="gopro_vipac_dbproceso_carga_index")
      * @Template()
      */
     public function indexAction($pais)
@@ -23,7 +28,7 @@ class CargaController extends BaseController
     }
 
     /**
-     * @Route("/carga/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_generico", defaults={"archivoEjecutar" = null})
+     * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_generico", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function genericoAction(Request $request,$archivoEjecutar)
@@ -74,7 +79,7 @@ class CargaController extends BaseController
     }
 
     /**
-     * @Route("/carga/arreglartc/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_arreglartc", defaults={"archivoEjecutar" = null})
+     * @Route("/arreglartc/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_arreglartc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function arreglartcAction(Request $request,$archivoEjecutar)

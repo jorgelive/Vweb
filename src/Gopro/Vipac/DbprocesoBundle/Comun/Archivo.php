@@ -25,7 +25,6 @@ class Archivo extends ContainerAware{
     private $valoresCustomIndizadosMulti;
     private $valoresDescartados;
     private $camposCustom;
-    private $camposCustomIndizados;
     private $archivoValido;
 
     public function getTablaSpecs(){

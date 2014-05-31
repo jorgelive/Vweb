@@ -11,7 +11,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-
+/**
+ * Doccptipo controller.
+ *
+ * @Route("/proceso")
+ */
 class ProcesoController extends BaseController
 {
 
@@ -25,7 +29,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/proceso/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
+     * @Route("/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function chequeAction(Request $request,$archivoEjecutar)
@@ -115,8 +119,98 @@ class ProcesoController extends BaseController
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $mensajes);
     }
 
+    //Cuenta contable normal del impuesto 2 64.1.1.1.01
+    //El subtotal cambia de cuenta si es diferido
     /**
-     * @Route("/proceso/calcc/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calcc", defaults={"archivoEjecutar" = null})
+     * @Route("/cargadorcp/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cargadorcp", defaults={"archivoEjecutar" = null})
+     * @Template()
+     */
+    public function cargadorcpAction(Request $request,$archivoEjecutar)
+    {
+
+        $operacion='proceso_cargadorcp';
+        $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+
+        $archivo = new Archivo();
+        $formulario = $this->createFormBuilder($archivo)
+            ->add('nombre')
+            ->add('file')
+            ->getForm();
+
+        $formulario->handleRequest($request);
+
+        if ($formulario->isValid()){
+            $archivo->setUsuario($this->getUserName());
+            $archivo->setOperacion($operacion);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($archivo);
+            $em->flush();
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+        }
+
+        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
+        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+            $this->setMensajes($procesoArchivo->getMensajes());
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'PROVEEDOR','tipo'=>'S');
+        $columnaspecs[0]=array('nombre'=>'TIPO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[1]=array('nombre'=>'DIFERIDO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[2]=array('nombre'=>'SUBTIPO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[3]=array('nombre'=>'PROVEEDOR','llave'=>'si');
+        $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[5]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[6]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[7]=array('nombre'=>'FECHA_CONTABLE','llave'=>'no','proceso'=>'no');
+        $columnaspecs[8]=array('nombre'=>'APLICACION','llave'=>'no','proceso'=>'no');
+        $columnaspecs[9]=array('nombre'=>'FILE_1','llave'=>'no','proceso'=>'no');
+        $columnaspecs[10]=array('nombre'=>'FILE_2','llave'=>'no','proceso'=>'no');
+        $columnaspecs[11]=array('nombre'=>'FILE_3','llave'=>'no','proceso'=>'no');
+        $columnaspecs[12]=array('nombre'=>'FILE_4','llave'=>'no','proceso'=>'no');
+        $columnaspecs[13]=array('nombre'=>'FILE_5','llave'=>'no','proceso'=>'no');
+        $columnaspecs[14]=array('nombre'=>'FILE_6','llave'=>'no','proceso'=>'no');
+        $columnaspecs[15]=array('nombre'=>'FILE_7','llave'=>'no','proceso'=>'no');
+        $columnaspecs[16]=array('nombre'=>'FILE_8','llave'=>'no','proceso'=>'no');
+        $columnaspecs[17]=array('nombre'=>'FILE_9','llave'=>'no','proceso'=>'no');
+        $columnaspecs[18]=array('nombre'=>'FILE_10','llave'=>'no','proceso'=>'no');
+        $columnaspecs[19]=array('nombre'=>'FILE_11','llave'=>'no','proceso'=>'no');
+        $columnaspecs[20]=array('nombre'=>'FILE_12','llave'=>'no','proceso'=>'no');
+        $columnaspecs[21]=array('nombre'=>'FILE_13','llave'=>'no','proceso'=>'no');
+        $columnaspecs[22]=array('nombre'=>'FILE_14','llave'=>'no','proceso'=>'no');
+        $columnaspecs[23]=array('nombre'=>'FILE_15','llave'=>'no','proceso'=>'no');
+        $columnaspecs[24]=array('nombre'=>'FILE_16','llave'=>'no','proceso'=>'no');
+        $columnaspecs[25]=array('nombre'=>'FILE_17','llave'=>'no','proceso'=>'no');
+        $columnaspecs[26]=array('nombre'=>'FILE_18','llave'=>'no','proceso'=>'no');
+        $columnaspecs[27]=array('nombre'=>'FILE_19','llave'=>'no','proceso'=>'no');
+        $columnaspecs[28]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
+        $columnaspecs[29]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
+
+        $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
+        $procesoArchivo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
+
+        if(!$procesoArchivo->parseExcel()){
+            $this->setMensajes($procesoArchivo->getMensajes());
+            $this->setMensajes('El archivo no se puede procesar');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+        }
+        print_r($procesoArchivo->getValoresCustom());
+        $datosProcesados=$this->get('gopro_dbproceso_comun_cargador');
+        if(!$datosProcesados->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+            $datosProcesados->setMensajes($procesoArchivo->getMensajes());
+            $datosProcesados->setMensajes($datosProcesados->getMensajes());
+            $datosProcesados->setMensajes('Los parametros de carga no son correctos');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+        }
+        //$datosProcesados->getProceso()->setCamposCustom(['ANO','NUM_FILE_FISICO']);
+        $datosProcesados->ejecutar();
+    }
+
+    /**
+     * @Route("/calcc/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calcc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calccAction(Request $request,$archivoEjecutar)
@@ -246,15 +340,16 @@ class ProcesoController extends BaseController
                 isset($serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
                 &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']])
                 &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
+                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
                 &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
+                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
                 &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
+                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
             ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]);
-                //print_r($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], array($this, 'setMonto'),'MONTO');
-
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getMonto();
                 if($this->getMonto()==0){
                     $coeficiente=0;
@@ -264,7 +359,11 @@ class ProcesoController extends BaseController
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['coeficiente']=$coeficiente;
                 $this->resetMonto();
             }else{
-                $this->setMensajes('No hay resultados para el file: '.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
+                if(empty($valor['ANO'])||empty($valor['NUM_FILE_FISICO'])){
+                    $this->setMensajes('No hay resultados para el CC: '.$valor['ASIENTO']);
+                }else{
+                    $this->setMensajes('No hay resultados para el CC: '.$valor['ASIENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
+                }
             }
         endforeach;
         if(!isset($preResultado)||empty($preResultado)){
@@ -317,7 +416,7 @@ class ProcesoController extends BaseController
 
 
     /**
-     * @Route("/proceso/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
+     * @Route("/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxfileAction(Request $request,$archivoEjecutar)
@@ -392,7 +491,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/proceso/calxreserva/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxreserva", defaults={"archivoEjecutar" = null})
+     * @Route("/calxreserva/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxreserva", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxreservaAction(Request $request,$archivoEjecutar)
@@ -494,7 +593,7 @@ class ProcesoController extends BaseController
 
     //@TODO: implementar funcion
     /**
-     * @Route("/proceso/editararchivo", name="gopro_vipac_dbproceso_proceso_editararchivo")
+     * @Route("/editararchivo", name="gopro_vipac_dbproceso_proceso_editararchivo")
      * @Method({"POST"})
      * @Template()
      */
@@ -517,7 +616,12 @@ class ProcesoController extends BaseController
         $em->flush();
         return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
     }
-
+    //@TODO: implementar funcion
+    /**
+     * @Route("/agregararchivo", name="gopro_vipac_dbproceso_proceso_agregararchivo")
+     * @Method({"POST"})
+     * @Template()
+     */
     public function agregarArchivoAction(Request $request)
     {
         if (!$request->isXMLHttpRequest()){

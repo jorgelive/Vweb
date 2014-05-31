@@ -1,0 +1,56 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Lista de tipos</h1>
+
+    <table class="records_list">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Subtotal</th>
+                <th>Impuesto 1</th>
+                <th>Impuesto 2</th>
+                <th>Rubro 1</th>
+                <th>Rubro 2</th>
+                <th>Rubro 2 %</th>
+                <th>Creado</th>
+                <th>Modificado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('gopro_vipac_dbproceso_doccptipo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.nombre }}</td>
+                <td>{{ entity.subtotal }}</td>
+                <td>{{ entity.impuesto1 }}</td>
+                <td>{{ entity.impuesto2 }}</td>
+                <td>{{ entity.rubro1 }}</td>
+                <td>{{ entity.rubro2 }}</td>
+                <td>{{ entity.rubro2porcentaje }}</td>
+                <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.modificado %}{{ entity.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('gopro_vipac_dbproceso_doccptipo_show', { 'id': entity.id }) }}">mostrar</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('gopro_vipac_dbproceso_doccptipo_edit', { 'id': entity.id }) }}">editar</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        <ul>
+        <li>
+            <a href="{{ path('gopro_vipac_dbproceso_doccptipo_new') }}">
+                Crear un nuevo registro
+            </a>
+        </li>
+    </ul>
+    {% endblock content%}

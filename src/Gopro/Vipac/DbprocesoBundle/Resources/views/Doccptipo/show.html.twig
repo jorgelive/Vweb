@@ -1,0 +1,63 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Tipo de documentos CP</h1>
+
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Subtotal</th>
+                <td>{{ entity.subtotal }}</td>
+            </tr>
+            <tr>
+                <th>Impuesto 1</th>
+                <td>{{ entity.impuesto1 }}</td>
+            </tr>
+            <tr>
+                <th>Impuesto 2</th>
+                <td>{{ entity.impuesto2 }}</td>
+            </tr>
+            <tr>
+                <th>Rubro 1</th>
+                <td>{{ entity.rubro1 }}</td>
+            </tr>
+            <tr>
+                <th>Rubro 2</th>
+                <td>{{ entity.rubro2 }}</td>
+            </tr>
+            <tr>
+                <th>Rubro 2 %</th>
+                <td>{{ entity.rubro2porcentaje }}</td>
+            </tr>
+            <tr>
+                <th>Creado</th>
+                <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Modificado</th>
+                <td>{{ entity.modificado|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul class="record_actions">
+        <li>
+            <a href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('gopro_vipac_dbproceso_doccptipo_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}
