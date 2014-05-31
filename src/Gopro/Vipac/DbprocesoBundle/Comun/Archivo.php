@@ -17,13 +17,13 @@ class Archivo extends ContainerAware{
 
     private $tablaSpecs;
     private $columnaSpecs;
-    private $valoresRaw;
-    private $valoresIndizados;
-    private $valoresIndizadosMulti;
-    private $valoresCustom;
-    private $valoresCustomIndizados;
-    private $valoresCustomIndizadosMulti;
-    private $valoresDescartados;
+    private $existentesRaw;
+    private $existentesIndizados;
+    private $existentesIndizadosMulti;
+    private $existentesCustomRaw;
+    private $existentesCustomIndizados;
+    private $existentesCustomIndizadosMulti;
+    private $existentesDescartados;
     private $camposCustom;
     private $archivoValido;
 
@@ -45,70 +45,79 @@ class Archivo extends ContainerAware{
 
     private function setMensajes($mensaje){
         $this->mensajes[]=$mensaje;
+        return $this;
     }
 
-    public function getValoresRaw(){
-        return $this->valoresRaw;
+    public function getExistentesRaw(){
+        return $this->existentesRaw;
     }
 
-    public function getValoresIndizados(){
-        return $this->valoresIndizados;
+    public function getExistentesIndizados(){
+        return $this->existentesIndizados;
     }
 
-    private function setValoresIndizados($valoresIndizados){
-        $this->valoresIndizados=$valoresIndizados;
+    private function setExistentesIndizados($existentesIndizados){
+        $this->existentesIndizados=$existentesIndizados;
+        return $this;
     }
 
-    public function getValoresIndizadosMulti(){
-        return $this->valoresIndizadosMulti;
+    public function getExistentesIndizadosMulti(){
+        return $this->existentesIndizadosMulti;
     }
 
-    private function setValoresIndizadosMulti($valoresIndizadosMulti){
-        $this->valoresIndizadosMulti=$valoresIndizadosMulti;
+    private function setExistentesIndizadosMulti($existentesIndizadosMulti){
+        $this->existentesIndizadosMulti=$existentesIndizadosMulti;
+        return $this;
     }
 
-    private function setValoresRaw($valores){
-        $this->valoresRaw=$valores;
+    private function setExistentesRaw($existentesRaw){
+        $this->existentesRaw=$existentesRaw;
+        return $this;
     }
 
     public function setCamposCustom($campos){
         $this->camposCustom=$campos;
+        return $this;
     }
 
     public function getCamposCustom(){
         return $this->camposCustom;
     }
 
-    public function getValoresCustomIndizados(){
-        return $this->valoresCustomIndizados;
+    public function getExistentesCustomIndizados(){
+        return $this->existentesCustomIndizados;
     }
 
-    private function setValoresCustomIndizados($valoresCustomIndizados){
-        $this->valoresCustomIndizados=$valoresCustomIndizados;
+    private function setExistentesCustomIndizados($existentesCustomIndizados){
+        $this->existentesCustomIndizados=$existentesCustomIndizados;
+        return $this;
     }
 
-    public function getValoresCustomIndizadosMulti(){
-        return $this->valoresCustomIndizadosMulti;
+    public function getExistentesCustomIndizadosMulti(){
+        return $this->existentesCustomIndizadosMulti;
     }
 
-    private function setValoresCustomIndizadosMulti($valoresCustomIndizadosMulti){
-        $this->valoresCustomIndizadosMulti=$valoresCustomIndizadosMulti;
+    private function setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti){
+        $this->existentesCustomIndizadosMulti=$existentesCustomIndizadosMulti;
+        return $this;
     }
 
-    public function getValoresCustom(){
-        return $this->valoresCustom;
+    public function getExistentesCustomRaw(){
+        return $this->existentesCustomRaw;
     }
 
-    private function setValoresCustom($valoresCustom){
-        $this->valoresCustom=$valoresCustom;
+    private function setExistentesCustomRaw($existentesCustomRaw){
+        $this->existentesCustomRaw=$existentesCustomRaw;
+        return $this;
     }
 
-    public function getValoresDescartados(){
-        return $this->valoresDescartados;
+    public function getExistentesDescartados(){
+        return $this->existentesDescartados;
     }
 
-    public function setValoresDescartados($valoresDescartados){
-       $this->valoresDescartados=$valoresDescartados;
+    public function setExistentesDescartados($existentesDescartados){
+        $this->existentesDescartados=$existentesDescartados;
+        return $this;
     }
 
     public function setParametros($setTablaSpecs,$setColumnaSpecs){
@@ -158,8 +167,8 @@ class Archivo extends ContainerAware{
             $this->columnaSpecs=array();
             $this->validCols=array();
         }
-        $this->valores=array();
-        $this->descartados=array();
+        $this->existentesRaw=array();
+        $this->existentesDescartados=array();
         $this->mensajes=array();
         $this->parsed='no';
     }
@@ -190,9 +199,9 @@ class Archivo extends ContainerAware{
         $arrayY=0;
         $specRow=false;
         $specRowType='';
-        $valores=array();
-        $valoresIndizados=array();
-        $valoresIndizadosMulti=array();
+        $existentesRaw=array();
+        $existentesIndizados=array();
+        $existentesIndizadosMulti=array();
         for ($row = 1; $row <= $highestRow;++$row)
         {
             $procesandoNombre=false;
@@ -285,10 +294,10 @@ class Archivo extends ContainerAware{
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-                            $valores[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            $existentesRaw[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
                         endforeach;
                     }else{
-                        $descartados[$arrayY][]=$value;
+                        $existentesDescartados[$arrayY][]=$value;
                     }
                 }
             }
@@ -296,26 +305,26 @@ class Archivo extends ContainerAware{
 
         }
 
-        if(empty($valores)){
+        if(empty($existentesRaw)){
             $this->setMensajes('No hay valores que procesar');
             return false;
         }
 
-        foreach ($valores as $nroLinea=>$valor):
+        foreach ($existentesRaw as $nroLinea=>$valor):
             $indice=array();
             foreach($this->tablaSpecs['llaves'] as $llave):
                 $indice[]=$valor[$llave];
                 unset($valor[$llave]);
 
             endforeach;
-            $valoresIndizados[implode('|',$indice)]=$valor;
-            $valoresIndizadosMulti[implode('|',$indice)][]=$valor;
+            $existentesIndizados[implode('|',$indice)]=$valor;
+            $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
             if(!empty($this->getCamposCustom())){
                 $i=0;
                 foreach($this->getCamposCustom() as $llaveCustom):
                     if(isset($valor[$llaveCustom])){
-                        $valoresCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
-                        $valoresCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
+                        $existentesCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
+                        $existentesCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
 
                     }
                     $i++;
@@ -324,25 +333,28 @@ class Archivo extends ContainerAware{
             if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $llaveCustom):
                     if(isset($valor[$llaveCustom])){
-                        $valoresCustom[$nroLinea][$llaveCustom]=$valor[$llaveCustom];
+                        $existentesCustomRaw[$nroLinea][$llaveCustom]=$valor[$llaveCustom];
                     }
                 endforeach;
             }
         endforeach;
 
-        $this->setValoresRaw($valores);
-        $this->setValoresIndizados($valoresIndizados);
-        $this->setValoresIndizadosMulti($valoresIndizadosMulti);
-        if(isset($valoresCustomIndizados)&&!empty($valoresCustomIndizados)){
-            $this->setValoresCustomIndizados($valoresCustomIndizados);
-        }
-        if(isset($valoresCustomIndizadosMulti)&&!empty($valoresCustomIndizadosMulti)){
-            $this->setValoresCustomIndizadosMulti($valoresCustomIndizadosMulti);
-        }
-        if(isset($valoresCustom)&&!empty($valoresCustom)){
-            $this->setValoresCustom($valoresCustom);
+        $this->setExistentesRaw($existentesRaw);
+        $this->setExistentesIndizados($existentesIndizados);
+        $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
+        if(isset($existentesCustomIndizados)&&!empty($existentesCustomIndizados)){
+            $this->setExistentesCustomIndizados($existentesCustomIndizados);
         }
 
+        if(isset($existentesCustomIndizadosMulti)&&!empty($existentesCustomIndizadosMulti)){
+            $this->setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti);
+        }
+        if(isset($existentesCustomRaw)&&!empty($existentesCustomRaw)){
+            $this->setExistentesCustomRaw($existentesCustomRaw);
+        }
+        if(isset($existentesDescartados)&&!empty($existentesDescartados)){
+            $this->setExistentesDescartados($existentesDescartados);
+        }
         return true;
     }
 

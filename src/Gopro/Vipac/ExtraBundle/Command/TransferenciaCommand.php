@@ -38,7 +38,7 @@ class TransferenciaCommand extends ContainerAwareCommand
         ]);
         $datos->setQueryVariables(['IND_PROCESO'=>'n']);
 
-        if(!$datos->ejecutarSelectQuery()||empty($datos->getExistenteRaw())){
+        if(!$datos->ejecutarSelectQuery()||empty($datos->getExistentesRaw())){
             $output->writeln('No hay datos que procesar');
             return false;
         }
@@ -65,14 +65,14 @@ class TransferenciaCommand extends ContainerAwareCommand
             'CATEGORIA_PROVEED',
             'PAIS'
         ]);
-        $datosTransferencia->setQueryVariables($datos->getExistenteCustom());
+        $datosTransferencia->setQueryVariables($datos->getExistentesCustom());
 
-        if(!$datosTransferencia->ejecutarSelectQuery()||empty($datosTransferencia->getExistenteRaw())){
+        if(!$datosTransferencia->ejecutarSelectQuery()||empty($datosTransferencia->getExistentesRaw())){
             $output->writeln('No hay datos coincidentes con la tabla de proceso');
             return false;
         }
 
-        $resultado = $this->getContainer()->get('gopro_dbproceso_comun_variable')->utf($datosTransferencia->getExistenteRaw());
+        $resultado = $this->getContainer()->get('gopro_dbproceso_comun_variable')->utf($datosTransferencia->getExistentesRaw());
 
         foreach($resultado as $linea):
             if(!empty(trim($linea['E_MAIL']))){

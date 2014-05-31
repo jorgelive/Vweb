@@ -65,7 +65,7 @@ class CargaController extends BaseController
 
         }
         $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
@@ -116,9 +116,9 @@ class CargaController extends BaseController
         $mensajes=$procesoArchivo->getMensajes();
         if($procesoArchivo->parseExcel()!==false){
             $documentoCp=$this->get('gopro_dbproceso_comun_cargador');
-            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'));
             $documentoCp->ejecutar();
-            $exiDocumentoCp=$documentoCp->getExistenteIndex();
+            $exiDocumentoCp=$documentoCp->getMensajes()->getExistentesIndizados();
             if(empty($exiDocumentoCp)){
                 $mensajes=array_merge($mensajes,array('No existen los asientos en Documentos CP'));
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
@@ -131,10 +131,10 @@ class CargaController extends BaseController
             );
             $columnaAsiDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
             $asiDi=$this->get('gopro_dbproceso_comun_cargador');
-            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'));
             $asiDi->prepararSelect();
             $asiDi->ejecutarSelectQuery();
-            $exiAsiDi=$asiDi->getExistenteIndex();
+            $exiAsiDi=$asiDi->getProceso()->getExistentesIndizados();
             if(empty($exiAsiDi)){
                 $mensajes=array_merge($mensajes,array('No existen los asientos en Asiento de Diario, posiblemente fueron mayorizados'));
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
@@ -147,11 +147,11 @@ class CargaController extends BaseController
             );
             $columnaDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
             $di=$this->get('gopro_dbproceso_comun_cargador');
-            $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'));
+            $di->setParametros($tablaDi,$columnaDi,$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'));
             $di->prepararSelect();
             $di->ejecutarSelectQuery();
 
-            $exiDi=$di->getExistenteIndex();
+            $exiDi=$di->getProceso()->getExistentesIndizados();
             if(empty($exiDi)){
                 $mensajes=array_merge($mensajes,array('No existen los asientos en el Diario, posiblemente fueron mayorizados'));
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
@@ -182,7 +182,7 @@ class CargaController extends BaseController
             $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
             $tc->prepararSelect();
             $tc->ejecutarSelectQuery();
-            $exiTc=$tc->getExistenteIndex();
+            $exiTc=$tc->getProceso()->getExistentesIndizados();
             foreach ($resultado as $codigoAsiento => $procesoTablas):
                 $procesar='si';
                 if(!isset($resultado[$codigoAsiento]['DOCUMENTOS_CP']['FECHA_DOCUMENTO'])){

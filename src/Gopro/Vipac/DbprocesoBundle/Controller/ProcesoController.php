@@ -77,7 +77,7 @@ class ProcesoController extends BaseController
 
         }
         $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValores(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
@@ -85,7 +85,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistenteIndex();
+        $existente=$carga->getProceso()->getExistentesIndizados();
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -94,7 +94,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $this->setMensajes($procesoArchivo->getMensajes());
                 $this->setMensajes($carga->getMensajes());
@@ -147,9 +147,9 @@ class ProcesoController extends BaseController
             return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
         }
 
-        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
-            $this->setMensajes($procesoArchivo->getMensajes());
+        $archivoInfo=$this->get('gopro_dbproceso_comun_archivo');
+        if(!$archivoInfo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+            $this->setMensajes($archivoInfo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'PROVEEDOR','tipo'=>'S');
@@ -184,48 +184,66 @@ class ProcesoController extends BaseController
         $columnaspecs[28]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
         $columnaspecs[29]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
 
-        $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
-        $procesoArchivo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
+        $archivoInfo->setParametros($tablaSpecs,$columnaspecs);
+        $archivoInfo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
 
-        if(!$procesoArchivo->parseExcel()){
-            $this->setMensajes($procesoArchivo->getMensajes());
+        if(!$archivoInfo->parseExcel()){
+            $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        $datosProcesados=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$datosProcesados->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
-            $this->setMensajes($procesoArchivo->getMensajes());
-            $this->setMensajes($datosProcesados->getMensajes());
+        $datosProveedor=$this->get('gopro_dbproceso_comun_cargador');
+        if(!$datosProveedor->setParametros($archivoInfo->getTablaSpecs(),$archivoInfo->getColumnaSpecs(),$archivoInfo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+            $this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
+        $datosProveedor->ejecutar();
+        if(empty($datosProveedor->getProceso()->getExistentesRaw())){
+            $$this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes($datosProveedor->getMensajes());
+            $this->setMensajes('No existe ningun proveedor de los ingresados');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
 
-        $datosProcesados->ejecutar();
-        array_walk($procesoArchivo->getValoresCustom(),[$this,'setStack'],['files','NUM_FILE']);
+        $filesMulti=$archivoInfo->getExistentesCustomRaw();
+        array_walk_recursive($filesMulti,[$this,'setStack'],['files','NUM_FILE']);
         $filesInfo=$this->container->get('gopro_dbproceso_comun_proceso');
         $filesInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
         $filesInfo->setTabla('VVW_FILE_MERCADO_SINGLEKEY');
         $filesInfo->setSchema('RESERVAS');
         $filesInfo->setCamposSelect([
-            'FILE',
+            'NUM_FILE',
             'NOMBRE',
             'NUM_PAX',
             'MERCADO',
             'CENTRO_COSTO',
             'PAIS_FILE'
         ]);
-        $filesInfo->setQueryVariables($this->getStack('files'));
-        if(!$filesInfo->ejecutarSelectQuery()||empty($filesInfo->getExistenteRaw())){
-            $this->setMensajes($procesoArchivo->getMensajes());
-            $this->setMensajes($filesInfo->getMensajes());
-            $this->setMensajes('No no existe ninguno de los files en la lista');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        $generarExcel=true;
+        if(!empty($this->getStack('files'))){
+            $filesInfo->setQueryVariables($this->getStack('files'));
 
+            if(!$filesInfo->ejecutarSelectQuery()||empty($filesInfo->getExistentesRaw())){
+                $this->setMensajes($archivoInfo->getMensajes());
+                $this->setMensajes($filesInfo->getMensajes());
+                $this->setMensajes('No existe ninguno de los files en la lista');
+                return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+            }
         }
-        print_r($filesInfo->getExistenteRaw());
+
+        foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
+            $dataCP[$nroLinea]=1;
+        endforeach;
+        print_r($archivoInfo->getExistentesCustomIndizados());
+        print_r($archivoInfo->getExistentesRaw());
+
+        print_r($datosProveedor->getProceso()->getExistentesIndizados());
     }
 
 
@@ -300,7 +318,7 @@ class ProcesoController extends BaseController
 
         }
         $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
@@ -310,7 +328,7 @@ class ProcesoController extends BaseController
         $carga->getProceso()->setCamposCustom(['ANO','NUM_FILE_FISICO']);
         $carga->ejecutar();
 
-        if(empty($carga->getProceso()->getExistenteCustom())){
+        if(empty($carga->getProceso()->getExistentesCustomRaw())){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
@@ -345,30 +363,30 @@ class ProcesoController extends BaseController
 	        'MONTO',
 	        'CUENTA'
         ]);
-        $serviciosHoteles->setQueryVariables($carga->getProceso()->getExistenteCustom());
-        if(!$serviciosHoteles->ejecutarSelectQuery()||empty($serviciosHoteles->getExistenteRaw())){
+        $serviciosHoteles->setQueryVariables($carga->getProceso()->getExistentesCustomRaw());
+        if(!$serviciosHoteles->ejecutarSelectQuery()||empty($serviciosHoteles->getExistentesRaw())){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        //print_r($procesoArchivo->getValoresCustomIndizados());
-        foreach($carga->getProceso()->getExistenteRaw() as $valor):
-            //print_r($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]);
+        //print_r($procesoArchivo->getExistentesCustomIndizados());
+        foreach($carga->getProceso()->getExistentesRaw() as $valor):
+            //print_r($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]);
             if(
-                isset($serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
-                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']])
-                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
-                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
-                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
-                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
-                &&isset($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
-                &&!empty($procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
+                isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
+                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']])
+                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
+                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
+                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
+                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
+                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
+                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
             ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getValoresCustomIndizados()[$valor['ASIENTO']]);
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistenteIndexMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setMontoTotal'],'MONTO');
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getMontoTotal();
                 if($this->getMontoTotal()==0){
@@ -473,14 +491,14 @@ class ProcesoController extends BaseController
         }
 
         $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistenteIndex();
+        $existente=$carga->getProceso()->getExistentesIndizados();
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -490,7 +508,7 @@ class ProcesoController extends BaseController
 
         }
 
-        foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }
@@ -546,7 +564,7 @@ class ProcesoController extends BaseController
         }
 
         $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getValoresRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('los parametros de carga no son correctos');
@@ -554,7 +572,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistenteIndex();
+        $existente=$carga->getProceso()->getExistentesIndizados();
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -564,7 +582,7 @@ class ProcesoController extends BaseController
 
         }
 
-        foreach($procesoArchivo->getValoresIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }

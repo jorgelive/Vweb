@@ -8,16 +8,16 @@ class Proceso extends ContainerAware{
     private $tabla;
     private $schema;
     private $mensajes=array();
-    private $existenteRaw;
-    private $existenteIndex;
-    private $existenteIndexMulti;
+    private $existentesRaw;
+    private $existentesIndizados;
+    private $existentesIndizadosMulti;
     private $whereSelectValores;
     private $whereSelectPh;
     private $camposSelect;
     private $camposCustom;
-    private $existenteCustom;
-    private $existenteCustomIndizado;
-    private $existenteCustomIndizadoMulti;
+    private $existentesCustomRaw;
+    private $existentesCustomIndizados;
+    private $existentesCustomIndizadosMulti;
     private $llaves;
 
     //valores temporales por fila
@@ -31,6 +31,7 @@ class Proceso extends ContainerAware{
 
     public function setTabla($tabla){
         $this->tabla=$tabla;
+        return $this;
     }
 
     public function getTabla(){
@@ -39,6 +40,7 @@ class Proceso extends ContainerAware{
 
     public function setSchema($schema){
         $this->schema=$schema;
+        return $this;
     }
 
     public function getSchema(){
@@ -47,6 +49,7 @@ class Proceso extends ContainerAware{
 
     public function setConexion($conexion){
         $this->conexion=$conexion;
+        return $this;
     }
 
     public function getConexion(){
@@ -57,80 +60,90 @@ class Proceso extends ContainerAware{
         return $this->whereSelectValores;
     }
 
-    public function setWhereSelectValores($where){
-        $this->whereSelectValores=$where;
+    public function setWhereSelectValores($whereSelectValores){
+        $this->whereSelectValores=$whereSelectValores;
+        return $this;
     }
 
     public function getWhereSelectPh(){
         return $this->whereSelectPh;
     }
 
-    public  function setWhereSelectPh($wherePh){
-        $this->whereSelectPh=$wherePh;
+    public  function setWhereSelectPh($whereSelectPh){
+        $this->whereSelectPh=$whereSelectPh;
+        return $this;
     }
 
     public function getCamposSelect(){
         return $this->camposSelect;
     }
 
-    public function setCamposSelect($campos){
-        $this->camposSelect=$campos;
+    public function setCamposSelect($camposSelect){
+        $this->camposSelect=$camposSelect;
+        return $this;
     }
 
     public function getWhereUpdateValores(){
         return $this->whereUpdateValores;
     }
 
-    public function setWhereUpdateValores($where){
-        $this->whereUpdateValores=$where;
+    public function setWhereUpdateValores($whereUpdateValores){
+        $this->whereUpdateValores=$whereUpdateValores;
+        return $this;
     }
 
     public function getWhereUpdatePh(){
         return $this->whereUpdatePh;
     }
 
-    public function setWhereUpdatePh($wherePh){
-        $this->whereUpdatePh=$wherePh;
+    public function setWhereUpdatePh($whereUpdatePh){
+        $this->whereUpdatePh=$whereUpdatePh;
+        return $this;
     }
 
     public function getValoresUpdateValores(){
         return $this->valoresUpdateValores;
     }
 
-    public function setValoresUpdateValores($act){
-        $this->valoresUpdateValores=$act;
+    public function setValoresUpdateValores($valoresUpdateValores){
+        $this->valoresUpdateValores=$valoresUpdateValores;
+        return $this;
     }
 
     public function getValoresUpdatePh(){
         return $this->valoresUpdatePh;
     }
 
-    public function setValoresUpdatePh($actPh){
-        $this->valoresUpdatePh=$actPh;
+    public function setValoresUpdatePh($valoresUpdatePh){
+        $this->valoresUpdatePh=$valoresUpdatePh;
+        return $this;
     }
 
     public function getValoresInsertValores(){
         return $this->valoresInsertValores;
     }
 
-    public function setValoresInsertValores($insert){
-        $this->valoresInsertValores=$insert;
+    public function setValoresInsertValores($valoresInsertValores){
+        $this->valoresInsertValores=$valoresInsertValores;
+        return $this;
     }
 
     public function getValoresInsertPh(){
         return $this->valoresInsertPh;
     }
 
-    public function setValoresInsertPh($insertPh){
-        $this->valoresInsertPh=$insertPh;
+    public function setValoresInsertPh($valoresInsertPh){
+        $this->valoresInsertPh=$valoresInsertPh;
+        return $this;
     }
 
     public function getCamposInsert(){
         return $this->camposInsert;
     }
 
-    public function setCamposInsert($campos){
-        $this->camposInsert=$campos;
+    public function setCamposInsert($camposInsert){
+        $this->camposInsert=$camposInsert;
+        return $this;
     }
 
     public function getMensajes(){
@@ -139,30 +152,34 @@ class Proceso extends ContainerAware{
 
     private function setMensajes($mensaje){
         $this->mensajes[]=$mensaje;
+        return $this;
     }
 
-    public function getExistenteRaw(){
-        return $this->existenteRaw;
+    public function getExistentesRaw(){
+        return $this->existentesRaw;
     }
 
-    private function setExistenteRaw($datos){
-        $this->existenteRaw=$datos;
+    private function setExistentesRaw($existentesRaw){
+        $this->existentesRaw=$existentesRaw;
+        return $this;
     }
 
-    public function getExistenteIndex(){
-        return $this->existenteIndex;
+    public function getExistentesIndizados(){
+        return $this->existentesIndizados;
     }
 
-    private function setExistenteIndex($datos){
-        $this->existenteIndex=$datos;
+    private function setExistentesIndizados($existentesIndizados){
+        $this->existentesIndizados=$existentesIndizados;
+        return $this;
     }
 
-    public function getExistenteIndexMulti(){
-        return $this->existenteIndexMulti;
+    public function getExistentesIndizadosMulti(){
+        return $this->existentesIndizadosMulti;
     }
 
-    private function setExistenteIndexMulti($datos){
-        $this->existenteIndexMulti=$datos;
+    private function setExistentesIndizadosMulti($existentesIndizadosMulti){
+        $this->existentesIndizadosMulti=$existentesIndizadosMulti;
+        return $this;
     }
 
     public function getLlaves(){
@@ -171,38 +188,43 @@ class Proceso extends ContainerAware{
 
     public function setLlaves($llaves){
         $this->llaves=$llaves;
+        return $this;
     }
 
     public function getCamposCustom(){
         return $this->camposCustom;
     }
 
-    public function setCamposCustom($campos){
-        $this->camposCustom=$campos;
+    public function setCamposCustom($camposCustom){
+        $this->camposCustom=$camposCustom;
+        return $this;
     }
 
-    public function getExistenteCustom(){
-        return $this->existenteCustom;
+    public function getExistentesCustomRaw(){
+        return $this->existentesCustomRaw;
     }
 
-    public function setExistenteCustom($existente){
-        $this->existenteCustom=$existente;
+    public function setExistentesCustomRaw($existentesCustomRaw){
+        $this->existentesCustomRaw=$existentesCustomRaw;
+        return $this;
     }
 
-    public function getExistenteCustomIndizado(){
-        return $this->existenteCustomIndizado;
+    public function getExistentesCustomIndizados(){
+        return $this->existentesCustomIndizados;
     }
 
-    public function setExistenteCustomIndizado($existente){
-        $this->existenteCustomIndizado=$existente;
+    public function setExistentesCustomIndizados($existentesCustomIndizados){
+        $this->existentesCustomIndizados=$existentesCustomIndizados;
+        return $this;
     }
 
-    public function getExistenteCustomIndizadoMulti(){
-        return $this->existenteCustomIndizado;
+    public function getExistentesCustomIndizadosMulti(){
+        return $this->existentesCustomIndizados;
     }
 
-    public function setExistenteCustomIndizadoMulti($existente){
-        $this->existenteCustomIndizadoMulti=$existente;
+    public function setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti){
+        $this->existentesCustomIndizadosMulti=$existentesCustomIndizadosMulti;
+        return $this;
     }
 
     private function getSerializedPhString($phArray){
@@ -313,9 +335,9 @@ class Proceso extends ContainerAware{
         if(!$statement->execute()){
             return false;
         }
-        $registros=$statement->fetchAll();
-        $this->setExistenteRaw($registros);
-        foreach($this->getExistenteRaw() as $nroLinea => $linea):
+        $existentesRaw=$statement->fetchAll();
+        $this->setExistentesRaw($existentesRaw);
+        foreach($this->getExistentesRaw() as $nroLinea => $linea):
             $indexedArray=array();
             foreach($this->getLlaves() as $llave):
                 if(isset($linea[$llave])){
@@ -323,14 +345,14 @@ class Proceso extends ContainerAware{
                     unset($linea[$llave]);
                 }
             endforeach;
-            $existente[implode('|',$indexedArray)]=$linea;
-            $existenteMulti[implode('|',$indexedArray)][]=$linea;
+            $existentesIndizados[implode('|',$indexedArray)]=$linea;
+            $existentesIndizadosMulti[implode('|',$indexedArray)][]=$linea;
             if(!empty($this->getCamposCustom())){
                 $i=0;
                 foreach($this->getCamposCustom() as $campo):
                     if(isset($linea[$campo])){
-                        $existenteCustomIndizadoMulti[implode('|',$indexedArray)][$i][$campo]=$linea[$campo];
-                        $existenteCustomIndizado[implode('|',$indexedArray)][$campo]=$linea[$campo];
+                        $existentesCustomIndizadosMulti[implode('|',$indexedArray)][$i][$campo]=$linea[$campo];
+                        $existentesCustomIndizados[implode('|',$indexedArray)][$campo]=$linea[$campo];
                     }
                 $i++;
                 endforeach;
@@ -338,22 +360,22 @@ class Proceso extends ContainerAware{
             if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $campo):
                     if(isset($linea[$campo])){
-                        $existenteCustom[$nroLinea][$campo]=$linea[$campo];
+                        $existentesCustomRaw[$nroLinea][$campo]=$linea[$campo];
                     }
                 endforeach;
             }
 
         endforeach;
-        $this->setExistenteIndex($existente);
-        $this->setExistenteIndexMulti($existenteMulti);
-        if(isset($existenteCustom)){
-            $this->setExistenteCustom($existenteCustom);
+        $this->setExistentesIndizados($existentesIndizados);
+        $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
+        if(isset($existentesCustomRaw)){
+            $this->setExistentesCustomRaw($existentesCustomRaw);
         }
-        if(isset($existenteCustomIndizado)){
-            $this->setExistenteCustomIndizado($existenteCustomIndizado);
+        if(isset($existentesCustomIndizados)){
+            $this->setExistentesCustomIndizados($existentesCustomIndizados);
         }
-        if(isset($existenteCustomIndizadoMulti)){
-            $this->setExistenteCustomIndizadoMulti($existenteCustomIndizadoMulti);
+        if(isset($existentesCustomIndizadosMulti)){
+            $this->setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti);
         }
         return true;
     }

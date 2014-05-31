@@ -16,6 +16,7 @@ class Cargador extends ContainerAware{
 
     private function setProceso(){
         $this->proceso=$this->container->get('gopro_dbproceso_comun_proceso');
+        return $this;
     }
 
     public function getTipo(){
@@ -24,6 +25,7 @@ class Cargador extends ContainerAware{
 
     private function setTipo($tipo){
         $this->tipo=$tipo;
+        return $this;
     }
 
     public function setParametros($tablaSpecs,$columnaSpecs,$valores,$conexion){
@@ -77,6 +79,7 @@ class Cargador extends ContainerAware{
 
     private function setMensajes($mensaje){
         $this->mensajes[]=$mensaje;
+        return $this;
     }
 
     private function getKeysDiff(){
@@ -133,7 +136,7 @@ class Cargador extends ContainerAware{
     }
 
     public function dbProcess(){
-        if(empty($this->getProceso()->getExistenteIndex())&&$this->getTipo()!='I'){
+        if(empty($this->getProceso()->getExistentesIndizados())&&$this->getTipo()!='I'){
             $this->setMensajes('Solo se permite inserciones con tipo I');
             return false;
         }
@@ -170,12 +173,12 @@ class Cargador extends ContainerAware{
 
     private function dbRowProcess($rowNumber){
         $busqueda=implode('|',$this->getProceso()->getWhereUpdateValores());
-        if(array_key_exists($busqueda,$this->getProceso()->getExistenteIndex())===true){//todo mejor comparacion
+        if(array_key_exists($busqueda,$this->getProceso()->getExistentesIndizados())===true){//todo mejor comparacion
             if($this->getTipo()=='I'){
                 $this->setMensajes('La linea '.$rowNumber.' ya existe, estamos en modo solo insertar');
                 return false;
             }
-            $diferencia=array_diff_assoc($this->getProceso()->getExistenteIndex()[$busqueda],$this->getProceso()->getValoresUpdateValores());
+            $diferencia=array_diff_assoc($this->getProceso()->getExistentesIndizados()[$busqueda],$this->getProceso()->getValoresUpdateValores());
             if(empty($diferencia)){
                 $this->setMensajes('Nada que actualizar para la linea: '.$rowNumber);
                 return true;
