@@ -186,7 +186,7 @@ class Cargador extends ContainerAware{
             if($this->getProceso()->ejecutarUpdateQuery()){
                 $this->setMensajes('Actualizando para la linea: '.$rowNumber);
             }
-        }elseif(isset($insertArray)&&!empty($insertArray)){
+        }elseif(!empty($insertArray)){
             if ($this->getTipo()=='U'){
                 $this->setMensajes('La linea '.$rowNumber. ' no existe, estamos en modo solo actualizar');
                 return false;

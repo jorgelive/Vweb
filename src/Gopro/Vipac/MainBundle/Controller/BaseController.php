@@ -10,7 +10,7 @@ class BaseController extends Controller
 
     private $stack;
 
-    private $montoTotal;
+    private $cantidadTotal;
 
     /**
      * @param mixed $mensaje
@@ -52,34 +52,41 @@ class BaseController extends Controller
     /**
      * @param mixed $valor
      * @param mixed $key
-     * @param mixed $condicion
+     * @param array $vars
      * @return boolean
      */
-    protected function setMontoTotal($valor,$key,$condicion)
+    protected function setCantidadTotal($valor,$key,$vars)
     {
-        if(empty($this->montoTotal)){$this->montoTotal=0;}
-        if($condicion===null||$key==$condicion){
-            $this->montoTotal=$this->montoTotal+$valor;
+        if(empty($this->cantidadTotal[$vars[0]])){
+            $this->cantidadTotal[$vars[0]]=0;
+        }
+        if(empty($vars[1])||$key==$vars[1]){
+            $this->cantidadTotal[$vars[0]]=$this->cantidadTotal[$vars[0]]+$valor;
             return true;
         }
         return false;
     }
 
     /**
+     * @param string $id
      * @return integer
      */
-    protected function resetMontoTotal()
+    protected function resetCantidadTotal($id)
     {
-        $this->montoTotal=0;
-        return $this->montoTotal;
+        $this->cantidadTotal[$id]=0;
+        return $this;
     }
 
     /**
+     * @param string $id
      * @return integer
      */
-    protected function getMontoTotal()
+    protected function getCantidadTotal($id)
     {
-        return $this->montoTotal;
+        if(empty($this->cantidadTotal[$id])){
+            return 0;
+        }
+        return $this->cantidadTotal[$id];
     }
 
     /**

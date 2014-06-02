@@ -196,12 +196,12 @@ class Archivo extends ContainerAware{
         $highestRow = $objWorksheet->getHighestRow();
         $highestColumn = $objWorksheet->getHighestColumn();
         $highestColumnIndex = $excelLoader->columnIndexFromString($highestColumn);
-        $arrayY=0;
         $specRow=false;
         $specRowType='';
         $existentesRaw=array();
         $existentesIndizados=array();
         $existentesIndizadosMulti=array();
+        $fila=0;
         for ($row = 1; $row <= $highestRow;++$row)
         {
             $procesandoNombre=false;
@@ -294,14 +294,14 @@ class Archivo extends ContainerAware{
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-                            $existentesRaw[$arrayY][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            $existentesRaw[$fila][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
                         endforeach;
                     }else{
-                        $existentesDescartados[$arrayY][]=$value;
+                        $existentesDescartados[$fila][]=$value;
                     }
                 }
             }
-            $arrayY ++;
+            $fila ++;
 
         }
 
@@ -342,17 +342,17 @@ class Archivo extends ContainerAware{
         $this->setExistentesRaw($existentesRaw);
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
-        if(isset($existentesCustomIndizados)&&!empty($existentesCustomIndizados)){
+        if(!empty($existentesCustomIndizados)){
             $this->setExistentesCustomIndizados($existentesCustomIndizados);
         }
 
-        if(isset($existentesCustomIndizadosMulti)&&!empty($existentesCustomIndizadosMulti)){
+        if(!empty($existentesCustomIndizadosMulti)){
             $this->setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti);
         }
-        if(isset($existentesCustomRaw)&&!empty($existentesCustomRaw)){
+        if(!empty($existentesCustomRaw)){
             $this->setExistentesCustomRaw($existentesCustomRaw);
         }
-        if(isset($existentesDescartados)&&!empty($existentesDescartados)){
+        if(!empty($existentesDescartados)){
             $this->setExistentesDescartados($existentesDescartados);
         }
         return true;

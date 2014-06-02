@@ -7,6 +7,8 @@
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Subtipo</th>
                 <th>Subtotal</th>
                 <th>Impuesto 1</th>
                 <th>Impuesto 2</th>
@@ -23,6 +25,8 @@
             <tr>
                 <td><a href="{{ path('gopro_vipac_dbproceso_doccptipo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.nombre }}</td>
+                <td>{{ entity.tipo }}</td>
+                <td>{{ entity.subtipo }}</td>
                 <td>{{ entity.subtotal }}</td>
                 <td>{{ entity.impuesto1 }}</td>
                 <td>{{ entity.impuesto2 }}</td>

@@ -26,17 +26,29 @@ class Doccptipo
     private $nombre;
 
     /**
+     * @ORM\Column(type="string", length=5)
+     * @Assert\NotBlank
+     */
+    private $tipo;
+
+    /**
+     * @ORM\Column(type="string", length=2)
+     * @Assert\NotBlank
+     */
+    private $subtipo;
+
+    /**
      * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $subtotal;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean")
      */
     private $impuesto1;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean")
      */
     private $impuesto2;
 
@@ -106,6 +118,52 @@ class Doccptipo
     public function getNombre()
     {
         return $this->nombre;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return Doccptipo
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+
+    /**
+     * Set subtipo
+     *
+     * @param string $subtipo
+     * @return Doccptipo
+     */
+    public function setSubtipo($subtipo)
+    {
+        $this->subtipo = $subtipo;
+
+        return $this;
+    }
+
+    /**
+     * Get subtipo
+     *
+     * @return string
+     */
+    public function getSubtipo()
+    {
+        return $this->subtipo;
     }
 
     /**

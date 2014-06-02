@@ -153,36 +153,36 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'PROVEEDOR','tipo'=>'S');
-        $columnaspecs[0]=array('nombre'=>'TIPO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[1]=array('nombre'=>'DIFERIDO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[2]=array('nombre'=>'SUBTIPO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[3]=array('nombre'=>'PROVEEDOR','llave'=>'si');
-        $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[5]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[6]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[7]=array('nombre'=>'FECHA_CONTABLE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[8]=array('nombre'=>'APLICACION','llave'=>'no','proceso'=>'no');
-        $columnaspecs[9]=array('nombre'=>'FILE_1','llave'=>'no','proceso'=>'no');
-        $columnaspecs[10]=array('nombre'=>'FILE_2','llave'=>'no','proceso'=>'no');
-        $columnaspecs[11]=array('nombre'=>'FILE_3','llave'=>'no','proceso'=>'no');
-        $columnaspecs[12]=array('nombre'=>'FILE_4','llave'=>'no','proceso'=>'no');
-        $columnaspecs[13]=array('nombre'=>'FILE_5','llave'=>'no','proceso'=>'no');
-        $columnaspecs[14]=array('nombre'=>'FILE_6','llave'=>'no','proceso'=>'no');
-        $columnaspecs[15]=array('nombre'=>'FILE_7','llave'=>'no','proceso'=>'no');
-        $columnaspecs[16]=array('nombre'=>'FILE_8','llave'=>'no','proceso'=>'no');
-        $columnaspecs[17]=array('nombre'=>'FILE_9','llave'=>'no','proceso'=>'no');
-        $columnaspecs[18]=array('nombre'=>'FILE_10','llave'=>'no','proceso'=>'no');
-        $columnaspecs[19]=array('nombre'=>'FILE_11','llave'=>'no','proceso'=>'no');
-        $columnaspecs[20]=array('nombre'=>'FILE_12','llave'=>'no','proceso'=>'no');
-        $columnaspecs[21]=array('nombre'=>'FILE_13','llave'=>'no','proceso'=>'no');
-        $columnaspecs[22]=array('nombre'=>'FILE_14','llave'=>'no','proceso'=>'no');
-        $columnaspecs[23]=array('nombre'=>'FILE_15','llave'=>'no','proceso'=>'no');
-        $columnaspecs[24]=array('nombre'=>'FILE_16','llave'=>'no','proceso'=>'no');
-        $columnaspecs[25]=array('nombre'=>'FILE_17','llave'=>'no','proceso'=>'no');
-        $columnaspecs[26]=array('nombre'=>'FILE_18','llave'=>'no','proceso'=>'no');
-        $columnaspecs[27]=array('nombre'=>'FILE_19','llave'=>'no','proceso'=>'no');
-        $columnaspecs[28]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
-        $columnaspecs[29]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
+        $columnaspecs[]=array('nombre'=>'TIPO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'DIFERIDO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'PROVEEDOR','llave'=>'si');
+        $columnaspecs[]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'MONEDA','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FECHA_CONTABLE','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'APLICACION','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_1','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_2','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_3','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_4','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_5','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_6','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_7','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_8','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_9','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_10','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_11','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_12','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_13','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_14','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_15','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_16','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_17','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_18','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_19','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
 
         $archivoInfo->setParametros($tablaSpecs,$columnaspecs);
         $archivoInfo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
@@ -236,14 +236,221 @@ class ProcesoController extends BaseController
 
             }
         }
+        $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Doccptipo tipo INDEX BY tipo.id");
+        $docCpTipos = $query->getArrayResult();
+
+        //print_r($docCpTipos);
 
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
-            $dataCP[$nroLinea]=1;
-        endforeach;
-        print_r($archivoInfo->getExistentesCustomIndizados());
-        print_r($archivoInfo->getExistentesRaw());
+            $dataCP[$nroLinea]=$linea;
+            if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
+                $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
+            }
+            $dataCP[$nroLinea]['CONDICION_PAGO']=$datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO'];
+            if(isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])){
+                $dataCP[$nroLinea]['CONDICIONES']=$docCpTipos[$dataCP[$nroLinea]['TIPO']];
+            }else{
+                $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no existe');
+                $generarExcel=false;
+            }
 
-        print_r($datosProveedor->getProceso()->getExistentesIndizados());
+            if(isset($dataCP[$nroLinea]['FILES'])){
+                foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
+                    if(isset($filesInfo->getExistentesIndizados()[$nroFile])){
+                        $dataCP[$nroLinea]['FILES'][$nroFile]=$filesInfo->getExistentesIndizados()[$nroFile];
+
+                    }else{
+                        $this->setMensajes('El numero de file: '.$nroFile.', de la linea: '.$nroLinea.', no existe');
+                        $generarExcel=false;
+                    }
+                endforeach;
+            }else{
+                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','MERCADO'=>'ND','PAIS'=>'ND','NUM_PAX'=>1]];
+            }
+
+            $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
+            array_walk_recursive($dataCP[$nroLinea]['FILES'], [$this, 'setCantidadTotal'],['totalPax','NUM_PAX']);
+            $dataCP[$nroLinea]['TOTAL_PAX']=$this->getCantidadTotal('totalPax');
+            $this->resetCantidadTotal('totalPax');
+
+            $result[$nroLinea][]=$dataCP[$nroLinea]['PROVEEDOR'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['DOCUMENTO'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['FECHA_CONTABLE'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['APLICACION'];
+            if(!empty($dataCP[$nroLinea]['RUBROS']['subtotal'])){
+                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['subtotal'];
+            }else{
+                $result[$nroLinea][]='';
+            }
+            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
+                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
+            }else{
+                $result[$nroLinea][]='';
+            }
+            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
+                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
+            }else{
+                $result[$nroLinea][]='';
+            }
+            if(!empty($dataCP[$nroLinea]['CONDICIONES']['impuesto2'])){
+                $result[$nroLinea][]='64.1.1.1.01';
+            }else{
+                $result[$nroLinea][]='';
+            }
+            if(!empty($dataCP[$nroLinea]['RUBROS']['rubro1'])){
+                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['rubro1'];
+            }else{
+                $result[$nroLinea][]='';
+            }
+            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            if(!empty($dataCP[$nroLinea]['RUBROS']['rubro2'])){
+                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['rubro2'];
+            }else{
+                $result[$nroLinea][]='';
+            }
+            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            $result[$nroLinea][]=$dataCP[$nroLinea]['MONTO'];
+
+            $i=1;
+            foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
+                foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
+                    $montoProcesado=0;
+                    if($i<count($dataCP[$nroLinea]['FILES'])){
+
+                        if(!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
+                            $montoProcesado=$montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'];
+                            $this->setCantidadTotal($montoProcesado,null,[$nombreRubro,null]);
+                        }
+                    }else{
+                        $montoProcesado=$montoRubro-$this->getCantidadTotal($nombreRubro);
+                    }
+
+                    $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro]=$montoProcesado;
+                    if($nombreRubro!='impuesto1'){
+                        if(!empty($montoProcesado)){
+                            $result[$nroLinea][]=$montoProcesado;
+                        }else{
+                            $result[$nroLinea][]='';
+                        }
+
+                    }
+                endforeach;
+                $i++;
+            endforeach;
+            $this->resetCantidadTotal('subtotal');
+            $this->resetCantidadTotal('impuesto1');
+            $this->resetCantidadTotal('impuesto2');
+            $this->resetCantidadTotal('rubro1');
+            $this->resetCantidadTotal('rubro2');
+        endforeach;
+
+        print_r($result);
+
+        //print_r($filesInfo->getExistentesIndizados());
+    }
+
+    /*
+     * @param array $condiciones
+     * @param double $monto
+     * @return array
+     */
+    private function setRubros($condiciones,$monto){
+        if(
+            !empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&empty($condiciones['rubro2'])
+        ){
+            $rubros['subtotal']=round($monto,2);
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=0;
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=0;
+        }elseif(
+            !empty($condiciones['subtotal'])
+            &&!empty($condiciones['impuesto1'])
+            &&empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&empty($condiciones['rubro2'])
+        ){
+            $rubros['subtotal']=round($monto/1.18,2);
+            $rubros['impuesto1']=round($monto-$rubros['subtotal'],2);
+            $rubros['impuesto2']=0;
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=0;
+        }elseif(
+            !empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&!empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&empty($condiciones['rubro2'])
+        ){
+            $rubros['subtotal']=round($monto/1.18,2);
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=round($monto-$rubros['subtotal'],2);
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=0;
+        }elseif(//solo rubro 1
+            empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&empty($condiciones['impuesto2'])
+            &&!empty($condiciones['rubro1'])
+            &&empty($condiciones['rubro2'])
+        ){
+            $rubros['subtotal']=0;
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=0;
+            $rubros['rubro1']=round($monto,2);
+            $rubros['rubro2']=0;
+        }elseif(
+            empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&!empty($condiciones['rubro2'])
+        ){
+            $rubros['subtotal']=0;
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=0;
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=round($monto,2);
+        }elseif(//restaurantes extranjero
+            !empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&!empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&!empty($condiciones['rubro2'])
+            &&!empty($condiciones['rubro2porcentaje'])
+        ){
+            $rubros['subtotal']=round($monto,2);
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=round($monto,2);
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=round($monto,2);
+        }elseif(//restaurantes nacional
+            !empty($condiciones['subtotal'])
+            &&!empty($condiciones['impuesto1'])
+            &&empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&!empty($condiciones['rubro2'])
+            &&!empty($condiciones['rubro2porcentaje'])
+        ){
+            $rubros['subtotal']=round($monto,2);
+            $rubros['impuesto1']=round($monto,2);
+            $rubros['impuesto2']=0;
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=round($monto,2);
+        }
+
+        if(isset($rubros)){
+            return $rubros;
+        }else{
+            return array();
+        }
     }
 
 
@@ -254,7 +461,6 @@ class ProcesoController extends BaseController
      */
     public function calccAction(Request $request,$archivoEjecutar)
     {
-
         $operacion='proceso_calcc';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
@@ -387,15 +593,15 @@ class ProcesoController extends BaseController
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
-                array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setMontoTotal'],'MONTO');
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getMontoTotal();
-                if($this->getMontoTotal()==0){
+                array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
+                if($this->getCantidadTotal('montoTotal')==0){
                     $coeficiente=0;
                 }else{
-                    $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getMontoTotal();
+                    $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getCantidadTotal('montoTotal');
                 }
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['coeficiente']=$coeficiente;
-                $this->resetMontoTotal();
+                $this->resetCantidadTotal('montoTotal');
             }else{
                 if(empty($valor['ANO'])||empty($valor['NUM_FILE_FISICO'])){
                     $this->setMensajes('No hay resultados para el CC: '.$valor['ASIENTO']);
@@ -404,7 +610,7 @@ class ProcesoController extends BaseController
                 }
             }
         endforeach;
-        if(!isset($preResultado)||empty($preResultado)){
+        if(empty($preResultado)){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No hay datos para procesar los resultados');
@@ -429,7 +635,7 @@ class ProcesoController extends BaseController
                 $i++;
             endforeach;
         endforeach;
-        if(!isset($resultado)||empty($resultado)){
+        if(empty($resultado)){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No hay resultados');
