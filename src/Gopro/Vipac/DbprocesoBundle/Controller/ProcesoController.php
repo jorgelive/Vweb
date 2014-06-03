@@ -189,7 +189,7 @@ class ProcesoController extends BaseController
 
         $archivoInfo->setParametros($tablaSpecs,$columnaspecs);
         $archivoInfo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
-
+        $archivoInfo->setDescartarBlanco(true);
         if(!$archivoInfo->parseExcel()){
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
@@ -207,14 +207,18 @@ class ProcesoController extends BaseController
         }
         $datosProveedor->ejecutar();
         if(empty($datosProveedor->getProceso()->getExistentesRaw())){
-            $$this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('No existe ningun proveedor de los ingresados');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
-        array_walk_recursive($filesMulti,[$this,'setStack'],['files','NUM_FILE']);
+
+        if(!empty($filesMulti)){
+            array_walk_recursive($filesMulti,[$this,'setStack'],['files','NUM_FILE']);
+        }
+
         $filesInfo=$this->container->get('gopro_dbproceso_comun_proceso');
         $filesInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
         $filesInfo->setTabla('VVW_FILE_MERCADO_SINGLEKEY');
@@ -227,7 +231,7 @@ class ProcesoController extends BaseController
             'CENTRO_COSTO',
             'PAIS_FILE'
         ]);
-        $generarExcel=true;
+
         if(!empty($this->getStack('files'))){
             $filesInfo->setQueryVariables($this->getStack('files'));
 
@@ -239,13 +243,18 @@ class ProcesoController extends BaseController
 
             }
         }
+
+        $generarExcel=true;
+
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Doccptipo tipo INDEX BY tipo.id");
         $docCpTipos = $query->getArrayResult();
-
-        //print_r($docCpTipos);
         $result=array();
+
+
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
             $dataCP[$nroLinea]=$linea;
+
+
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
                 $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
             }
@@ -256,6 +265,7 @@ class ProcesoController extends BaseController
                 $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no existe');
                 $generarExcel=false;
             }
+
             if(isset($dataCP[$nroLinea]['FILES'])){
                 foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
                     if(isset($filesInfo->getExistentesIndizados()[$nroFile])){
@@ -267,8 +277,9 @@ class ProcesoController extends BaseController
                     }
                 endforeach;
             }else{
-                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','MERCADO'=>'ND','PAIS_FILE'=>'ND','NUM_PAX'=>1]];
+                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','CENTRO_COSTO'=>'0.00.00.00','MERCADO'=>'ND','PAIS_FILE'=>'ND','NUM_PAX'=>1]];
             }
+
 
             $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
             if(empty($dataCP[$nroLinea]['RUBROS'])){
@@ -361,24 +372,30 @@ class ProcesoController extends BaseController
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
                 $result[$nroLinea]['FILE'.$i]=$nroFile;
-                if(empty($file['CENTRO_COSTO'])){
+                if(empty($file['CENTRO_COSTO'])&&!empty($file['PAIS_FILE'])){
                     $result[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
-                }else{
+                }elseif(!empty($file['CENTRO_COSTO'])&&$file['CENTRO_COSTO']=='0.00.00.00'){
+                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'];
+                }elseif(!empty($file['CENTRO_COSTO'])){
                     $result[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'].$mercadoSufijo;
-
+                }else{
+                    $result[$nroLinea]['FILE'.$i.'_CC']='';
                 }
                 foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
                     $montoProcesado=0;
                     if($i<count($dataCP[$nroLinea]['FILES'])){
 
                         if(!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
-                            $montoProcesado=$montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'];
+                            $montoProcesado=round($montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'],2);
                             $this->setCantidadTotal($montoProcesado,null,[$nombreRubro,null]);
                         }
                     }else{
                         $montoProcesado=$montoRubro-$this->getCantidadTotal($nombreRubro);
                     }
-                    $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro]=$montoProcesado;
+                    if(isset($dataCP[$nroLinea]['FILES'][$nroFile]['montos'])){
+                        $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro]=$montoProcesado;
+                    }
+
                     if($nombreRubro!='impuesto1'){
                         if(!empty($montoProcesado)){
                             $result[$nroLinea]['FILE'.$i.'_'.$nombreRubro]=$montoProcesado;
@@ -398,7 +415,7 @@ class ProcesoController extends BaseController
         endforeach;
 
         if($generarExcel===false){
-            $$this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('No se general el achivo, existen observaciones');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
@@ -672,9 +689,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        //print_r($procesoArchivo->getExistentesCustomIndizados());
         foreach($carga->getProceso()->getExistentesRaw() as $valor):
-            //print_r($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]);
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
                 &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']])

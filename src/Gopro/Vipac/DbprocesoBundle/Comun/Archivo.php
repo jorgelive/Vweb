@@ -14,6 +14,7 @@ class Archivo extends ContainerAware{
     private $setColumnaSpecs;
     private $validCols;
     private $parsed;
+    private $descartarBlanco;
 
     private $tablaSpecs;
     private $columnaSpecs;
@@ -50,6 +51,15 @@ class Archivo extends ContainerAware{
 
     public function getExistentesRaw(){
         return $this->existentesRaw;
+    }
+
+    public function getDescartarBlanco(){
+        return $this->descartarBlanco;
+    }
+
+    public function setDescartarBlanco($descartarBlanco){
+        $this->descartarBlanco=$descartarBlanco;
+        return $this;
     }
 
     public function getExistentesIndizados(){
@@ -294,16 +304,23 @@ class Archivo extends ContainerAware{
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
                             }
-                            $existentesRaw[$fila][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            if(trim($parteValor)!=''||empty($this->getDescartarBlanco())){
+                                $existentesRaw[$fila][$this->columnaSpecs[$columnName[$key]]['nombre']]=$parteValor;
+                            }
                         endforeach;
                     }else{
-                        $existentesDescartados[$fila][]=$value;
+                        if(trim($value)!=''||empty($this->getDescartarBlanco())){
+                            $existentesDescartados[$fila][]=$value;
+                        }
                     }
                 }
             }
             $fila ++;
 
         }
+
+
+
 
         if(empty($existentesRaw)){
             $this->setMensajes('No hay valores que procesar');
@@ -340,6 +357,7 @@ class Archivo extends ContainerAware{
         endforeach;
 
         $this->setExistentesRaw($existentesRaw);
+
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
         if(!empty($existentesCustomIndizados)){
