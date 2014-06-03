@@ -24,6 +24,8 @@ class DoccptipoType extends AbstractType
             ->add('rubro1',null, array('label' => 'Rubro 1'))
             ->add('rubro2',null, array('label' => 'Rubro 2'))
             ->add('rubro2porcentaje',null, array('label' => 'Rubro 2 %'))
+            ->add('retencion',null, array('label' => 'Retención'))
+            ->add('codretencion',null, array('label' => 'Código de Retención'))
         ;
     }
     

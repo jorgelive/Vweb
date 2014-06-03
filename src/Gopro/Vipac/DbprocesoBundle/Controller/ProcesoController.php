@@ -159,9 +159,12 @@ class ProcesoController extends BaseController
         $columnaspecs[]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'MONEDA','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'FECHA_RIGE','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'FECHA_CONTABLE','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'APLICACION','llave'=>'no','proceso'=>'no');
+        //$columnaspecs[]=array('nombre'=>'VOUCHER','llave'=>'no','proceso'=>'no');
+        $columnaspecs[]=array('nombre'=>'DOCUMENTO_ASOCIADO','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'FILE_1','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'FILE_2','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'FILE_3','llave'=>'no','proceso'=>'no');
@@ -240,7 +243,7 @@ class ProcesoController extends BaseController
         $docCpTipos = $query->getArrayResult();
 
         //print_r($docCpTipos);
-
+        $result=array();
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
             $dataCP[$nroLinea]=$linea;
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
@@ -253,7 +256,6 @@ class ProcesoController extends BaseController
                 $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no existe');
                 $generarExcel=false;
             }
-
             if(isset($dataCP[$nroLinea]['FILES'])){
                 foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
                     if(isset($filesInfo->getExistentesIndizados()[$nroFile])){
@@ -265,57 +267,106 @@ class ProcesoController extends BaseController
                     }
                 endforeach;
             }else{
-                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','MERCADO'=>'ND','PAIS'=>'ND','NUM_PAX'=>1]];
+                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','MERCADO'=>'ND','PAIS_FILE'=>'ND','NUM_PAX'=>1]];
             }
 
             $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
+            if(empty($dataCP[$nroLinea]['RUBROS'])){
+                $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no puede ser procesado');
+                $generarExcel=false;
+            }
             array_walk_recursive($dataCP[$nroLinea]['FILES'], [$this, 'setCantidadTotal'],['totalPax','NUM_PAX']);
             $dataCP[$nroLinea]['TOTAL_PAX']=$this->getCantidadTotal('totalPax');
             $this->resetCantidadTotal('totalPax');
 
-            $result[$nroLinea][]=$dataCP[$nroLinea]['PROVEEDOR'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['DOCUMENTO'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['FECHA_CONTABLE'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['APLICACION'];
-            if(!empty($dataCP[$nroLinea]['RUBROS']['subtotal'])){
-                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['subtotal'];
-            }else{
-                $result[$nroLinea][]='';
-            }
-            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            $result[$nroLinea]['PROVEEDOR']=$dataCP[$nroLinea]['PROVEEDOR'];
+            $result[$nroLinea]['TIPO']=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
+            $result[$nroLinea]['DOCUMENTO']=$dataCP[$nroLinea]['DOCUMENTO'];
+            $result[$nroLinea]['FECHA_DOCUMENTO']=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
+            $result[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
+            $result[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
+            $result[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
+            $result[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
-                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
+                $result[$nroLinea]['IMPUESTO1']=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
             }else{
-                $result[$nroLinea][]='';
+                $result[$nroLinea]['IMPUESTO1']='';
             }
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
-                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
+                $result[$nroLinea]['IMPUESTO2']=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
             }else{
-                $result[$nroLinea][]='';
+                $result[$nroLinea]['IMPUESTO2']='';
             }
             if(!empty($dataCP[$nroLinea]['CONDICIONES']['impuesto2'])){
-                $result[$nroLinea][]='64.1.1.1.01';
+                if(empty($dataCP[$nroLinea]['DIFERIDO'])){
+                    $result[$nroLinea]['IMPUESTO2_CUENTA']='64.1.1.1.01';
+                }else{
+                    $result[$nroLinea]['IMPUESTO2_CUENTA']='IMP2DIFF';
+                }
             }else{
-                $result[$nroLinea][]='';
+                $result[$nroLinea]['IMPUESTO2_CUENTA']='';
             }
             if(!empty($dataCP[$nroLinea]['RUBROS']['rubro1'])){
-                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['rubro1'];
+                $result[$nroLinea]['RUBRO1']=$dataCP[$nroLinea]['RUBROS']['rubro1'];
             }else{
-                $result[$nroLinea][]='';
+                $result[$nroLinea]['RUBRO1']='';
             }
-            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            $result[$nroLinea]['RUBRO1_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro1'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['rubro2'])){
-                $result[$nroLinea][]=$dataCP[$nroLinea]['RUBROS']['rubro2'];
+                $result[$nroLinea]['RUBRO2']=$dataCP[$nroLinea]['RUBROS']['rubro2'];
             }else{
-                $result[$nroLinea][]='';
+                $result[$nroLinea]['RUBRO2']='';
             }
-            $result[$nroLinea][]=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
-            $result[$nroLinea][]=$dataCP[$nroLinea]['MONTO'];
+            $result[$nroLinea]['RUBRO2_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            $result[$nroLinea]['MONTO']=$dataCP[$nroLinea]['MONTO'];
+            $result[$nroLinea]['MONEDA']=$dataCP[$nroLinea]['MONEDA'];
+            $result[$nroLinea]['CONDICION_PAGO']=$dataCP[$nroLinea]['CONDICION_PAGO'];
+            $result[$nroLinea]['SUBTIPO']=$dataCP[$nroLinea]['CONDICIONES']['subtipo'];
+            $result[$nroLinea]['FECHA_CONTABLE']=$dataCP[$nroLinea]['FECHA_CONTABLE'];
+            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
+                $result[$nroLinea]['RUBRO6']='001';
+            }elseif(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
+                $result[$nroLinea]['RUBRO6']='003';
+            }else{
+                $result[$nroLinea]['RUBRO6']='';
+            }
+
+            if ($this->getUser()->hasGroup('Cusco')) {
+                $result[$nroLinea]['RUBRO7']='CUZCO';
+                $mercadoSufijo='.CU.OP';
+            }else{
+                $result[$nroLinea]['RUBRO7']='LIMA';
+                $mercadoSufijo='.LI.OP';
+            }
+            if (!empty($dataCP[$nroLinea]['VOUCHER'])) {
+                $result[$nroLinea]['RUBRO8']=$dataCP[$nroLinea]['VOUCHER'];
+            }else{
+                $result[$nroLinea]['RUBRO8']='N';
+            }
+            if (($dataCP[$nroLinea]['MONTO']>=700&&$result[$nroLinea]['TIPO']!='RHP')||$dataCP[$nroLinea]['MONTO']>1500) {
+                $result[$nroLinea]['RUBRO10']=$dataCP[$nroLinea]['CONDICIONES']['retencion'];
+                $result[$nroLinea]['RETENCION']=$dataCP[$nroLinea]['CONDICIONES']['codretencion'];
+            }else{
+                $result[$nroLinea]['RUBRO10']='';
+                $result[$nroLinea]['RETENCION']='';
+            }
+            if (!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
+                $result[$nroLinea]['TIPO_REFERENCIA']='FAC';
+                $result[$nroLinea]['DOC_REFERENCIA']=$dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
+            }else{
+                $result[$nroLinea]['TIPO_REFERENCIA']='';
+                $result[$nroLinea]['DOC_REFERENCIA']='';
+            }
 
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
+                $result[$nroLinea]['FILE'.$i]=$nroFile;
+                if(empty($file['CENTRO_COSTO'])){
+                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
+                }else{
+                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'].$mercadoSufijo;
+
+                }
                 foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
                     $montoProcesado=0;
                     if($i<count($dataCP[$nroLinea]['FILES'])){
@@ -327,13 +378,12 @@ class ProcesoController extends BaseController
                     }else{
                         $montoProcesado=$montoRubro-$this->getCantidadTotal($nombreRubro);
                     }
-
                     $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro]=$montoProcesado;
                     if($nombreRubro!='impuesto1'){
                         if(!empty($montoProcesado)){
-                            $result[$nroLinea][]=$montoProcesado;
+                            $result[$nroLinea]['FILE'.$i.'_'.$nombreRubro]=$montoProcesado;
                         }else{
-                            $result[$nroLinea][]='';
+                            $result[$nroLinea]['FILE'.$i.'_'.$nombreRubro]='';
                         }
 
                     }
@@ -347,9 +397,53 @@ class ProcesoController extends BaseController
             $this->resetCantidadTotal('rubro2');
         endforeach;
 
-        print_r($result);
+        if($generarExcel===false){
+            $$this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes($datosProveedor->getMensajes());
+            $this->setMensajes('No se general el achivo, existen observaciones');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
-        //print_r($filesInfo->getExistentesIndizados());
+        }
+        $encabezados = ['PROVEEDOR',
+            'TIPO',
+            'DOCUMENTO',
+            'FECHA DOCUMENTO',
+            'FECHA RIGE',
+            'APLICACION',
+            'SUBTOTAL',
+            'CUENTA CONTABLE',
+            'IMPUESTO1',
+            'IMPUESTO2',
+            'CUENTA CONTABLE IGV NO GRAVADO',
+            'RUBRO 1(EXONERADO)',
+            'CUENTA CONTABLE EXONERADO',
+            'RUBRO 2',
+            'CUENTA CONTABLE INAFECTO',
+            'MONTO',
+            'MONEDA',
+            'CONDICION_PAGO',
+            'SUBTIPO',
+            'FECHA CONTABLE',
+            'RUBRO 6',
+            'DOC RUBRO 7',
+            'DOC RUBRO 8',
+            'DOC RUBRO 10',
+            'DOC RETENCIÓN',
+            'TIPO REFERENCIA',
+            'DOC REFERENCIA',
+
+        ];
+        for ($i=1;$i<=20;$i++){
+            $encabezados[]='FILE '.$i;
+            $encabezados[]='CENTRO DE COSTO  '.$i;
+            $encabezados[]='DISTRIBUCION MONTO '.$i;
+            $encabezados[]='DISTRIBUCION EXONERADO '.$i;
+            $encabezados[]='DISTRIBUCION IMPUESTO NO GRAVADO '.$i;
+            $encabezados[]='DISTRIBUCION INAFECTO '.$i;
+        }
+
+        $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($result),['d','e','t']);
+        return $respuesta;
     }
 
     /*
@@ -358,6 +452,7 @@ class ProcesoController extends BaseController
      * @return array
      */
     private function setRubros($condiciones,$monto){
+        $igv=18;
         if(
             !empty($condiciones['subtotal'])
             &&empty($condiciones['impuesto1'])
@@ -377,7 +472,7 @@ class ProcesoController extends BaseController
             &&empty($condiciones['rubro1'])
             &&empty($condiciones['rubro2'])
         ){
-            $rubros['subtotal']=round($monto/1.18,2);
+            $rubros['subtotal']=round($monto/(1+$igv/100),2);
             $rubros['impuesto1']=round($monto-$rubros['subtotal'],2);
             $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
@@ -389,7 +484,7 @@ class ProcesoController extends BaseController
             &&empty($condiciones['rubro1'])
             &&empty($condiciones['rubro2'])
         ){
-            $rubros['subtotal']=round($monto/1.18,2);
+            $rubros['subtotal']=round($monto/(1+$igv/100),2);
             $rubros['impuesto1']=0;
             $rubros['impuesto2']=round($monto-$rubros['subtotal'],2);
             $rubros['rubro1']=0;
@@ -418,19 +513,6 @@ class ProcesoController extends BaseController
             $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
             $rubros['rubro2']=round($monto,2);
-        }elseif(//restaurantes extranjero
-            !empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&!empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&!empty($condiciones['rubro2'])
-            &&!empty($condiciones['rubro2porcentaje'])
-        ){
-            $rubros['subtotal']=round($monto,2);
-            $rubros['impuesto1']=0;
-            $rubros['impuesto2']=round($monto,2);
-            $rubros['rubro1']=0;
-            $rubros['rubro2']=round($monto,2);
         }elseif(//restaurantes nacional
             !empty($condiciones['subtotal'])
             &&!empty($condiciones['impuesto1'])
@@ -439,11 +521,24 @@ class ProcesoController extends BaseController
             &&!empty($condiciones['rubro2'])
             &&!empty($condiciones['rubro2porcentaje'])
         ){
-            $rubros['subtotal']=round($monto,2);
-            $rubros['impuesto1']=round($monto,2);
+            $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
+            $rubros['impuesto1']=round($rubros['subtotal']/$igv*100,2);
             $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
-            $rubros['rubro2']=round($monto,2);
+            $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto1'],2);
+        }elseif(//restaurantes extranjero
+            !empty($condiciones['subtotal'])
+            &&empty($condiciones['impuesto1'])
+            &&!empty($condiciones['impuesto2'])
+            &&empty($condiciones['rubro1'])
+            &&!empty($condiciones['rubro2'])
+            &&!empty($condiciones['rubro2porcentaje'])
+        ){
+            $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
+            $rubros['impuesto1']=0;
+            $rubros['impuesto2']=round($rubros['subtotal']/$igv*100,2);
+            $rubros['rubro1']=0;
+            $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto2'],2);
         }
 
         if(isset($rubros)){

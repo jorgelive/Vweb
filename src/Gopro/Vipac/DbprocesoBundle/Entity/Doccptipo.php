@@ -63,9 +63,22 @@ class Doccptipo
     private $rubro2;
 
     /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $retencion;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $codretencion;
+
+    /**
      * @ORM\Column(type="integer", nullable=true)
      */
+
     private $rubro2porcentaje;
+
+
 
     /**
      * @var datetime $creado
@@ -302,6 +315,53 @@ class Doccptipo
     public function getRubro2porcentaje()
     {
         return $this->rubro2porcentaje;
+    }
+
+
+    /**
+     * Set retencion
+     *
+     * @param string $retencion
+     * @return Doccptipo
+     */
+    public function setRetencion($retencion)
+    {
+        $this->retencion = $retencion;
+
+        return $this;
+    }
+
+    /**
+     * Get retencion
+     *
+     * @return string
+     */
+    public function getRetencion()
+    {
+        return $this->retencion;
+    }
+
+    /**
+     * Set codretencion
+     *
+     * @param string $codretencion
+     * @return Doccptipo
+     */
+    public function setCodretencion($codretencion)
+    {
+        $this->codretencion = $codretencion;
+
+        return $this;
+    }
+
+    /**
+     * Get codretencion
+     *
+     * @return string
+     */
+    public function getCodretencion()
+    {
+        return $this->codretencion;
     }
 
     /**

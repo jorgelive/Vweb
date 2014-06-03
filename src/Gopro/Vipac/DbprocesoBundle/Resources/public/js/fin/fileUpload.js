@@ -1,4 +1,4 @@
-$(function () {
+/*$(function () {
     'use strict';
     $('#fileUpload').fileupload({
         xhrFields: {withCredentials: true},
@@ -28,4 +28,4 @@ $(function () {
         $(this).fileupload('option', 'done')
             .call(this, $.Event('done'), {result: result});
     });
-});
+});*/

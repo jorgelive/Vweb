@@ -4,12 +4,12 @@
 
     {{ form(edit_form) }}
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">
-            Volver a la lista
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+    <ul id="registroAcciones">
+        <li>
+            <a href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
 {% endblock content %}

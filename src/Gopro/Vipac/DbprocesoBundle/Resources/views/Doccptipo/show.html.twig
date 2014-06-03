@@ -2,7 +2,7 @@
 {% block content %}
     <h1>Tipo de documentos CP</h1>
 
-    <table class="record_properties">
+    <table id="registroPropiedades">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -45,6 +45,14 @@
                 <td>{{ entity.rubro2porcentaje }}</td>
             </tr>
             <tr>
+                <th>Retención</th>
+                <td>{{ entity.retencion }}</td>
+            </tr>
+            <tr>
+                <th>Código de retención</th>
+                <td>{{ entity.codretencion }}</td>
+            </tr>
+            <tr>
                 <th>Creado</th>
                 <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
             </tr>
@@ -55,7 +63,7 @@
         </tbody>
     </table>
 
-    <ul class="record_actions">
+    <ul id="registroAcciones">
         <li>
             <a href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">
                 Volver a la lista

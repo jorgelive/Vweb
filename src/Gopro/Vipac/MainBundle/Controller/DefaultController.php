@@ -27,7 +27,11 @@ class DefaultController extends Controller
             array('nombre'=>'Calculadora por File','route'=>'gopro_vipac_dbproceso_proceso_calxfile'),
             array('nombre'=>'Calculadora por Reserva','route'=>'gopro_vipac_dbproceso_proceso_calxreserva'),
             array('nombre'=>'Cheque','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
-            array('nombre'=>'Cargador Generico','route'=>'gopro_vipac_dbproceso_carga_generico')
+            array('nombre'=>'Cargador Generico','route'=>'gopro_vipac_dbproceso_carga_generico'),
+            array('nombre'=>'Reclasificador de CC','route'=>'gopro_vipac_dbproceso_proceso_calcc'),
+            array('nombre'=>'Cargador de CP','route'=>'gopro_vipac_dbproceso_proceso_cargadorcp'),
+            array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
+
         );
         return array('items'=> $items);
     }

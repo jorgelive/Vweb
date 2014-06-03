@@ -2,7 +2,7 @@
 {% block content %}
     <h1>Lista de tipos</h1>
 
-    <table class="records_list">
+    <table id="listaRegistros">
         <thead>
             <tr>
                 <th>Id</th>
@@ -15,6 +15,8 @@
                 <th>Rubro 1</th>
                 <th>Rubro 2</th>
                 <th>Rubro 2 %</th>
+                <th>Retención</th>
+                <th>Código de retención</th>
                 <th>Creado</th>
                 <th>Modificado</th>
                 <th>Acciones</th>
@@ -33,6 +35,8 @@
                 <td>{{ entity.rubro1 }}</td>
                 <td>{{ entity.rubro2 }}</td>
                 <td>{{ entity.rubro2porcentaje }}</td>
+                <td>{{ entity.retencion }}</td>
+                <td>{{ entity.codretencion }}</td>
                 <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>{% if entity.modificado %}{{ entity.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
@@ -50,7 +54,7 @@
         </tbody>
     </table>
 
-        <ul>
+    <ul id="listaAcciones">
         <li>
             <a href="{{ path('gopro_vipac_dbproceso_doccptipo_new') }}">
                 Crear un nuevo registro

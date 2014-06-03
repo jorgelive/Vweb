@@ -358,7 +358,7 @@ class Archivo extends ContainerAware{
         return true;
     }
 
-    public function escribirExcel($archivo,$encabezados,$datos,$tipo='xlsx'){
+    public function escribirExcel($archivo,$encabezados,$datos,$dateColumns=array(),$tipo='xlsx'){
         $excelLoader = $this->container->get('phpexcel');
         $phpExcelObject = $excelLoader->createPHPExcelObject();
         $phpExcelObject->getProperties()->setCreator("Viapac")
@@ -370,6 +370,14 @@ class Archivo extends ContainerAware{
             $hoja->setCellValue($columna.'1', $encabezado);
         endforeach;
         $hoja->fromArray($datos, NULL, 'A2');
+        if(isset($dateColumns)){
+            $highestRow = $hoja->getHighestRow();
+            foreach($dateColumns as $column):
+                $hoja->getStyle($column.'2:'.$column.$highestRow)
+                    ->getNumberFormat()
+                    ->setFormatCode('d/mm/yy');
+            endforeach;
+        }
         $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
         $phpExcelObject->setActiveSheetIndex(0);
         $writer = $this->container->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
