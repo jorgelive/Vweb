@@ -28,6 +28,15 @@ class Archivo extends ContainerAware{
     private $camposCustom;
     private $archivoValido;
 
+//generado
+    private $archivoGenerado;
+    private $nombre;
+    private $tipo;
+    private $contenido;
+    private $encabezado;
+    private $formatoColumna;
+    private $celdas;
+
     public function getTablaSpecs(){
         return $this->tablaSpecs;
     }
@@ -130,7 +139,7 @@ class Archivo extends ContainerAware{
         return $this;
     }
 
-    public function setParametros($setTablaSpecs,$setColumnaSpecs){
+    public function setParametrosReader($setTablaSpecs,$setColumnaSpecs){
         if(is_null($this->getArchivoValido())||is_null($this->getArchivoValido()->getAbsolutePath())){
             $this->setMensajes('El archivo no existe');
             return false;
@@ -319,9 +328,6 @@ class Archivo extends ContainerAware{
 
         }
 
-
-
-
         if(empty($existentesRaw)){
             $this->setMensajes('No hay valores que procesar');
             return false;
@@ -376,35 +382,122 @@ class Archivo extends ContainerAware{
         return true;
     }
 
-    public function escribirExcel($archivo,$encabezados,$datos,$dateColumns=array(),$tipo='xlsx'){
-        $excelLoader = $this->container->get('phpexcel');
-        $phpExcelObject = $excelLoader->createPHPExcelObject();
+
+
+    public function setParametrosWriter($nombre,$encabezado=null,$contenido){
+        $this->setNombre($nombre);
+        if($encabezado!=null){
+            $this->setEncabezado($encabezado);
+        }
+
+        $this->setContenido($contenido);
+        $this->setTipo();
+    }
+
+    public function setEncabezado($encabezado){
+        $this->encabezado=$encabezado;
+        return $this;
+    }
+
+    public function getEncabezado(){
+        return $this->encabezado;
+    }
+
+    public function setContenido($contenido){
+        $this->contenido=$contenido;
+        return $this;
+    }
+
+    public function getContenido(){
+        return $this->contenido;
+    }
+
+    public function setTipo($tipo='xlsx'){
+        $this->tipo=$tipo;
+        return $this;
+    }
+
+    public function getTipo(){
+        return $this->tipo;
+    }
+
+    public function setNombre($nombre='archivoGenerado'){
+        $this->nombre=$nombre;
+        return $this;
+    }
+
+    public function getNombre(){
+        return $this->nombre;
+    }
+
+    public function getArchivoGenerado(){
+        return $this->archivoGenerado;
+    }
+
+    public function setFormatoColumna($formatoColumna){
+        $this->formatoColumna=$formatoColumna;
+        return $this;
+    }
+
+    public function getFormatoColumna(){
+        return $this->formatoColumna;
+    }
+
+    public function setCeldas($celdas){
+        $this->celdas=$celdas;
+        return $this;
+    }
+
+    public function getCeldas(){
+        return $this->celdas;
+    }
+
+    public function setArchivoGenerado(){
+        $excelWriter = $this->container->get('phpexcel');
+        $phpExcelObject = $excelWriter->createPHPExcelObject();
         $phpExcelObject->getProperties()->setCreator("Viapac")
             ->setTitle("Documento Generado")
             ->setDescription("Documento generado para descargar");
         $hoja=$phpExcelObject->setActiveSheetIndex(0);
-        foreach($encabezados as $key=>$encabezado):
-            $columna = $excelLoader->stringFromColumnIndex($key);
-            $hoja->setCellValue($columna.'1', $encabezado);
-        endforeach;
-        $hoja->fromArray($datos, NULL, 'A2');
-        if(isset($dateColumns)){
+        $filaBase=1;
+        if(!empty($this->getEncabezado())){
+            foreach($this->getEncabezado() as $key=>$encabezado):
+                $columna = $excelWriter->stringFromColumnIndex($key);
+                $hoja->setCellValue($columna.'1', $encabezado);
+            endforeach;
+            $filaBase=2;
+        }
+        $hoja->fromArray($this->getContenido(), NULL, 'A'.$filaBase);
+
+        if(!empty($this->getFormatoColumna())&&$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($this->getFormatoColumna())){
             $highestRow = $hoja->getHighestRow();
-            foreach($dateColumns as $column):
-                $hoja->getStyle($column.'2:'.$column.$highestRow)
-                    ->getNumberFormat()
-                    ->setFormatCode('d/mm/yy');
+            foreach($this->getFormatoColumna() as $formato => $columnas):
+                foreach($columnas as $columna):
+                    $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
+                        ->getNumberFormat()
+                        ->setFormatCode($formato);
+                endforeach;
             endforeach;
         }
+
+        if(!empty($this->getCeldas())&&$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($this->getCeldas())){
+            if(!empty($this->getCeldas()['texto'])){
+                foreach($this->getCeldas()['texto'] as $celda => $valor):
+                        $hoja->setCellValueExplicit($celda,$valor,'s');
+                endforeach;
+            }
+        }
+
         $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
         $phpExcelObject->setActiveSheetIndex(0);
         $writer = $this->container->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
         $response = $this->container->get('phpexcel')->createStreamedResponse($writer);
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($archivo).'.'.$tipo);
+        $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->getNombre().'.'.$this->getTipo()));
         $response->headers->set('Pragma', 'public');
         $response->headers->set('Cache-Control', 'maxage=1');
-        return $response;
+        $this->archivoGenerado=$response;
+        return $this;
     }
 
     public function validarArchivo($repositorio,$archivoEjecutar,$funcionArchivo){

@@ -13,6 +13,7 @@ class Factory
 {
     private $phpExcelIO;
     private $phpExcelCell;
+    private $phpExcelStyle;
 
     public function __construct($phpExcelIO = '\PHPExcel_IOFactory',$phpExcelCell = '\PHPExcel_Cell')
     {
@@ -49,11 +50,10 @@ class Factory
         return call_user_func(array($this->phpExcelCell, 'columnIndexFromString'), $column);
     }
 
-
     /**
      * Creates an empty PHPExcel Object if the filename is empty, otherwise loads the file into the object.
      *
-     * @param string $column
+     * @param string $indice
      *
      * @return \PHPExcel
      */

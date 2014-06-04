@@ -57,7 +57,7 @@ class CargaController extends BaseController
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
-        $procesoArchivo->setParametros(null,null);
+        $procesoArchivo->setParametrosReader(null,null);
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
@@ -112,7 +112,7 @@ class CargaController extends BaseController
         $columnaDocCp[1]=array('nombre'=>'MONTO','llave'=>'no');
         $columnaDocCp[2]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no');
         $columnaDocCp[3]=array('nombre'=>'MONEDA','llave'=>'no');
-        $procesoArchivo->setParametros($tablaDocCp,$columnaDocCp);
+        $procesoArchivo->setParametrosReader($tablaDocCp,$columnaDocCp);
         $mensajes=$procesoArchivo->getMensajes();
         if($procesoArchivo->parseExcel()!==false){
             $documentoCp=$this->get('gopro_dbproceso_comun_cargador');

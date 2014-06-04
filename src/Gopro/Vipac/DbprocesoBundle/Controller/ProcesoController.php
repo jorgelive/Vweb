@@ -68,7 +68,7 @@ class ProcesoController extends BaseController
         $columnaspecs[3]=null;
         $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
         $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
-        $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
+        $procesoArchivo->setParametrosReader($tablaSpecs,$columnaspecs);
 
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -116,7 +116,7 @@ class ProcesoController extends BaseController
 
         $this->setMensajes($procesoArchivo->getMensajes());
         $this->setMensajes($carga->getMensajes());
-        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $mensajes);
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $this->getMensajes());
     }
 
     //Cuenta contable normal del impuesto 2 64.1.1.1.01
@@ -187,7 +187,7 @@ class ProcesoController extends BaseController
         $columnaspecs[]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
         $columnaspecs[]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
 
-        $archivoInfo->setParametros($tablaSpecs,$columnaspecs);
+        $archivoInfo->setParametrosReader($tablaSpecs,$columnaspecs);
         $archivoInfo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
         $archivoInfo->setDescartarBlanco(true);
         if(!$archivoInfo->parseExcel()){
@@ -248,7 +248,8 @@ class ProcesoController extends BaseController
 
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Doccptipo tipo INDEX BY tipo.id");
         $docCpTipos = $query->getArrayResult();
-        $result=array();
+        $resultado=array();
+        $celdas=array();
 
 
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
@@ -262,7 +263,7 @@ class ProcesoController extends BaseController
             if(isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])){
                 $dataCP[$nroLinea]['CONDICIONES']=$docCpTipos[$dataCP[$nroLinea]['TIPO']];
             }else{
-                $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no existe');
+                $this->setMensajes('El tipo de documento establecido para la linea: '.($nroLinea+1).', no existe');
                 $generarExcel=false;
             }
 
@@ -272,7 +273,7 @@ class ProcesoController extends BaseController
                         $dataCP[$nroLinea]['FILES'][$nroFile]=$filesInfo->getExistentesIndizados()[$nroFile];
 
                     }else{
-                        $this->setMensajes('El numero de file: '.$nroFile.', de la linea: '.$nroLinea.', no existe');
+                        $this->setMensajes('El numero de file: '.$nroFile.', de la linea: '.($nroLinea+1).', no existe');
                         $generarExcel=false;
                     }
                 endforeach;
@@ -283,103 +284,105 @@ class ProcesoController extends BaseController
 
             $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
             if(empty($dataCP[$nroLinea]['RUBROS'])){
-                $this->setMensajes('El tipo de documento establecido para la linea: '.$nroLinea.', no puede ser procesado');
+                $this->setMensajes('El tipo de documento establecido para la linea: '.($nroLinea+1).', no puede ser procesado');
                 $generarExcel=false;
             }
             array_walk_recursive($dataCP[$nroLinea]['FILES'], [$this, 'setCantidadTotal'],['totalPax','NUM_PAX']);
             $dataCP[$nroLinea]['TOTAL_PAX']=$this->getCantidadTotal('totalPax');
             $this->resetCantidadTotal('totalPax');
 
-            $result[$nroLinea]['PROVEEDOR']=$dataCP[$nroLinea]['PROVEEDOR'];
-            $result[$nroLinea]['TIPO']=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
-            $result[$nroLinea]['DOCUMENTO']=$dataCP[$nroLinea]['DOCUMENTO'];
-            $result[$nroLinea]['FECHA_DOCUMENTO']=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
-            $result[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
-            $result[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
-            $result[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
-            $result[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            $resultado[$nroLinea]['PROVEEDOR']=$dataCP[$nroLinea]['PROVEEDOR'];
+            $resultado[$nroLinea]['TIPO']=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
+            $resultado[$nroLinea]['DOCUMENTO']=$dataCP[$nroLinea]['DOCUMENTO'];
+            $resultado[$nroLinea]['FECHA_DOCUMENTO']=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
+            $resultado[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
+            $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
+            $resultado[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
+            $resultado[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
-                $result[$nroLinea]['IMPUESTO1']=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
+                $resultado[$nroLinea]['IMPUESTO1']=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
             }else{
-                $result[$nroLinea]['IMPUESTO1']='';
+                $resultado[$nroLinea]['IMPUESTO1']='';
             }
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
-                $result[$nroLinea]['IMPUESTO2']=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
+                $resultado[$nroLinea]['IMPUESTO2']=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
             }else{
-                $result[$nroLinea]['IMPUESTO2']='';
+                $resultado[$nroLinea]['IMPUESTO2']='';
             }
             if(!empty($dataCP[$nroLinea]['CONDICIONES']['impuesto2'])){
                 if(empty($dataCP[$nroLinea]['DIFERIDO'])){
-                    $result[$nroLinea]['IMPUESTO2_CUENTA']='64.1.1.1.01';
+                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='64.1.1.1.01';
                 }else{
-                    $result[$nroLinea]['IMPUESTO2_CUENTA']='IMP2DIFF';
+                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='IMP2DIFF';
                 }
             }else{
-                $result[$nroLinea]['IMPUESTO2_CUENTA']='';
+                $resultado[$nroLinea]['IMPUESTO2_CUENTA']='';
             }
             if(!empty($dataCP[$nroLinea]['RUBROS']['rubro1'])){
-                $result[$nroLinea]['RUBRO1']=$dataCP[$nroLinea]['RUBROS']['rubro1'];
+                $resultado[$nroLinea]['RUBRO1']=$dataCP[$nroLinea]['RUBROS']['rubro1'];
             }else{
-                $result[$nroLinea]['RUBRO1']='';
+                $resultado[$nroLinea]['RUBRO1']='';
             }
-            $result[$nroLinea]['RUBRO1_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro1'];
+            $resultado[$nroLinea]['RUBRO1_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro1'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['rubro2'])){
-                $result[$nroLinea]['RUBRO2']=$dataCP[$nroLinea]['RUBROS']['rubro2'];
+                $resultado[$nroLinea]['RUBRO2']=$dataCP[$nroLinea]['RUBROS']['rubro2'];
             }else{
-                $result[$nroLinea]['RUBRO2']='';
+                $resultado[$nroLinea]['RUBRO2']='';
             }
-            $result[$nroLinea]['RUBRO2_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
-            $result[$nroLinea]['MONTO']=$dataCP[$nroLinea]['MONTO'];
-            $result[$nroLinea]['MONEDA']=$dataCP[$nroLinea]['MONEDA'];
-            $result[$nroLinea]['CONDICION_PAGO']=$dataCP[$nroLinea]['CONDICION_PAGO'];
-            $result[$nroLinea]['SUBTIPO']=$dataCP[$nroLinea]['CONDICIONES']['subtipo'];
-            $result[$nroLinea]['FECHA_CONTABLE']=$dataCP[$nroLinea]['FECHA_CONTABLE'];
+            $resultado[$nroLinea]['RUBRO2_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            $resultado[$nroLinea]['MONTO']=$dataCP[$nroLinea]['MONTO'];
+            $resultado[$nroLinea]['MONEDA']=$dataCP[$nroLinea]['MONEDA'];
+            $resultado[$nroLinea]['CONDICION_PAGO']=$dataCP[$nroLinea]['CONDICION_PAGO'];
+            $resultado[$nroLinea]['SUBTIPO']=$dataCP[$nroLinea]['CONDICIONES']['subtipo'];
+            $resultado[$nroLinea]['FECHA_CONTABLE']=$dataCP[$nroLinea]['FECHA_CONTABLE'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
-                $result[$nroLinea]['RUBRO6']='001';
+                $resultado[$nroLinea]['RUBRO6']='001';
+                $celdas['texto']['u'.($nroLinea+1)]='001';
             }elseif(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
-                $result[$nroLinea]['RUBRO6']='003';
+                $resultado[$nroLinea]['RUBRO6']='003';
+                $celdas['texto']['u'.($nroLinea+1)]='003';
             }else{
-                $result[$nroLinea]['RUBRO6']='';
+                $resultado[$nroLinea]['RUBRO6']='';
             }
 
             if ($this->getUser()->hasGroup('Cusco')) {
-                $result[$nroLinea]['RUBRO7']='CUZCO';
+                $resultado[$nroLinea]['RUBRO7']='CUZCO';
                 $mercadoSufijo='.CU.OP';
             }else{
-                $result[$nroLinea]['RUBRO7']='LIMA';
+                $resultado[$nroLinea]['RUBRO7']='LIMA';
                 $mercadoSufijo='.LI.OP';
             }
             if (!empty($dataCP[$nroLinea]['VOUCHER'])) {
-                $result[$nroLinea]['RUBRO8']=$dataCP[$nroLinea]['VOUCHER'];
+                $resultado[$nroLinea]['RUBRO8']=$dataCP[$nroLinea]['VOUCHER'];
             }else{
-                $result[$nroLinea]['RUBRO8']='N';
+                $resultado[$nroLinea]['RUBRO8']='N';
             }
-            if (($dataCP[$nroLinea]['MONTO']>=700&&$result[$nroLinea]['TIPO']!='RHP')||$dataCP[$nroLinea]['MONTO']>1500) {
-                $result[$nroLinea]['RUBRO10']=$dataCP[$nroLinea]['CONDICIONES']['retencion'];
-                $result[$nroLinea]['RETENCION']=$dataCP[$nroLinea]['CONDICIONES']['codretencion'];
+            if (($dataCP[$nroLinea]['MONTO']>=700&&$resultado[$nroLinea]['TIPO']!='RHP')||$dataCP[$nroLinea]['MONTO']>1500) {
+                $resultado[$nroLinea]['RUBRO10']=$dataCP[$nroLinea]['CONDICIONES']['retencion'];
+                $resultado[$nroLinea]['RETENCION']=$dataCP[$nroLinea]['CONDICIONES']['codretencion'];
             }else{
-                $result[$nroLinea]['RUBRO10']='';
-                $result[$nroLinea]['RETENCION']='';
+                $resultado[$nroLinea]['RUBRO10']='';
+                $resultado[$nroLinea]['RETENCION']='';
             }
             if (!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
-                $result[$nroLinea]['TIPO_REFERENCIA']='FAC';
-                $result[$nroLinea]['DOC_REFERENCIA']=$dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
+                $resultado[$nroLinea]['TIPO_REFERENCIA']='FAC';
+                $resultado[$nroLinea]['DOC_REFERENCIA']=$dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
             }else{
-                $result[$nroLinea]['TIPO_REFERENCIA']='';
-                $result[$nroLinea]['DOC_REFERENCIA']='';
+                $resultado[$nroLinea]['TIPO_REFERENCIA']='';
+                $resultado[$nroLinea]['DOC_REFERENCIA']='';
             }
 
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
-                $result[$nroLinea]['FILE'.$i]=$nroFile;
+                $resultado[$nroLinea]['FILE'.$i]=$nroFile;
                 if(empty($file['CENTRO_COSTO'])&&!empty($file['PAIS_FILE'])){
-                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
+                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
                 }elseif(!empty($file['CENTRO_COSTO'])&&$file['CENTRO_COSTO']=='0.00.00.00'){
-                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'];
+                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'];
                 }elseif(!empty($file['CENTRO_COSTO'])){
-                    $result[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'].$mercadoSufijo;
+                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'].$mercadoSufijo;
                 }else{
-                    $result[$nroLinea]['FILE'.$i.'_CC']='';
+                    $resultado[$nroLinea]['FILE'.$i.'_CC']='';
                 }
                 foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
                     $montoProcesado=0;
@@ -398,12 +401,13 @@ class ProcesoController extends BaseController
 
                     if($nombreRubro!='impuesto1'){
                         if(!empty($montoProcesado)){
-                            $result[$nroLinea]['FILE'.$i.'_'.$nombreRubro]=$montoProcesado;
+                            $resultado[$nroLinea]['FILE'.$i.'_'.$nombreRubro]=$montoProcesado;
                         }else{
-                            $result[$nroLinea]['FILE'.$i.'_'.$nombreRubro]='';
+                            $resultado[$nroLinea]['FILE'.$i.'_'.$nombreRubro]='';
                         }
 
                     }
+
                 endforeach;
                 $i++;
             endforeach;
@@ -459,8 +463,12 @@ class ProcesoController extends BaseController
             $encabezados[]='DISTRIBUCION INAFECTO '.$i;
         }
 
-        $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($result),['d','e','t']);
-        return $respuesta;
+        $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
+        $archivoGenerado->setParametrosWriter($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultado));
+        $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
+        $archivoGenerado->setCeldas($celdas);
+        $archivoGenerado->setArchivoGenerado();
+        return $archivoGenerado->getArchivoGenerado();
     }
 
     /*
@@ -479,8 +487,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=round($monto,2);
             $rubros['impuesto1']=0;
-            $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=0;
             $rubros['rubro2']=0;
         }elseif(
             !empty($condiciones['subtotal'])
@@ -491,8 +499,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=round($monto/(1+$igv/100),2);
             $rubros['impuesto1']=round($monto-$rubros['subtotal'],2);
-            $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=0;
             $rubros['rubro2']=0;
         }elseif(
             !empty($condiciones['subtotal'])
@@ -503,8 +511,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=round($monto/(1+$igv/100),2);
             $rubros['impuesto1']=0;
-            $rubros['impuesto2']=round($monto-$rubros['subtotal'],2);
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=round($monto-$rubros['subtotal'],2);
             $rubros['rubro2']=0;
         }elseif(//solo rubro 1
             empty($condiciones['subtotal'])
@@ -515,8 +523,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=0;
             $rubros['impuesto1']=0;
-            $rubros['impuesto2']=0;
             $rubros['rubro1']=round($monto,2);
+            $rubros['impuesto2']=0;
             $rubros['rubro2']=0;
         }elseif(
             empty($condiciones['subtotal'])
@@ -527,8 +535,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=0;
             $rubros['impuesto1']=0;
-            $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=0;
             $rubros['rubro2']=round($monto,2);
         }elseif(//restaurantes nacional
             !empty($condiciones['subtotal'])
@@ -540,8 +548,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
             $rubros['impuesto1']=round($rubros['subtotal']/$igv*100,2);
-            $rubros['impuesto2']=0;
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=0;
             $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto1'],2);
         }elseif(//restaurantes extranjero
             !empty($condiciones['subtotal'])
@@ -553,8 +561,8 @@ class ProcesoController extends BaseController
         ){
             $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
             $rubros['impuesto1']=0;
-            $rubros['impuesto2']=round($rubros['subtotal']/$igv*100,2);
             $rubros['rubro1']=0;
+            $rubros['impuesto2']=round($rubros['subtotal']/$igv*100,2);
             $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto2'],2);
         }
 
@@ -626,7 +634,7 @@ class ProcesoController extends BaseController
         $columnaspecs[22]=array('nombre'=>'CLIENTE','llave'=>'no');
         $columnaspecs[23]=array('nombre'=>'MONTO_DOLAR','llave'=>'no');
 
-        $procesoArchivo->setParametros($tablaSpecs,$columnaspecs);
+        $procesoArchivo->setParametrosReader($tablaSpecs,$columnaspecs);
         $procesoArchivo->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DOCUMENTO']);
 
         if(!$procesoArchivo->parseExcel()){
@@ -759,8 +767,10 @@ class ProcesoController extends BaseController
         endforeach;
 
         $encabezados=array_keys($resultado[0]);
-        $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultado));
-        return $respuesta;
+        $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultado));
+        $archivoGenerado->setArchivoGenerado();
+        return $archivoGenerado->getArchivoGenerado();
 
     }
 
@@ -797,7 +807,7 @@ class ProcesoController extends BaseController
         }
 
         $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_PRINCIPAL_MERCADO');
-        $procesoArchivo->setParametros($tablaSpecs,null);
+        $procesoArchivo->setParametrosReader($tablaSpecs,null);
 
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -834,8 +844,10 @@ class ProcesoController extends BaseController
         endforeach;
 
         $encabezados=array_keys($fusion[0]);
-        $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
-        return $respuesta;
+        $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($fusion));
+        $archivoGenerado->setArchivoGenerado();
+        return $archivoGenerado->getArchivoGenerado();
     }
 
     /**
@@ -870,7 +882,7 @@ class ProcesoController extends BaseController
         }
 
         $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_SERVICIOS_MERCADO');
-        $procesoArchivo->setParametros($tablaSpecs,null);
+        $procesoArchivo->setParametrosReader($tablaSpecs,null);
 
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -908,8 +920,10 @@ class ProcesoController extends BaseController
         endforeach;
 
         $encabezados=array_keys($fusion[0]);
-        $respuesta=$this->get('gopro_dbproceso_comun_archivo')->escribirExcel($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
-        return $respuesta;
+        $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($fusion));
+        $archivoGenerado->setArchivoGenerado();
+        return $archivoGenerado->getArchivoGenerado();
     }
 
     /**
@@ -938,59 +952,4 @@ class ProcesoController extends BaseController
         $em->flush();
         return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
     }
-
-    //@TODO: implementar funcion
-    /**
-     * @Route("/editararchivo", name="gopro_vipac_dbproceso_proceso_editararchivo")
-     * @Method({"POST"})
-     * @Template()
-     */
-    public function editarArchivoAction(Request $request)
-    {
-        if (!$request->isXMLHttpRequest()){
-            throw new NotFoundHttpException("No se encontro la página");
-        }
-        $usuario=$this->get('security.context')->getToken()->getUser();
-        if(!is_string($usuario)){
-            $usuario=$usuario->getUsername();
-        }
-        $em = $this->getDoctrine()->getManager();
-        $archivo = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($request->request->get('id'));
-
-        if(empty($archivo)||$archivo->getUsuario()!=$usuario){
-            return new JsonResponse(array('exito'=>'no','mensaje'=>'No existe el archivo'));
-        }
-        $em->remove($archivo);
-        $em->flush();
-        return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
-    }
-    //@TODO: implementar funcion
-    /**
-     * @Route("/agregararchivo", name="gopro_vipac_dbproceso_proceso_agregararchivo")
-     * @Method({"POST"})
-     * @Template()
-     */
-    public function agregarArchivoAction(Request $request)
-    {
-        if (!$request->isXMLHttpRequest()){
-            throw new NotFoundHttpException("No se encontro la página");
-        }
-        $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
-        $formulario->handleRequest($request);
-
-        if ($formulario->isValid()){
-            $archivo->setUsuario($this->getUserName());
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($archivo);
-            $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
-        }
-    }
-
-
-
 }
