@@ -208,7 +208,7 @@ sonata_user:
         group:              Gopro\UserBundle\Entity\Group
 
 
-services:
+#services:
 #    fixUser.listener:
 #        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
 #        tags:
