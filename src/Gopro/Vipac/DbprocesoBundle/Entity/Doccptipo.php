@@ -32,7 +32,7 @@ class Doccptipo
     private $tipo;
 
     /**
-     * @ORM\Column(type="string", length=2)
+     * @ORM\Column(type="string", length=3)
      * @Assert\NotBlank
      */
     private $subtipo;

@@ -9,11 +9,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * User
  *
- * @ORM\Table(name="gp_organizacion")
+ * @ORM\Table(name="gp_dependencia")
  * @ORM\Entity
  */
 
-class Organizacion
+class Dependencia
 {
 
     /**
@@ -30,11 +30,6 @@ class Organizacion
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=11, unique=true)
-     */
-    private $ruc;
-
-    /**
      * @ORM\Column(type="string", length=100)
      */
     private $email;
@@ -45,12 +40,17 @@ class Organizacion
     private $direccion;
 
     /**
-     * @ORM\OneToMany(targetEntity="Dependencia", mappedBy="organizacion")
+     * @ORM\ManyToOne(targetEntity="Organizacion", inversedBy="dependencias")
      */
-    protected $dependencias;
+    protected $organizacion;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="dependencia")
+     */
+    protected $users;
 
     public function __construct()
     {
-        $this->dependencias = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 }

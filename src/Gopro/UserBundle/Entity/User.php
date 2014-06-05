@@ -22,7 +22,7 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Organizacion", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Dependencia", inversedBy="users")
      */
-    protected $organizacion;
+    protected $dependencia;
 }
