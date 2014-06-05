@@ -7,6 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+/**
+ * Doccptipo controller.
+ *
+ * @Route("/varios")
+ */
 class VariosController extends Controller
 {
     /**

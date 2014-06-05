@@ -2,15 +2,21 @@
 
 namespace Gopro\Vipac\ExtraBundle\Controller;
 
+use Gopro\Vipac\ExtraBundle\Form\FirmaType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-class DefaultController extends Controller
+/**
+ * Doccptipo controller.
+ *
+ * @Route("/firma")
+ */
+class FirmaController extends Controller
 {
     /**
-     * @Route("/firma", name="gopro_vipac_extra_firma")
+     * @Route("/", name="gopro_vipac_extra_firma")
      * @Template()
      */
     public function firmaAction(Request $request)
@@ -19,24 +25,16 @@ class DefaultController extends Controller
         $textarea='';
         $body='';
         $css='';
-        $oficinaChOp = array('reducto'=>'Reducto','lamar'=>'La Mar','cusco'=>'Cusco','app'=>'Arequipa');
-        $oficinaCh=array('choices'=>$oficinaChOp,'multiple'=>false,'expanded'=>true);
-        $idiomaChOp = array('es'=>'Español','en'=>'Inglés','pt'=>'Portugués');
-        $idiomaCh=array('choices'=>$idiomaChOp,'multiple'=>false,'expanded'=>true);
+        $form = $this->createForm(new FirmaType(), $datos, array(
+            'action' => $this->generateUrl('gopro_vipac_extra_firma'),
+            'method' => 'POST',
+        ));
 
-        $formulario = $this->createFormBuilder($datos)
-            ->add('Nombre', 'text')
-            ->add('E-mail', 'text')
-            ->add('Cargo', 'text')
-            ->add('Anexo', 'text', array('required' => false))
-            ->add('Opcional', 'text', array('required' => false))
-            ->add('Oficina', 'choice', $oficinaCh)
-            ->add('Idioma', 'choice', $idiomaCh)
-            ->getForm();
+        $form->add('submit', 'submit', array('label' => 'Generar'));
 
         if ($request->isMethod('POST')) {
-            $formulario->handleRequest($request);
-            $data = $formulario->getData();
+            $form->handleRequest($request);
+            $data = $form->getData();
 
 $markupOpen='<html lang="es">';
 $markupOpen.='<head>';
@@ -152,9 +150,7 @@ $markupClose='</body>';
 $markupClose.='</html>';
             $textarea=$this->getTextoSinAcentos($markupOpen.$css.$markupMiddle.$body.$markupClose);
         }
-
-
-        return array('formulario' => $formulario->createView(),'textarea' => $textarea,'css' => $css, 'body'=> $body);
+        return array('formulario' => $form->createView(),'textarea' => $textarea,'css' => $css, 'body'=> $body);
     }
 
     private function getTraduccion($variable,$idioma){

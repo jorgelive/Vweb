@@ -212,7 +212,7 @@ class DoccptipoController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder(NULL, array ( 'attr' => array ( 'name' => 'deleteForm', 'id' => 'deleteForm' ) ))
+        return $this->createFormBuilder(NULL,array('attr'=>array('name'=>'deleteForm','id'=>'deleteForm')))
             ->setAction($this->generateUrl('gopro_vipac_dbproceso_doccptipo_delete', array('id' => $id)))
             ->setMethod('DELETE')
             ->add('submit', 'submit', array('label' => 'Borrar'))

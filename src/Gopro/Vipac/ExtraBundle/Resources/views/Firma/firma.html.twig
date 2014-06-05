@@ -1,4 +1,6 @@
 {% extends 'GoproVipacExtraBundle::layout.html.twig' %}
+{% block title %}Generador de Firmas{% endblock title %}
+{% block titulo %}Generador de Firmas{% endblock titulo %}
 {% block stylesheets %}
     {{ parent() }}
     {% if css|default %}
@@ -10,14 +12,7 @@
 {% endblock stylesheets%}
 
 {% block content %}
-    <h1>Generador de Firmas</h1>
-
-    <form action="#" method="post" {{ form_enctype(formulario) }}>
-        {{ form_widget(formulario) }}
-
-        <input type="submit" value="Generar" />
-    </form>
-
+    {{ form(formulario) }}
     {% if body|default %}
         {{ body | raw}}
         <textarea class="codigo">
