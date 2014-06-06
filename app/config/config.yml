@@ -208,6 +208,11 @@ sonata_user:
         group:              Gopro\UserBundle\Entity\Group
 
 
+    admin:                  # Admin Classes
+        user:
+            class:          Gopro\UserBundle\Admin\UserAdmin
+            controller:     SonataAdminBundle:CRUD
+            translation:    SonataUserBundle
 #services:
 #    fixUser.listener:
 #        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit

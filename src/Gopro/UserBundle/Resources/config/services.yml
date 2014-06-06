@@ -1,0 +1,12 @@
+services:
+    gopro_user.admin.organizacion:
+        class: Gopro\UserBundle\Admin\OrganizacionAdmin
+        arguments: [~, Gopro\UserBundle\Entity\Organizacion, GoproUserBundle:OrganizacionAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Admin, label: Organizacion}
+
+    gopro_user.admin.dependencia:
+        class: Gopro\UserBundle\Admin\DependenciaAdmin
+        arguments: [~, Gopro\UserBundle\Entity\Dependencia, GoproUserBundle:DependenciaAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Admin, label: Dependencia}

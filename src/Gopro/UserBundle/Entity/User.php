@@ -25,4 +25,40 @@ class User extends BaseUser
      * @ORM\ManyToOne(targetEntity="Dependencia", inversedBy="users")
      */
     protected $dependencia;
+
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set dependencia
+     *
+     * @param \Gopro\UserBundle\Entity\Dependencia $dependencia
+     * @return User
+     */
+    public function setDependencia(\Gopro\UserBundle\Entity\Dependencia $dependencia = null)
+    {
+        $this->dependencia = $dependencia;
+
+        return $this;
+    }
+
+    /**
+     * Get dependencia
+     *
+     * @return \Gopro\UserBundle\Entity\Dependencia 
+     */
+    public function getDependencia()
+    {
+        return $this->dependencia;
+    }
+
+
 }

@@ -232,9 +232,9 @@ class Archivo
     /**
      * Get extension
      *
-     * @return string 
+     * @return string
      */
-    public function getextension()
+    public function getExtension()
     {
         return $this->extension;
     }
@@ -330,4 +330,6 @@ class Archivo
     {
         return $this->modificado;
     }
+
+
 }
