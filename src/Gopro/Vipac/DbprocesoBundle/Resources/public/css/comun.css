@@ -1,6 +1,9 @@
-div#container div#GoproViapacDbprocesoBundle div#carga{width:400px; margin:10px auto;}
-div#container div#GoproViapacDbprocesoBundle div#carga div#archivosForm form div#form div label{font-size: 80%; display:block;}
-div#container div#GoproViapacDbprocesoBundle div#carga div#archivosForm form div#form div input#form_nombre{width:95%}
+div#container div#GoproViapacDbprocesoBundle div#parametros{width:400px; margin:10px auto;}
+div#container div#GoproViapacDbprocesoBundle div#parametros div#mainForm form div#form div label{text-align:right; width:100px; margin-right:10px; display:inline-block;}
+div#container div#GoproViapacDbprocesoBundle div#parametros div#mainForm form div#form div input#form_nombre{width:95%}
+
+div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div label{display: inline-block; margin-left: 5px; width: 90px;}
+div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div label{display: inline-block; margin-left: 5px; width: 70px;}
 
 div#GoproViapacDbprocesoBundle div#mensajes{margin-top: 10px;}
 div#GoproViapacDbprocesoBundle div#mensajes ul{margin-left: 30px;}

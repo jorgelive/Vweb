@@ -25,16 +25,16 @@ class FirmaController extends Controller
         $textarea='';
         $body='';
         $css='';
-        $form = $this->createForm(new FirmaType(), $datos, array(
+        $formulario = $this->createForm(new FirmaType(), $datos, array(
             'action' => $this->generateUrl('gopro_vipac_extra_firma'),
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Generar'));
+        $formulario->add('submit', 'submit', array('label' => 'Generar'));
 
         if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
-            $data = $form->getData();
+            $formulario->handleRequest($request);
+            $data = $formulario->getData();
 
 $markupOpen='<html lang="es">';
 $markupOpen.='<head>';
@@ -150,7 +150,7 @@ $markupClose='</body>';
 $markupClose.='</html>';
             $textarea=$this->getTextoSinAcentos($markupOpen.$css.$markupMiddle.$body.$markupClose);
         }
-        return array('formulario' => $form->createView(),'textarea' => $textarea,'css' => $css, 'body'=> $body);
+        return array('formulario' => $formulario->createView(),'textarea' => $textarea,'css' => $css, 'body'=> $body);
     }
 
     private function getTraduccion($variable,$idioma){

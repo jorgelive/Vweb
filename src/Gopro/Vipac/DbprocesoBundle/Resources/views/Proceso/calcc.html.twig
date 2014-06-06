@@ -3,9 +3,9 @@
 {% block titulo %}Calculadora de centros de costo y cuentas por asiento{% endblock titulo %}
 {% block content %}
 
-    <div id="carga">
+    <div id="parametros">
         <h1>Agregar archivo</h1>
-        <div id="archivosForm">
+        <div id="mainForm">
             <form action="#" method="post" {{ form_enctype(formulario) }}>
                 {{ form_widget(formulario) }}
                 <input type="submit" value="Subir archivo" />

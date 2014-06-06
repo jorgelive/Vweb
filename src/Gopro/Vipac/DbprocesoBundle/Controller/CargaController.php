@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 
 /**
- * Doccptipo controller.
+ * Carga controller.
  *
  * @Route("/carga")
  */

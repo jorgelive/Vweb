@@ -1,0 +1,38 @@
+<?php
+
+namespace Gopro\Vipac\DbprocesoBundle\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+class ParametrosType extends AbstractType
+{
+        /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
+        $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true);
+        $tipoChOp = array('detallado'=>'Detallado','resumido'=>'Resumido');
+        $tipoCh=array('choices'=>$tipoChOp,'multiple'=>false,'expanded'=>true);
+
+        $builder
+            ->add('fechaInicio', 'text')
+            ->add('fechaFin', 'text')
+            ->add('Destino', 'choice', $destinoCh)
+            ->add('Tipo', 'choice', $tipoCh)
+        ;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'gopro_vipac_dbprocesobundle_parametros';
+    }
+}

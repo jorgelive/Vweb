@@ -1,0 +1,24 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Reporte de Vencimientos CP{% endblock title %}
+{% block titulo %}Reporte de Vencimientos CP{% endblock titulo %}
+{% block content %}
+    <div id="parametros">
+        <h1>Parametros</h1>
+        {{ form(formulario) }}
+    </div>
+
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Mensajes del proceso</h1>
+            <ul>
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock content %}
+
+
+
+
