@@ -709,7 +709,6 @@ class ProcesoController extends BaseController
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
                 &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
                 &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_LOCAL'])
             ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]);
@@ -744,14 +743,26 @@ class ProcesoController extends BaseController
                 $resultado[$i]['NUM_FILE_FISICO']=$valor['NUM_FILE_FISICO'];
                 $resultado[$i]['ANO']=$valor['ANO'];
                 $resultado[$i]['ASIENTO']=$valor['ASIENTO'];
-                $resultado[$i]['ASIENTO_RELACIONADO']=$valor['ASIENTO_ARCHIVO'];
+                if(!empty($valor['ASIENTO_ARCHIVO'])){
+                    $resultado[$i]['ASIENTO_RELACIONADO']=$valor['ASIENTO_ARCHIVO'];
+                }else{
+                    $resultado[$i]['ASIENTO_RELACIONADO']='';
+                }
                 $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
                 $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
-                $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
+                if(!empty($valor['CREDITO_LOCAL'])){
+                    $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
+                }else{
+                    $resultado[$i]['CREDITO_LOCAL']='';
+                }
                 $resultado[$i]['DOCUMENTO']=$valor['DOCUMENTO'];
                 $resultado[$i]['MONTO_PRORRATEADO']=$item['MONTO']*$valor['coeficiente'];
-                $resultado[$i]['MONTO_PRORRATEADO_LOCAL']=$resultado[$i]['MONTO_PRORRATEADO']*$valor['CREDITO_LOCAL']/$valor['CREDITO_DOLAR'];
+                if(!empty($valor['CREDITO_LOCAL'])){
+                    $resultado[$i]['MONTO_PRORRATEADO_LOCAL']=$resultado[$i]['MONTO_PRORRATEADO']*$valor['CREDITO_LOCAL']/$valor['CREDITO_DOLAR'];
+                }else{
+                    $resultado[$i]['MONTO_PRORRATEADO_LOCAL']='';
+                }
                 $resultado[$i]['COEFICIENTE']=$valor['coeficiente'];
                 //
                 $i++;
