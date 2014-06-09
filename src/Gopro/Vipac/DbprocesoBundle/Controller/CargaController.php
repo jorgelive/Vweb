@@ -35,12 +35,13 @@ class CargaController extends BaseController
     public function genericoAction(Request $request,$archivoEjecutar)
     {
 
+        $operacion='carga_generico';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => 'carga_generico'),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -49,14 +50,14 @@ class CargaController extends BaseController
         $formulario->handleRequest($request);
         if ($formulario->isValid()){
             $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion('carga_generico');
+            $archivo->setOperacion($operacion);
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('carga_generico'));
+            return $this->redirect($this->generateUrl($operacion));
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_generico')){
+        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -88,11 +89,12 @@ class CargaController extends BaseController
     public function arreglartcAction(Request $request,$archivoEjecutar)
     {
 
+        $operacion='carga_arreglartc';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => 'carga_arreglartc'),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -100,14 +102,14 @@ class CargaController extends BaseController
         $formulario->handleRequest($request);
         if ($formulario->isValid()){
             $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion('carga_arreglartc');
+            $archivo->setOperacion($operacion);
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('carga_arreglartc'));
+            return $this->redirect($this->generateUrl($operacion));
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_arreglartc')){
+        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }

@@ -43,9 +43,8 @@ $markupOpen.='<head>';
     $markupOpen.='<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">';
     $markupOpen.='<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
     $css='<style type="text/css">';
-        $css.='#firma {font-family: calibri, arial}';
+        $css.='#firma { text-align: left; font-family: Calibri; font-size: 11px;}';
         $css.='#firma *{margin: 0; padding: 0; border: 0; }';
-        $css.='#firma { text-align: left; font-family: calibri; font-size: 11px;}';
         $css.='#firma table, #firma tr, #firma td {padding: 0; border: 0; border-collapse: collapse; }';
         $css.='#firma a { margin: 0; padding: 0; font-family: calibri; text-decoration: none; border: 0;}';
         $css.='#firma a:hover { text-decoration: underline; }';
@@ -149,7 +148,7 @@ $body.='</table>';
 $body.='</div>';
 $markupClose='</body>';
 $markupClose.='</html>';
-            $textarea=$this->getTextoSinAcentos($markupOpen.$css.$markupMiddle.$body.$markupClose);
+            $textarea=$this->getTextoSinAcentos($markupOpen.preg_replace('/#firma/','body',$css).$markupMiddle.$body.$markupClose);
         }
         return array('formulario' => $formulario->createView(),'textarea' => $textarea,'css' => $css, 'body'=> $body);
     }

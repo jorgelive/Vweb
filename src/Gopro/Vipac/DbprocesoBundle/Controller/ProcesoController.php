@@ -41,7 +41,7 @@ class ProcesoController extends BaseController
 
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -64,7 +64,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILES_MERCADO');
+        $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_PRINCIPAL_MERCADO');
         $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
         $columnaspecs[1]=null;
         $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
@@ -97,7 +97,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $this->setMensajes($procesoArchivo->getMensajes());
                 $this->setMensajes($carga->getMensajes());
@@ -136,7 +136,7 @@ class ProcesoController extends BaseController
 
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -276,7 +276,6 @@ class ProcesoController extends BaseController
                 foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
                     if(isset($filesInfo->getExistentesIndizados()[$nroFile])){
                         $dataCP[$nroLinea]['FILES'][$nroFile]=$filesInfo->getExistentesIndizados()[$nroFile];
-
                     }else{
                         $this->setMensajes('El numero de file: '.$nroFile.', de la linea: '.($nroLinea+1).', no existe');
                         $generarExcel=false;
@@ -592,7 +591,7 @@ class ProcesoController extends BaseController
 
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -791,7 +790,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -841,7 +840,7 @@ class ProcesoController extends BaseController
 
         }
 
-        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }
@@ -868,7 +867,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
         $archivo = new Archivo();
         $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl('proceso_cheque'),
+            'action' => $this->generateUrl($operacion),
             'method' => 'POST',
         ));
 
@@ -918,8 +917,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-
-        foreach($procesoArchivo->getExistentesIndizados() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }
