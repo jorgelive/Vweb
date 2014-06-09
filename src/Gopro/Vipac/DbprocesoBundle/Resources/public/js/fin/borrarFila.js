@@ -1,11 +1,12 @@
-$( ".ajaxLink" ).click(function(event) {
+$(".borrarFila").click(function(event) {
     event.preventDefault();
-    var id = $(this).prop('rel');
-    var url = $(this).prop( "href" );
-    var posting = $.post( url, { id: id } );
-
-    posting.done(function( data ) {
-        //  var content = $( data ).find( "#content" );
+    var id = $(this).data('id');
+    var url = $(this).prop('href');
+    var deleting = $.ajax({
+        url: url,
+        type: 'DELETE'
+    });
+    deleting.done(function(data) {
         if(!data.hasOwnProperty('exito')){
             alert ('El servidor no devolvio la respueta esperada')
             return false;
@@ -15,12 +16,10 @@ $( ".ajaxLink" ).click(function(event) {
             return false;
         }
         if(data.exito=='si'){
-            $("#archivos #listado tr[rel="+id+"]").remove();
+            $("#archivos #listado tr[data-id="+id+"]").remove();
+            $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data));
         }else{
             //alert(data.mensaje);
-
         };
-        $("#sessionFlash").empty().append(data.mensaje);
-        //
     });
 });

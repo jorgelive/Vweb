@@ -25,7 +25,7 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('gopro_vipac_dbproceso_doccptipo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td><a href="{{ path('doccptipo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.nombre }}</td>
                 <td>{{ entity.tipo }}</td>
                 <td>{{ entity.subtipo }}</td>
@@ -42,10 +42,10 @@
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('gopro_vipac_dbproceso_doccptipo_show', { 'id': entity.id }) }}">mostrar</a>
+                        <a href="{{ path('doccptipo_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('gopro_vipac_dbproceso_doccptipo_edit', { 'id': entity.id }) }}">editar</a>
+                        <a href="{{ path('doccptipo_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -56,7 +56,7 @@
 
     <ul id="listaAcciones">
         <li>
-            <a href="{{ path('gopro_vipac_dbproceso_doccptipo_new') }}">
+            <a href="{{ path('doccptipo_new') }}">
                 Crear un nuevo registro
             </a>
         </li>

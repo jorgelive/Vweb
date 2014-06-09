@@ -60,16 +60,16 @@ class Archivo
     /**
      * @Assert\File(maxSize="6000000")
      */
-    private $archivo;
+    private $file;
 
     /**
-     * Sets archivo.
+     * Sets file.
      *
-     * @param UploadedFile $archivo
+     * @param UploadedFile $file
      */
-    public function setArchivo(UploadedFile $archivo = null)
+    public function setFile(UploadedFile $file = null)
     {
-        $this->archivo = $archivo;
+        $this->file = $file;
         // check if we have an old image path
         if (is_file($this->getAbsolutePath())) {
             // store the old name to delete after the update
@@ -80,13 +80,13 @@ class Archivo
     }
 
     /**
-     * Get archivo.
+     * Get file.
      *
      * @return UploadedFile
      */
-    public function getArchivo()
+    public function getFile()
     {
-        return $this->archivo;
+        return $this->file;
     }
 
     private $temp;
@@ -97,8 +97,8 @@ class Archivo
      */
     public function preUpload()
     {
-        if (null !== $this->getArchivo()) {
-            $this->extension = $this->getArchivo()->guessExtension();
+        if (null !== $this->getFile()) {
+            $this->extension = $this->getFile()->guessExtension();
         }
     }
 
@@ -108,7 +108,7 @@ class Archivo
      */
     public function upload()
     {
-        if (null === $this->getArchivo()) {
+        if (null === $this->getFile()) {
             return;
         }
         if (isset($this->temp)) {
@@ -120,12 +120,12 @@ class Archivo
         // you must throw an exception here if the file cannot be moved
         // so that the entity is not persisted to the database
         // which the UploadedFile move() method does
-        $this->getArchivo()->move(
+        $this->getFile()->move(
             $this->getUploadRootDir(),
-            $this->id.'.'.$this->getArchivo()->guessExtension()
+            $this->id.'.'.$this->getFile()->guessExtension()
         );
 
-        $this->setArchivo(null);
+        $this->setFile(null);
     }
 
     /**
@@ -232,9 +232,9 @@ class Archivo
     /**
      * Get extension
      *
-     * @return string
+     * @return string 
      */
-    public function getExtension()
+    public function getextension()
     {
         return $this->extension;
     }
@@ -330,6 +330,4 @@ class Archivo
     {
         return $this->modificado;
     }
-
-
 }

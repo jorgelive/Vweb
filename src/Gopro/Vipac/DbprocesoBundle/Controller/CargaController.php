@@ -2,6 +2,7 @@
 
 namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
+use Gopro\Vipac\DbprocesoBundle\Form\ArchivoType;
 use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Gopro\Vipac\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class CargaController extends BaseController
 {
     /**
-     * @Route("/index/{name}", name="gopro_vipac_dbproceso_carga_index")
+     * @Route("/index/{name}", name="carga_index")
      * @Template()
      */
     public function indexAction($pais)
@@ -28,7 +29,7 @@ class CargaController extends BaseController
     }
 
     /**
-     * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_generico", defaults={"archivoEjecutar" = null})
+     * @Route("/generico/{archivoEjecutar}", name="carga_generico", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function genericoAction(Request $request,$archivoEjecutar)
@@ -38,10 +39,12 @@ class CargaController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => 'carga_generico'),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
 
         $formulario->handleRequest($request);
         if ($formulario->isValid()){
@@ -50,7 +53,7 @@ class CargaController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_generico'));
+            return $this->redirect($this->generateUrl('carga_generico'));
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_generico')){
@@ -75,11 +78,11 @@ class CargaController extends BaseController
         $carga->ejecutar();
         $this->setMensajes($procesoArchivo->getMensajes());
         $this->setMensajes($carga->getMensajes());
-        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);
+        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
     }
 
     /**
-     * @Route("/arreglartc/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_arreglartc", defaults={"archivoEjecutar" = null})
+     * @Route("/arreglartc/{archivoEjecutar}", name="carga_arreglartc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function arreglartcAction(Request $request,$archivoEjecutar)
@@ -88,10 +91,12 @@ class CargaController extends BaseController
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => 'carga_arreglartc'),array('creado' => 'DESC'));
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
         if ($formulario->isValid()){
             $archivo->setUsuario($this->getUserName());
@@ -99,7 +104,7 @@ class CargaController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_carga_arreglartc'));
+            return $this->redirect($this->generateUrl('carga_arreglartc'));
         }
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,'carga_arreglartc')){

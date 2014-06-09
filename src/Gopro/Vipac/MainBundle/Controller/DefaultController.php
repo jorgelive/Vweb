@@ -24,13 +24,15 @@ class DefaultController extends Controller
     public function sidebarAction()
     {
         $items=array(
-            array('nombre'=>'Calculadora por File','route'=>'gopro_vipac_dbproceso_proceso_calxfile'),
-            array('nombre'=>'Calculadora por Reserva','route'=>'gopro_vipac_dbproceso_proceso_calxreserva'),
-            array('nombre'=>'Cheque','route'=>'gopro_vipac_dbproceso_proceso_cheque'),
-            array('nombre'=>'Cargador Generico','route'=>'gopro_vipac_dbproceso_carga_generico'),
-            array('nombre'=>'Reclasificador de CC','route'=>'gopro_vipac_dbproceso_proceso_calcc'),
-            array('nombre'=>'Cargador de CP','route'=>'gopro_vipac_dbproceso_proceso_cargadorcp'),
-            array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
+            array('nombre'=>'Calculadora por File','route'=>'proceso_calxfile'),
+            array('nombre'=>'Calculadora por Reserva','route'=>'proceso_calxreserva'),
+            array('nombre'=>'Cheque','route'=>'proceso_cheque'),
+            array('nombre'=>'Cargador Generico','route'=>'carga_generico'),
+            array('nombre'=>'Reclasificador de CC','route'=>'proceso_calcc'),
+            array('nombre'=>'Cargador de CP','route'=>'proceso_cargadorcp'),
+            array('nombre'=>'Tipos de documentos CP','route'=>'doccptipo'),
+            array('nombre'=>'Vencimiento CP','route'=>'reporte_vencimientocp'),
+
 
         );
         return array('items'=> $items);

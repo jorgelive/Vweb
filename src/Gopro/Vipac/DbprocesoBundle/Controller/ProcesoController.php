@@ -2,6 +2,7 @@
 
 namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
+use Gopro\Vipac\DbprocesoBundle\Form\ArchivoType;
 use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Gopro\Vipac\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +21,7 @@ class ProcesoController extends BaseController
 {
 
     /**
-     * @Route("/index", name="gopro_vipac_dbproceso_proceso_index")
+     * @Route("/index", name="proceso_index")
      * @Template()
      */
     public function indexAction(){
@@ -29,7 +30,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
+     * @Route("/cheque/{archivoEjecutar}", name="proceso_cheque", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function chequeAction(Request $request,$archivoEjecutar)
@@ -39,10 +40,12 @@ class ProcesoController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
 
         $formulario->handleRequest($request);
 
@@ -52,7 +55,7 @@ class ProcesoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+            return $this->redirect($this->generateUrl($operacion));
         }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
@@ -122,7 +125,7 @@ class ProcesoController extends BaseController
     //Cuenta contable normal del impuesto 2 64.1.1.1.01
     //El subtotal cambia de cuenta si es diferido
     /**
-     * @Route("/cargadorcp/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cargadorcp", defaults={"archivoEjecutar" = null})
+     * @Route("/cargadorcp/{archivoEjecutar}", name="proceso_cargadorcp", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function cargadorcpAction(Request $request,$archivoEjecutar)
@@ -132,10 +135,12 @@ class ProcesoController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
 
         if ($formulario->isValid()){
@@ -144,7 +149,7 @@ class ProcesoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+            return $this->redirect($this->generateUrl($operacion));
         }
 
         $archivoInfo=$this->get('gopro_dbproceso_comun_archivo');
@@ -576,7 +581,7 @@ class ProcesoController extends BaseController
 
 
     /**
-     * @Route("/calcc/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calcc", defaults={"archivoEjecutar" = null})
+     * @Route("/calcc/{archivoEjecutar}", name="proceso_calcc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calccAction(Request $request,$archivoEjecutar)
@@ -586,10 +591,12 @@ class ProcesoController extends BaseController
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
 
         $formulario->handleRequest($request);
 
@@ -599,7 +606,7 @@ class ProcesoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+            return $this->redirect($this->generateUrl($operacion));
         }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
@@ -611,9 +618,9 @@ class ProcesoController extends BaseController
         $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'VVW_DOCUMENTOS_CC','tipo'=>'S');
         $columnaspecs[0]=array('nombre'=>'CUENTA_CONTABLE','llave'=>'no','proceso'=>'no');
         $columnaspecs[1]=array('nombre'=>'DESCRIPCION','llave'=>'no','proceso'=>'no');
-        $columnaspecs[2]=array('nombre'=>'ASIENTO','llave'=>'si');
+        $columnaspecs[2]=array('nombre'=>'ASIENTO_ARCHIVO','llave'=>'no','proceso'=>'no');
         $columnaspecs[3]=array('nombre'=>'TIPO_DE_DOCUMENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'si');
         $columnaspecs[5]=array('nombre'=>'REFERENCIA','llave'=>'no','proceso'=>'no');
         $columnaspecs[6]=array('nombre'=>'DEBITO_LOCAL','llave'=>'no','proceso'=>'no');
         $columnaspecs[7]=array('nombre'=>'DEBITO_DOLAR','llave'=>'no','proceso'=>'no');
@@ -633,9 +640,10 @@ class ProcesoController extends BaseController
         $columnaspecs[21]=array('nombre'=>'NUM_FILE_FISICO','llave'=>'no');
         $columnaspecs[22]=array('nombre'=>'CLIENTE','llave'=>'no');
         $columnaspecs[23]=array('nombre'=>'MONTO_DOLAR','llave'=>'no');
+        $columnaspecs[24]=array('nombre'=>'ASIENTO','llave'=>'no');
 
         $procesoArchivo->setParametrosReader($tablaSpecs,$columnaspecs);
-        $procesoArchivo->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DOCUMENTO']);
+        $procesoArchivo->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DOCUMENTO','ASIENTO_ARCHIVO']);
 
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -700,16 +708,12 @@ class ProcesoController extends BaseController
         foreach($carga->getProceso()->getExistentesRaw() as $valor):
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_DOLAR'])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['CREDITO_LOCAL'])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]['DOCUMENTO'])
+                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
+                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])
+                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_LOCAL'])
             ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['ASIENTO']]);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
@@ -722,9 +726,9 @@ class ProcesoController extends BaseController
                 $this->resetCantidadTotal('montoTotal');
             }else{
                 if(empty($valor['ANO'])||empty($valor['NUM_FILE_FISICO'])){
-                    $this->setMensajes('No hay resultados para el CC: '.$valor['ASIENTO']);
+                    $this->setMensajes('No hay resultados para la factura: '.$valor['DOCUMENTO']);
                 }else{
-                    $this->setMensajes('No hay resultados para el CC: '.$valor['ASIENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
+                    $this->setMensajes('No hay resultados para la factura: '.$valor['DOCUMENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
                 }
             }
         endforeach;
@@ -741,6 +745,7 @@ class ProcesoController extends BaseController
                 $resultado[$i]['NUM_FILE_FISICO']=$valor['NUM_FILE_FISICO'];
                 $resultado[$i]['ANO']=$valor['ANO'];
                 $resultado[$i]['ASIENTO']=$valor['ASIENTO'];
+                $resultado[$i]['ASIENTO_RELACIONADO']=$valor['ASIENTO_ARCHIVO'];
                 $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
                 $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
@@ -775,7 +780,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
+     * @Route("/calxfile/{archivoEjecutar}", name="proceso_calxfile", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxfileAction(Request $request,$archivoEjecutar)
@@ -785,10 +790,12 @@ class ProcesoController extends BaseController
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
 
         if ($formulario->isValid()){
@@ -797,7 +804,7 @@ class ProcesoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+            return $this->redirect($this->generateUrl($operacion));
         }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
@@ -851,7 +858,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/calxreserva/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxreserva", defaults={"archivoEjecutar" = null})
+     * @Route("/calxreserva/{archivoEjecutar}", name="proceso_calxreserva", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxreservaAction(Request $request,$archivoEjecutar)
@@ -860,10 +867,12 @@ class ProcesoController extends BaseController
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
         $archivo = new Archivo();
-        $formulario = $this->createFormBuilder($archivo)
-            ->add('nombre')
-            ->add('file')
-            ->getForm();
+        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
+            'action' => $this->generateUrl('proceso_cheque'),
+            'method' => 'POST',
+        ));
+
+        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
 
         if ($formulario->isValid()){
@@ -872,7 +881,7 @@ class ProcesoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $em->persist($archivo);
             $em->flush();
-            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_'.$operacion));
+            return $this->redirect($this->generateUrl($operacion));
         }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
@@ -924,32 +933,5 @@ class ProcesoController extends BaseController
         $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($fusion));
         $archivoGenerado->setArchivoGenerado();
         return $archivoGenerado->getArchivoGenerado();
-    }
-
-    /**
-     * @Route("/proceso/borrararchivo", name="gopro_vipac_dbproceso_proceso_borrararchivo")
-     * @Method({"POST"})
-     * @Template()
-     */
-    public function borrarArchivoAction(Request $request)
-    {
-        if (!$request->isXMLHttpRequest()){
-            throw new NotFoundHttpException("No se encontro la página");
-        }
-
-        $usuario=$this->get('security.context')->getToken()->getUser();
-        if(!is_string($usuario)){
-            $usuario=$usuario->getUsername();
-        }
-        $em = $this->getDoctrine()->getManager();
-        $archivo = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($request->request->get('id'));
-
-        if(empty($archivo)||$archivo->getUsuario()!=$usuario){
-            return new JsonResponse(array('exito'=>'no','mensaje'=>'No existe el archivo'));
-
-        }
-        $em->remove($archivo);
-        $em->flush();
-        return new JsonResponse(array('exito'=>'si','mensaje'=>'Se ha eliminado el archivo'));
     }
 }

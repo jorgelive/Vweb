@@ -5,12 +5,7 @@
 
     <div id="parametros">
         <h1>Agregar archivo</h1>
-        <div id="mainForm">
-            <form action="#" method="post" {{ form_enctype(formulario) }}>
-                {{ form_widget(formulario) }}
-                <input type="submit" value="Subir archivo" />
-            </form>
-        </div>
+        {{ form(formulario) }}
     </div>
 
     {% if archivosAlmacenados|default %}
@@ -26,12 +21,12 @@
                 </thead>
                 <tbody>
                 {% for archivo in archivosAlmacenados %}
-                    <tr rel="{{ archivo.id }}">
+                    <tr data-id="{{ archivo.id }}">
                         <td class="nombre">{{ archivo.nombre }}</td>
                         <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
                         <td>
-                            <a href="{{ path('gopro_vipac_dbproceso_proceso_cargadorcp', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
-                            <a class="ajaxLink" rel="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_proceso_borrararchivo') }}">Borrar</a>
+                            <a href="{{ path('proceso_cargadorcp', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
                 {% endfor %}

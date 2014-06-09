@@ -19,7 +19,7 @@ class ReporteController extends BaseController
 {
 
     /**
-     * @Route("/index", name="gopro_vipac_dbproceso_proceso_index")
+     * @Route("/index", name="proceso_index")
      * @Template()
      */
     public function indexAction(){
@@ -28,14 +28,14 @@ class ReporteController extends BaseController
     }
 
     /**
-     * @Route("/vencimientocp", name="gopro_vipac_dbproceso_reporte_vencimientocp")
+     * @Route("/vencimientocp", name="reporte_vencimientocp")
      * @Template()
      */
     public function VencimientocpAction(Request $request)
     {
         $datos = array();
         $formulario = $this->createForm(new ParametrosType(), $datos, array(
-            'action' => $this->generateUrl('gopro_vipac_dbproceso_reporte_vencimientocp'),
+            'action' => $this->generateUrl('reporte_vencimientocp'),
             'method' => 'POST',
         ));
 
@@ -70,12 +70,11 @@ class ReporteController extends BaseController
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
 
-
+        $selectQuery="SELECT * FROM VIAPAC.VVW_DOCCP_VENCIMIENTO WHERE VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO >= to_date(:fechaInicio,'yyyy-mm-dd') AND VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO <= to_date(:fechaFin,'yyyy-mm-dd')";
         if ($this->getUser()->hasGroup('Cusco')) {
-            $selectQuery="SELECT * FROM VIAPAC.VVW_DOCCP_VENCIMIENTO WHERE VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO >= to_date(:fechaInicio,'yyyy-mm-dd') AND VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO <= to_date(:fechaFin,'yyyy-mm-dd') AND LOCALIDAD ='CUZ'";
-
+            $selectQuery.=" AND LOCALIDAD ='Cusco'";
         }else{
-            $selectQuery="SELECT * FROM VIAPAC.VVW_DOCCP_VENCIMIENTO WHERE VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO >= to_date(:fechaInicio,'yyyy-mm-dd') AND VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO <= to_date(:fechaFin,'yyyy-mm-dd') AND LOCALIDAD !='CUZ'";
+            $selectQuery.=" AND LOCALIDAD ='Lima'";
         }
         $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
         $statement->bindValue('fechaInicio',$fechaInicio->format('Y-m-d'));
@@ -84,7 +83,6 @@ class ReporteController extends BaseController
             $this->setMensajes('Hubo un error en la ejecucion de la consulta');
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
-
 
         $existentesRaw=$statement->fetchAll();
 

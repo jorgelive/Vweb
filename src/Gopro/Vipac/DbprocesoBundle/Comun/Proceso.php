@@ -336,6 +336,8 @@ class Proceso extends ContainerAware{
             return false;
         }
         $existentesRaw=$statement->fetchAll();
+        $existentesIndizados=array();
+        $existentesIndizadosMulti=array();
         $this->setExistentesRaw($existentesRaw);
         foreach($this->getExistentesRaw() as $nroLinea => $linea):
             $indexedArray=array();

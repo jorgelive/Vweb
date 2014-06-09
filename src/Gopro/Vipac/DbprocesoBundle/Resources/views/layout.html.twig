@@ -9,9 +9,9 @@
 {% endblock stylesheets%}
 {% block javascripts %}
     {{ parent() }}
-    {# {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/inicio/*' '@GoproVipacDbprocesoBundle/Resources/public/js/jquery.fileUpload/*' %}
+    {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/inicio/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %} #}
+    {% endjavascripts %}
 {% endblock javascripts %}
 {% block sidebar %}
     {{ parent() }}
@@ -24,11 +24,8 @@
 {% endblock container %}
 
 {% block javascriptsfinal %}
-    <script id="template-download" type="text/x-tmpl">
-        {{ source("GoproVipacDbprocesoBundle:Jstemplates:fileUploadTemplateDownload.js.twig") }}
-    </script>
-    <script id="template-upload" type="text/x-tmpl">
-        {{ source("GoproVipacDbprocesoBundle:Jstemplates:fileUploadTemplateUpload.js.twig") }}
+    <script id="plantillaHighlight" type="text/x-tmpl">
+        {{ source("GoproVipacDbprocesoBundle:Plantilla:highlight.js.twig") }}
     </script>
     {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
