@@ -24,6 +24,7 @@ class DefaultController extends Controller
     public function sidebarAction()
     {
         $items=array(
+            array('nombre'=>'Generador de firmas','route'=>'extra_firma'),
             array('nombre'=>'Calculadora por File','route'=>'proceso_calxfile'),
             array('nombre'=>'Calculadora por Reserva','route'=>'proceso_calxreserva'),
             array('nombre'=>'Cheque','route'=>'proceso_cheque'),
