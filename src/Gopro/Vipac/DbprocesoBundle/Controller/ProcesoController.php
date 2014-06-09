@@ -851,7 +851,7 @@ class ProcesoController extends BaseController
 
         }
 
-        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }
@@ -928,7 +928,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
+        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
             }

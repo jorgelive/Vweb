@@ -21,6 +21,8 @@ class Archivo extends ContainerAware{
     private $existentesRaw;
     private $existentesIndizados;
     private $existentesIndizadosMulti;
+    private $existentesIndizadosKp;
+    private $existentesIndizadosMultiKp;
     private $existentesCustomRaw;
     private $existentesCustomIndizados;
     private $existentesCustomIndizadosMulti;
@@ -86,6 +88,24 @@ class Archivo extends ContainerAware{
 
     private function setExistentesIndizadosMulti($existentesIndizadosMulti){
         $this->existentesIndizadosMulti=$existentesIndizadosMulti;
+        return $this;
+    }
+
+    public function getExistentesIndizadosKp(){
+        return $this->existentesIndizadosKp;
+    }
+
+    private function setExistentesIndizadosKp($existentesIndizadosKp){
+        $this->existentesIndizadosKp=$existentesIndizadosKp;
+        return $this;
+    }
+
+    public function getExistentesIndizadosMultiKp(){
+        return $this->existentesIndizadosMultiKp;
+    }
+
+    private function setExistentesIndizadosMultiKp($existentesIndizadosMultiKp){
+        $this->existentesIndizadosMultiKp=$existentesIndizadosMultiKp;
         return $this;
     }
 
@@ -220,6 +240,8 @@ class Archivo extends ContainerAware{
         $existentesRaw=array();
         $existentesIndizados=array();
         $existentesIndizadosMulti=array();
+        $existentesIndizadosKp=array();
+        $existentesIndizadosMultiKp=array();
         $fila=0;
         for ($row = 1; $row <= $highestRow;++$row)
         {
@@ -335,13 +357,16 @@ class Archivo extends ContainerAware{
 
         foreach ($existentesRaw as $nroLinea=>$valor):
             $indice=array();
+            $llavesSave=array();
             foreach($this->tablaSpecs['llaves'] as $llave):
                 $indice[]=$valor[$llave];
+                $llavesSave[$llave]=$valor[$llave];
                 unset($valor[$llave]);
-
             endforeach;
             $existentesIndizados[implode('|',$indice)]=$valor;
             $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
+            $existentesIndizadosKp[implode('|',$indice)]=array_merge($llavesSave,$valor);
+            $existentesIndizadosMultiKp[implode('|',$indice)][]=array_merge($llavesSave,$valor);
             if(!empty($this->getCamposCustom())){
                 $i=0;
                 foreach($this->getCamposCustom() as $llaveCustom):
@@ -366,6 +391,8 @@ class Archivo extends ContainerAware{
 
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
+        $this->setExistentesIndizadosKp($existentesIndizadosKp);
+        $this->setExistentesIndizadosMultiKp($existentesIndizadosMultiKp);
         if(!empty($existentesCustomIndizados)){
             $this->setExistentesCustomIndizados($existentesCustomIndizados);
         }

@@ -18,6 +18,8 @@ class Proceso extends ContainerAware{
     private $existentesCustomRaw;
     private $existentesCustomIndizados;
     private $existentesCustomIndizadosMulti;
+    private $existentesIndizadosKp;
+    private $existentesIndizadosMultiKp;
     private $llaves;
 
     //valores temporales por fila
@@ -182,6 +184,24 @@ class Proceso extends ContainerAware{
         return $this;
     }
 
+    public function getExistentesIndizadosKp(){
+        return $this->existentesIndizadosKp;
+    }
+
+    private function setExistentesIndizadosKp($existentesIndizadosKp){
+        $this->existentesIndizadosKp=$existentesIndizadosKp;
+        return $this;
+    }
+
+    public function getExistentesIndizadosMultiKp(){
+        return $this->existentesIndizadosMultiKp;
+    }
+
+    private function setExistentesIndizadosMultiKp($existentesIndizadosMultiKp){
+        $this->existentesIndizadosMultiKp=$existentesIndizadosMultiKp;
+        return $this;
+    }
+
     public function getLlaves(){
         return $this->llaves;
     }
@@ -338,17 +358,23 @@ class Proceso extends ContainerAware{
         $existentesRaw=$statement->fetchAll();
         $existentesIndizados=array();
         $existentesIndizadosMulti=array();
+        $existentesIndizadosKp=array();
+        $existentesIndizadosMultiKp=array();
         $this->setExistentesRaw($existentesRaw);
         foreach($this->getExistentesRaw() as $nroLinea => $linea):
             $indexedArray=array();
+            $llavesSave=array();
             foreach($this->getLlaves() as $llave):
                 if(isset($linea[$llave])){
                     $indexedArray[]=$linea[$llave];
+                    $llavesSave[$llave]=$linea[$llave];
                     unset($linea[$llave]);
                 }
             endforeach;
             $existentesIndizados[implode('|',$indexedArray)]=$linea;
+            $existentesIndizadosKp[implode('|',$indexedArray)]=array_merge($llavesSave,$linea);
             $existentesIndizadosMulti[implode('|',$indexedArray)][]=$linea;
+            $existentesIndizadosMultiKp[implode('|',$indexedArray)][]=array_merge($llavesSave,$linea);
             if(!empty($this->getCamposCustom())){
                 $i=0;
                 foreach($this->getCamposCustom() as $campo):
@@ -370,6 +396,8 @@ class Proceso extends ContainerAware{
         endforeach;
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
+        $this->setExistentesIndizadosKp($existentesIndizadosKp);
+        $this->setExistentesIndizadosMultiKp($existentesIndizadosMultiKp);
         if(isset($existentesCustomRaw)){
             $this->setExistentesCustomRaw($existentesCustomRaw);
         }
@@ -379,6 +407,7 @@ class Proceso extends ContainerAware{
         if(isset($existentesCustomIndizadosMulti)){
             $this->setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti);
         }
+
         return true;
     }
 
