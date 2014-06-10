@@ -22,7 +22,6 @@ class Archivo
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
      */
     private $nombre;
 
@@ -99,6 +98,7 @@ class Archivo
     {
         if (null !== $this->getArchivo()) {
             $this->extension = $this->getArchivo()->guessExtension();
+            $this->nombre = preg_replace('/\.[^.]*$/', '', $this->getArchivo()->getClientOriginalName());
         }
     }
 
@@ -117,9 +117,6 @@ class Archivo
             $this->temp = null;
         }
 
-        // you must throw an exception here if the file cannot be moved
-        // so that the entity is not persisted to the database
-        // which the UploadedFile move() method does
         $this->getArchivo()->move(
             $this->getUploadRootDir(),
             $this->id.'.'.$this->getArchivo()->guessExtension()
