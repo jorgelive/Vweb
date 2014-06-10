@@ -302,7 +302,11 @@ class ProcesoController extends BaseController
             $resultado[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
             $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
             $resultado[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
-            $resultado[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            if(empty($dataCP[$nroLinea]['DIFERIDO'])){
+                $resultado[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            }else{
+                $resultado[$nroLinea]['SUBTOTAL_CUENTA']='18.9.2.2.'.str_pad($dataCP[$nroLinea]['DIFERIDO'],2,0,STR_PAD_LEFT);
+            }
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
                 $resultado[$nroLinea]['IMPUESTO1']=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
             }else{
@@ -317,7 +321,7 @@ class ProcesoController extends BaseController
                 if(empty($dataCP[$nroLinea]['DIFERIDO'])){
                     $resultado[$nroLinea]['IMPUESTO2_CUENTA']='64.1.1.1.01';
                 }else{
-                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='IMP2DIFF';
+                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='18.9.3.2.'.str_pad($dataCP[$nroLinea]['DIFERIDO'],2,0,STR_PAD_LEFT);
                 }
             }else{
                 $resultado[$nroLinea]['IMPUESTO2_CUENTA']='';
@@ -379,7 +383,7 @@ class ProcesoController extends BaseController
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
                 $resultado[$nroLinea]['FILE'.$i]=$nroFile;
-                if(empty($dataCP[$nroLinea]['DIFERIDO'])){
+                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
                     $file['CENTRO_COSTO']='0.00.00.00';
                 }
                 if(empty($file['CENTRO_COSTO'])&&!empty($file['PAIS_FILE'])){

@@ -3,9 +3,9 @@ div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div 
 
 div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div{margin-bottom: 7px;}
 div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div label{display: inline-block; margin-left: 5px; width: 90px;}
-div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker{width: 80px;}
+div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker{width: 100px;}
 div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul{list-style: none;}
-div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul li{color:#f4543c; font-size: 9px;}
+div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul li{color:#cd0a0a; font-size: 9px;}
 div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div{margin-top: 5px; margin-left: 10px;}
 div#GoproViapacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div label{display: inline-block; margin-left: 5px; width: 70px;}
 

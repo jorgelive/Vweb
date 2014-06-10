@@ -22,10 +22,12 @@ class ParametrosType extends AbstractType
 
         $builder
             ->add('fechaInicio','date',array(
+                'input'  => 'datetime',
                 'widget' => 'single_text',
                 'attr' => array('class' => 'datePicker')
             ))
             ->add('fechaFin','date',array(
+                'input'  => 'datetime',
                 'widget' => 'single_text',
                 'attr' => array('class' => 'datePicker')
             ))
