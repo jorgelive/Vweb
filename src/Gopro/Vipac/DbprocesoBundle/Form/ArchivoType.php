@@ -15,7 +15,6 @@ class ArchivoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre')
             ->add('archivo',null,array(
                 'required' => true,
             ))

@@ -31,7 +31,7 @@ class ReporteController extends BaseController
      * @Route("/vencimientocp", name="reporte_vencimientocp")
      * @Template()
      */
-    public function VencimientocpAction(Request $request)
+    public function vencimientocpAction(Request $request)
     {
         $datos = array();
         $formulario = $this->createForm(new ParametrosType(), $datos, array(
@@ -110,11 +110,11 @@ class ReporteController extends BaseController
             for($i=0;$i<$numDias;$i++){
                 $fechaVencimiento = new \DateTime($valores['FECHA_VENCIMIENTO']);
                 if($fechaProceso==$fechaVencimiento){
-                    if($valores['MONEDA']='SOL'){
+                    if($valores['MONEDA']=='SOL'){
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']=$valores['SALDO'];
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']='';
                     }else{
-                        $resultado[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
+                        $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']=$valores['SALDO'];
                     }
                 }else{
