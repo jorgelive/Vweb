@@ -110,22 +110,12 @@ class ReporteController extends BaseController
             for($i=0;$i<$numDias;$i++){
                 $fechaVencimiento = new \DateTime($valores['FECHA_VENCIMIENTO']);
                 if($fechaProceso==$fechaVencimiento){
-<<<<<<< HEAD
-                    if($valores['MONEDA']=='USD'){
-                        $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
-                        $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']=$valores['SALDO'];
-                    }else{
-                        $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']=$valores['SALDO'];
-                        $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']='';
-
-=======
                     if($valores['MONEDA']=='SOL'){
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']=$valores['SALDO'];
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']='';
                     }else{
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']=$valores['SALDO'];
->>>>>>> 3c86ceacc8c9ae51e6ad299ea10accfe586bb10d
                     }
                 }else{
                     $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';

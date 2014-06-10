@@ -379,6 +379,9 @@ class ProcesoController extends BaseController
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
                 $resultado[$nroLinea]['FILE'.$i]=$nroFile;
+                if(empty($dataCP[$nroLinea]['DIFERIDO'])){
+                    $file['CENTRO_COSTO']='0.00.00.00';
+                }
                 if(empty($file['CENTRO_COSTO'])&&!empty($file['PAIS_FILE'])){
                     $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
                 }elseif(!empty($file['CENTRO_COSTO'])&&$file['CENTRO_COSTO']=='0.00.00.00'){
