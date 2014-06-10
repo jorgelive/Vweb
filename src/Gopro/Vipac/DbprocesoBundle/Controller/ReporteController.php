@@ -31,7 +31,7 @@ class ReporteController extends BaseController
      * @Route("/vencimientocp", name="reporte_vencimientocp")
      * @Template()
      */
-    public function VencimientocpAction(Request $request)
+    public function vencimientocpAction(Request $request)
     {
         $datos = array();
         $formulario = $this->createForm(new ParametrosType(), $datos, array(
@@ -52,15 +52,11 @@ class ReporteController extends BaseController
 
         }
         $parametros = $formulario->getData();
-        print_r($parametros);
-        $inicioText='2014-05-01';
-        $finText='2014-05-20';
         $destino='archivo';
-        $fechaInicio = new \DateTime($inicioText);
-        $fechaFin = new \DateTime($finText);
+        $fechaInicio = $parametros['fechaInicio'];
+        $fechaFin = $parametros['fechaFin'];
         $diferencia = $fechaFin->diff($fechaInicio);
         $numDias=$diferencia->format('%d')+1;
-
         if($fechaFin<$fechaInicio){
             $this->setMensajes('La fecha de inicio es mayor a la fecha de fin');
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
@@ -70,11 +66,22 @@ class ReporteController extends BaseController
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
 
-        $selectQuery="SELECT * FROM VIAPAC.VVW_DOCCP_VENCIMIENTO WHERE VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO >= to_date(:fechaInicio,'yyyy-mm-dd') AND VVW_DOCCP_VENCIMIENTO.FECHA_VENCIMIENTO <= to_date(:fechaFin,'yyyy-mm-dd')";
+        if($parametros['tipo']=='resumido'){
+            $selectQuery='SELECT PROVEEDOR, NOMBRE, FECHA_VENCIMIENTO, MONEDA, sum(SALDO) SALDO FROM VIAPAC.VVW_DOCCP_VENCIMIENTO';
+        }else{
+            $selectQuery='SELECT * FROM VIAPAC.VVW_DOCCP_VENCIMIENTO';
+        }
+
+        $selectQuery.=" WHERE FECHA_VENCIMIENTO >= to_date(:fechaInicio,'yyyy-mm-dd') AND FECHA_VENCIMIENTO <= to_date(:fechaFin,'yyyy-mm-dd')";
+
         if ($this->getUser()->hasGroup('Cusco')) {
             $selectQuery.=" AND LOCALIDAD ='Cusco'";
         }else{
             $selectQuery.=" AND LOCALIDAD ='Lima'";
+        }
+
+        if($parametros['tipo']=='resumido'){
+            $selectQuery.=' group by PROVEEDOR, NOMBRE, FECHA_VENCIMIENTO, MONEDA';
         }
         $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
         $statement->bindValue('fechaInicio',$fechaInicio->format('Y-m-d'));
@@ -92,21 +99,24 @@ class ReporteController extends BaseController
         }
 
         foreach($existentesRaw as $fila => $valores):
-            $fechaProceso=new \DateTime($inicioText);
+            $fechaProceso = clone $fechaInicio;
             $resultados[$fila]['COD_PROVEEDOR']=$valores['PROVEEDOR'];
             $resultados[$fila]['NOMBRE_PROVEEDOR']=$valores['NOMBRE'];
-            $resultados[$fila]['ASIENTO']=$valores['ASIENTO'];
-            $resultados[$fila]['TIPO_DOCUMENTO']=$valores['TIPO'];
-            $resultados[$fila]['NRO_DOCUMENTO']=$valores['DOCUMENTO'];
+            if($parametros['tipo']!='resumido'){
+                $resultados[$fila]['ASIENTO']=$valores['ASIENTO'];
+                $resultados[$fila]['TIPO_DOCUMENTO']=$valores['TIPO'];
+                $resultados[$fila]['NRO_DOCUMENTO']=$valores['DOCUMENTO'];
+            }
             for($i=0;$i<$numDias;$i++){
                 $fechaVencimiento = new \DateTime($valores['FECHA_VENCIMIENTO']);
                 if($fechaProceso==$fechaVencimiento){
-                    if($valores['MONEDA']='SOL'){
+                    if($valores['MONEDA']=='USD'){
+                        $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
+                        $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']=$valores['SALDO'];
+                    }else{
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']=$valores['SALDO'];
                         $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']='';
-                    }else{
-                        $resultado[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
-                        $resultados[$fila][$fechaProceso->format('Y-m-d').' USD']=$valores['SALDO'];
+
                     }
                 }else{
                     $resultados[$fila][$fechaProceso->format('Y-m-d').' SOL']='';
@@ -114,24 +124,16 @@ class ReporteController extends BaseController
                 }
                 $fechaProceso->add(new \DateInterval('P1D'));
             }
-
         endforeach;
         $encabezado=array_keys($resultados[0]);
-        //print_r($encabezado);
-        //print_r($resultado);
 
         if($destino='archivo'){
             $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-            $archivoGenerado->setParametrosWriter('Reporte_'.$inicioText.'_'.$finText,$encabezado,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultados));
+            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$encabezado,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultados));
+            $archivoGenerado->setAnchoColumna(['A'=>12,'B'=>'auto','2:'=>12]);
             $archivoGenerado->setArchivoGenerado();
             return $archivoGenerado->getArchivoGenerado();
         }
-
         return array('formulario' => $formulario->createView(), 'mensajes' => $this->getMensajes());
-
-
-
     }
-
-
 }

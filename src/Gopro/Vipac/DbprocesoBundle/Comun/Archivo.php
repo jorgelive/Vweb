@@ -37,6 +37,7 @@ class Archivo extends ContainerAware{
     private $contenido;
     private $encabezado;
     private $formatoColumna;
+    private $anchoColumna;
     private $celdas;
 
     public function getTablaSpecs(){
@@ -231,9 +232,9 @@ class Archivo extends ContainerAware{
         $objPHPExcel = $excelLoader->createPHPExcelObject($this->archivo);
         $total_sheets=$objPHPExcel->getSheetCount();
         $allSheetName=$objPHPExcel->getSheetNames();
-        $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
-        $highestRow = $objWorksheet->getHighestRow();
-        $highestColumn = $objWorksheet->getHighestColumn();
+        $hoja = $objPHPExcel->setActiveSheetIndex(0);
+        $highestRow = $hoja->getHighestRow();
+        $highestColumn = $hoja->getHighestColumn();
         $highestColumnIndex = $excelLoader->columnIndexFromString($highestColumn);
         $specRow=false;
         $specRowType='';
@@ -248,7 +249,7 @@ class Archivo extends ContainerAware{
             $procesandoNombre=false;
             for ($col = 0; $col <$highestColumnIndex;++$col)
             {
-                $value=$objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $value=$hoja->getCellByColumnAndRow($col, $row)->getValue();
                 if ($col==0 && substr($value,0,1)=="&" && substr($value,3,1)=="&"){
                     $specRow=true;
                     if(substr($value,0,4)=="&ta&"){
@@ -470,6 +471,15 @@ class Archivo extends ContainerAware{
         return $this->formatoColumna;
     }
 
+    public function setAnchoColumna($anchoColumna){
+        $this->anchoColumna=$anchoColumna;
+        return $this;
+    }
+
+    public function getAnchoColumna(){
+        return $this->anchoColumna;
+    }
+
     public function setCeldas($celdas){
         $this->celdas=$celdas;
         return $this;
@@ -500,10 +510,59 @@ class Archivo extends ContainerAware{
             $highestRow = $hoja->getHighestRow();
             foreach($this->getFormatoColumna() as $formato => $columnas):
                 foreach($columnas as $columna):
-                    $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
-                        ->getNumberFormat()
-                        ->setFormatCode($formato);
+                    if (strpos($columna, ':') !== false){
+                        $columna=explode(':',$columna,2);
+                        if(is_numeric($columna[0])&&(is_numeric($columna[1])||empty($columna[1]))){
+                            if(empty($columna[1])){
+                                $columna[1]=$excelWriter->columnIndexFromString($hoja->getHighestColumn());
+                            }
+                            foreach(range($columna[0], $columna[1]) as $columnaProceso) {
+                                $columnaString=$excelWriter->stringFromColumnIndex($columnaProceso);
+                                $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
+                                    ->getNumberFormat()
+                                    ->setFormatCode($columnaString);
+                            }
+                        }
+
+                    }else{
+                        if(is_numeric($columna)){
+                            $columna=$excelWriter->stringFromColumnIndex($columna);
+                        }
+                        $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
+                            ->getNumberFormat()
+                            ->setFormatCode($formato);
+                    }
                 endforeach;
+            endforeach;
+        }
+
+        if(!empty($this->getAnchoColumna())&&is_array($this->getAnchoColumna())){
+            foreach($this->getAnchoColumna() as $columna => $ancho):
+                if (strpos($columna, ':') !== false){
+                    $columna=explode(':',$columna,2);
+                    if(is_numeric($columna[0])&&(is_numeric($columna[1])||empty($columna[1]))){
+                        if(empty($columna[1])){
+                            $columna[1]=$excelWriter->columnIndexFromString($hoja->getHighestColumn());
+                        }
+                        foreach(range($columna[0], $columna[1]) as $columnaProceso) {
+                            $columnaString=$excelWriter->stringFromColumnIndex($columnaProceso);
+                            if(is_numeric($ancho)){
+                                $hoja->getColumnDimension($columnaString)->setWidth($ancho);
+                            }elseif($ancho=='auto'){
+                                $hoja->getColumnDimension($columnaString)->setAutoSize(true);
+                            }
+                        }
+                    }
+                }else{
+                    if(is_numeric($columna)){
+                        $columna=$excelWriter->stringFromColumnIndex($columna);
+                    }
+                    if(is_numeric($ancho)){
+                        $hoja->getColumnDimension($columna)->setWidth($ancho);
+                    }elseif($ancho=='auto'){
+                        $hoja->getColumnDimension($columna)->setAutoSize(true);
+                    }
+                }
             endforeach;
         }
 

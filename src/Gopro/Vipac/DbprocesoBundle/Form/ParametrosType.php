@@ -21,10 +21,16 @@ class ParametrosType extends AbstractType
         $tipoCh=array('choices'=>$tipoChOp,'multiple'=>false,'expanded'=>true);
 
         $builder
-            ->add('fechaInicio', 'text')
-            ->add('fechaFin', 'text')
-            ->add('Destino', 'choice', $destinoCh)
-            ->add('Tipo', 'choice', $tipoCh)
+            ->add('fechaInicio','date',array(
+                'widget' => 'single_text',
+                'attr' => array('class' => 'datePicker')
+            ))
+            ->add('fechaFin','date',array(
+                'widget' => 'single_text',
+                'attr' => array('class' => 'datePicker')
+            ))
+            ->add('destino', 'choice', $destinoCh)
+            ->add('tipo', 'choice', $tipoCh)
         ;
     }
     
