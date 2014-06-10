@@ -16,7 +16,9 @@ class ArchivoType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('archivo')
+            ->add('archivo',null,array(
+                'required' => true,
+            ))
         ;
     }
     
