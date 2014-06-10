@@ -1,6 +1,6 @@
 $(document).ready(function()
 {
-    var formulario=$('form[name="gopro_vipac_dbprocesobundle_archivo"]');
+    var formulario=$('form[name="gopro_vipac_dbprocesobundle_archivocampos"]');
     var url=formulario.attr('action');
 
     $("#cargadorArchivos").uploadFile({

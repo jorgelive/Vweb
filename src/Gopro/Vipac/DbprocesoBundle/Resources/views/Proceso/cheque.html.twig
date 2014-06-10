@@ -2,11 +2,12 @@
 {% block title %}Calculo para cheques{% endblock title %}
 {% block titulo %}Calculo para cheques{% endblock titulo %}
 {% block content %}
-    <div id="parametros">
-        <h1>Agregar archivo</h1>
+    <div id="archivo">
         {{ form(formulario) }}
+        <h1>Agregar archivo</h1>
+        <div id="cargadorArchivos">Upload</div>
     </div>
-    <div id="cargadorArchivos">Upload</div>
+
 
     {% if archivosAlmacenados|default %}
         <div id="archivos">

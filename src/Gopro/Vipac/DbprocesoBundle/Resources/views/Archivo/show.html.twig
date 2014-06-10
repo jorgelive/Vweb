@@ -1,9 +1,8 @@
-{% extends '::base.html.twig' %}
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Archivos</h1>
 
-{% block body -%}
-    <h1>Archivo</h1>
-
-    <table class="record_properties">
+    <table class="registroPropiedades">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -36,17 +35,17 @@
         </tbody>
     </table>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('archivo') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('archivo_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
-{% endblock %}
+    <ul class="registroAcciones">
+        <li>
+            <a href="{{ path('archivo') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('archivo_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

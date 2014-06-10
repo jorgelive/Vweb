@@ -15,7 +15,7 @@ class ArchivocamposType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('proceso','hidden')
+            ->add('operacion','hidden')
         ;
     }
     

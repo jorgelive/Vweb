@@ -1,15 +1,12 @@
-{% extends '::base.html.twig' %}
-
-{% block body -%}
-    <h1>Archivo creation</h1>
-
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Carga de Archivos</h1>
     {{ form(form) }}
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('archivo') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
-{% endblock %}
+    <ul class="listaAcciones">
+        <li>
+            <a href="{{ path('archivo') }}">
+                Vover a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

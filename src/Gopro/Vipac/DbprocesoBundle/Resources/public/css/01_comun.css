@@ -21,21 +21,20 @@ div#GoproViapacDbprocesoBundle div#archivos table#listado tbody tr td.nombre{tex
 div#GoproViapacDbprocesoBundle div#archivos table#listado tbody tr td a{ margin:0 5px; color:#444;}
 div#GoproViapacDbprocesoBundle div#archivos table#listado tbody tr td a:hover{ margin:0 5px; color:#444;}
 
-div#GoproViapacDbprocesoBundle table#listaRegistros,
-div#GoproViapacDbprocesoBundle table#registroPropiedades{border-collapse: collapse;}
-
-div#GoproViapacDbprocesoBundle table#listaRegistros tr td,
-div#GoproViapacDbprocesoBundle table#registroPropiedades tr td,
-div#GoproViapacDbprocesoBundle table#listaRegistros tr th,
-div#GoproViapacDbprocesoBundle table#registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
-div#GoproViapacDbprocesoBundle table#listaRegistros tr td ul,
-div#GoproViapacDbprocesoBundle table#registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
-
-
 div#GoproViapacDbprocesoBundle form #gopro_vipac_dbprocesobundle_doccptipo label{display: inline-block; margin: 2px 10px; text-align: right; width: 150px;}
-div#GoproViapacDbprocesoBundle ul#registroAcciones,
-div#GoproViapacDbprocesoBundle ul#listaAcciones{list-style: none outside none; margin: 10px 20px;}
-div#GoproViapacDbprocesoBundle ul#registroAcciones ul,
-div#GoproViapacDbprocesoBundle ul#listaAcciones ul{}
-div#GoproViapacDbprocesoBundle ul#registroAcciones ul li,
-div#GoproViapacDbprocesoBundle ul#listaAcciones ul li{}
+
+div#GoproViapacDbprocesoBundle table.listaRegistros,
+div#GoproViapacDbprocesoBundle table.registroPropiedades{border-collapse: collapse;}
+div#GoproViapacDbprocesoBundle table.listaRegistros tr td,
+div#GoproViapacDbprocesoBundle table.registroPropiedades tr td,
+div#GoproViapacDbprocesoBundle table.listaRegistros tr th,
+div#GoproViapacDbprocesoBundle table.registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
+div#GoproViapacDbprocesoBundle table.listaRegistros tr td ul,
+div#GoproViapacDbprocesoBundle table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
+
+div#GoproViapacDbprocesoBundle ul.registroAcciones,
+div#GoproViapacDbprocesoBundle ul.listaAcciones{list-style: none outside none; margin: 10px 20px;}
+div#GoproViapacDbprocesoBundle ul.registroAcciones ul,
+div#GoproViapacDbprocesoBundle ul.listaAcciones ul{}
+div#GoproViapacDbprocesoBundle ul.registroAcciones ul li,
+div#GoproViapacDbprocesoBundle ul.listaAcciones ul li{}
