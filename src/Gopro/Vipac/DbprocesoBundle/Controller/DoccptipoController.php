@@ -163,7 +163,7 @@ class DoccptipoController extends Controller
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Doccptipo entity.');
+            throw $this->createNotFoundException('No existe el archivo.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -196,7 +196,7 @@ class DoccptipoController extends Controller
             $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Doccptipo entity.');
+                throw $this->createNotFoundException('No existe el archivo.');
             }
 
             $em->remove($entity);

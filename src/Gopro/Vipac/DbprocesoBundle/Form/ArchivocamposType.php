@@ -24,6 +24,6 @@ class ArchivocamposType extends AbstractType
      */
     public function getName()
     {
-        return 'gopro_vipac_dbprocesobundle_archivocampos';
+        return 'gopro_vipac_dbprocesobundle_archivo';//suplantando
     }
 }

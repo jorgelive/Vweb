@@ -49,10 +49,18 @@ class ArchivoController extends BaseController
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid()||$request->isXMLHttpRequest()) {
+            $entity->setUsuario($this->getUserName());
             $em = $this->getDoctrine()->getManager();
+
             $em->persist($entity);
             $em->flush();
+            if ($request->isXMLHttpRequest()){
+                return new JsonResponse([
+                    'mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'El archivo se ha agregado'],
+                    'archivo'=>['id'=>$entity->getId(),'nombre'=>$entity->getNombre(),'creado'=>$entity->getCreado()]
+                ]);
+            }
 
             return $this->redirect($this->generateUrl('archivo_show', array('id' => $entity->getId())));
         }
@@ -211,6 +219,7 @@ class ArchivoController extends BaseController
      */
     public function deleteAction(Request $request, $id)
     {
+
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
@@ -218,17 +227,18 @@ class ArchivoController extends BaseController
             $em = $this->getDoctrine()->getManager();
             $entity = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->findOneBy(['id'=>$id,'usuario'=>$this->getUserName()]);
 
-            if (!$entity&&!$request->isXMLHttpRequest()) {
+            if(!$entity&&$request->isXMLHttpRequest()){
+                return new JsonResponse(['mensaje'=>['exito'=>'no','titulo'=>'Fallo','texto'=>'No existe el archivo']]);
+            }elseif (!$entity) {
                 throw $this->createNotFoundException('No se encuentra el archivo o no tiene permiso sobre el.');
-            }elseif(!$entity){
-                return new JsonResponse(array('exito'=>'no','titulo'=>'Fallo','mensaje'=>'No existe el archivo'));
             }
 
             $em->remove($entity);
             $em->flush();
-        }
-        if ($request->isXMLHttpRequest()){
-            return new JsonResponse(array('exito'=>'si','titulo'=>'Exito','mensaje'=>'Se ha eliminado el archivo'));
+
+            if ($request->isXMLHttpRequest()){
+                return new JsonResponse(['mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'Se ha eliminado el archivo']]);
+            }
         }
         return $this->redirect($this->generateUrl('archivo'));
     }

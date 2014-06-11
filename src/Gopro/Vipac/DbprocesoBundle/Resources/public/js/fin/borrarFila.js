@@ -4,20 +4,22 @@ $(".borrarFila").click(function(event) {
     var url = $(this).prop('href');
     var deleting = $.ajax({
         url: url,
-        type: 'DELETE'
+        type: 'DELETE',
+        statusCode: {
+            500: function() {
+                alert("500 Error Interno: No se ha eliminado la fila.");
+            }
+        }
     });
     deleting.done(function(data) {
-        if(!data.hasOwnProperty('exito')){
-            alert ('El servidor no devolvio la respueta esperada')
+        if(!data.hasOwnProperty('mensaje')
+        ){
+            alert ('La respuesta no fue válida.')
             return false;
         }
-        if(!data.hasOwnProperty('mensaje')){
-            alert ('El servidor no devolvio mensaje')
-            return false;
-        }
-        if(data.exito=='si'){
+        if(data.mensaje.exito=='si'){
             $("#archivos #listado tr[data-id="+id+"]").remove();
-            $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data));
+            $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
         }else{
             //alert(data.mensaje);
         };
