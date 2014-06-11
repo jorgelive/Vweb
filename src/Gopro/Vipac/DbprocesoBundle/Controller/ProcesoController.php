@@ -75,7 +75,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistentesIndizados();
+        $existente=$this->container->get('gopro_dbproceso_comun_variable')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -83,7 +83,7 @@ class ProcesoController extends BaseController
             $this->setMensajes('No existen datos para generar archivo');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
-
+        $fusion=array();
         foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $this->setMensajes($procesoArchivo->getMensajes());
@@ -97,6 +97,7 @@ class ProcesoController extends BaseController
             }
         endforeach;
 
+        $resultados=array();
         foreach($fusion as $fusionPart):
             if(!isset($resultados[$fusionPart['CENTRO_COSTO']])){
                 $resultados[$fusionPart['CENTRO_COSTO']]=0;
@@ -109,8 +110,6 @@ class ProcesoController extends BaseController
         return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $this->getMensajes());
     }
 
-    //Cuenta contable normal del impuesto 2 64.1.1.1.01
-    //El subtotal cambia de cuenta si es diferido
     /**
      * @Route("/cargadorcp/{archivoEjecutar}", name="proceso_cargadorcp", defaults={"archivoEjecutar" = null})
      * @Template()
@@ -237,11 +236,10 @@ class ProcesoController extends BaseController
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
             $dataCP[$nroLinea]=$linea;
 
-
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
                 $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
             }
-            $dataCP[$nroLinea]['CONDICION_PAGO']=$datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO'];
+            $dataCP[$nroLinea]['CONDICION_PAGO']=$this->container->get('gopro_dbproceso_comun_variable')->utf($datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO']);
             if(isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])){
                 $dataCP[$nroLinea]['CONDICIONES']=$docCpTipos[$dataCP[$nroLinea]['TIPO']];
             }else{
@@ -452,7 +450,7 @@ class ProcesoController extends BaseController
         }
 
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultado));
+        $archivoGenerado->setParametrosWriter($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$resultado);
         $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
         $archivoGenerado->setCeldas($celdas);
         $archivoGenerado->setArchivoGenerado();
@@ -674,14 +672,14 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        foreach($carga->getProceso()->getExistentesRaw() as $valor):
+        foreach($this->container->get('gopro_dbproceso_comun_variable')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
                 &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
                 &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])
             ){
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]));
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
@@ -753,7 +751,7 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($resultado[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultado));
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$resultado);
         $archivoGenerado->setArchivoGenerado();
         return $archivoGenerado->getArchivoGenerado();
 
@@ -801,7 +799,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistentesIndizados();
+        $existente=$this->container->get('gopro_dbproceso_comun_variable')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -822,7 +820,7 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($fusion[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($fusion));
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
         $archivoGenerado->setArchivoGenerado();
         return $archivoGenerado->getArchivoGenerado();
     }
@@ -869,7 +867,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$carga->getProceso()->getExistentesIndizados();
+        $existente=$this->container->get('gopro_dbproceso_comun_variable')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -889,7 +887,7 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($fusion[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$this->container->get('gopro_dbproceso_comun_variable')->utf($fusion));
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
         $archivoGenerado->setArchivoGenerado();
         return $archivoGenerado->getArchivoGenerado();
     }

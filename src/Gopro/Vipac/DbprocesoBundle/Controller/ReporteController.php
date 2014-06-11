@@ -91,7 +91,7 @@ class ReporteController extends BaseController
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
 
-        $existentesRaw=$statement->fetchAll();
+        $existentesRaw=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
 
         if(empty($existentesRaw)){
             $this->setMensajes('No hay resultados');
@@ -128,7 +128,7 @@ class ReporteController extends BaseController
 
         if($destino='archivo'){
             $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$encabezado,$this->container->get('gopro_dbproceso_comun_variable')->utf($resultados));
+            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$encabezado,$resultados);
             $archivoGenerado->setAnchoColumna(['A'=>12,'B'=>'auto','2:'=>12]);
             $archivoGenerado->setArchivoGenerado();
             return $archivoGenerado->getArchivoGenerado();
