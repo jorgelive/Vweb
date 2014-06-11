@@ -58,7 +58,13 @@ class ArchivoController extends BaseController
             if ($request->isXMLHttpRequest()){
                 return new JsonResponse([
                     'mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'El archivo se ha agregado'],
-                    'archivo'=>['id'=>$entity->getId(),'nombre'=>$entity->getNombre(),'creado'=>$entity->getCreado()]
+                    'archivo'=>[
+                        'id'=>$entity->getId(),
+                        'nombre'=>$entity->getNombre(),
+                        'creado'=>$entity->getCreado(),
+                        'procesarRoute'=>$this->get('router')->generate($entity->getOperacion(), array('archivoEjecutar' => $entity->getId())),
+                        'borrarRoute'=>$this->get('router')->generate('archivo_delete', array('id' => $entity->getId())),
+                    ]
                 ]);
             }
 

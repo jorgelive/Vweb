@@ -2,37 +2,40 @@
 {% block title %}Arreglar Tipo de Cambio{% endblock title %}
 {% block titulo %}Arreglar Tipo de Cambio{% endblock titulo %}
 {% block content %}
-    <div id="parametros">
-        <h1>Agregar archivo</h1>
+    <div id="archivo">
         {{ form(formulario) }}
+        <h1>Agregar archivo</h1>
+        <div id="cargadorArchivos">Subir Archivo</div>
     </div>
 
-    {% if archivosAlmacenados|default %}
-        <div id="archivos">
-            <h1>Listado de Archivos</h1>
-            <table id="listado">
-                <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Fecha de creación</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
+
+    <div id="archivos">
+        <h1>Listado de Archivos</h1>
+        <table id="listaArchivos">
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha de creación</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if archivosAlmacenados|default %}
                 {% for archivo in archivosAlmacenados %}
                     <tr data-id="{{ archivo.id }}">
                         <td class="nombre">{{ archivo.nombre }}</td>
-                        <td>{{ archivo.creado | date('d-m-Y H:i:s') }}</td>
+                        <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
                         <td>
                             <a href="{{ path('carga_arreglartc', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
                             <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
     {% if mensajes|default %}
         <div id="mensajes">
             <h1>Mensajes del proceso</h1>

@@ -12,11 +12,12 @@ $(document).ready(function()
         fileName: 'gopro_vipac_dbprocesobundle_archivo[archivo]',
         multiple:false,
         showStatusAfterSuccess:false,
+        dragDropStr: "<span><b>Area para arrastrar y soltar archivos</b></span>",
         onSuccess:function(files,data,xhr)
         {
             $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
-            //$("#eventsmessage").html($("#eventsmessage").html()+"<br/>Success for: "+JSON.stringify(data));
-
+            $("table#listaArchivos tbody").prepend(tmpl('archivoRow',data.archivo));
+            $(".borrarFila").borraFila();
         }
     });
 });

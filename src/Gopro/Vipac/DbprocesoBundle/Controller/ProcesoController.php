@@ -2,7 +2,6 @@
 
 namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
-use Gopro\Vipac\DbprocesoBundle\Form\ArchivoType;
 use Gopro\Vipac\DbprocesoBundle\Form\ArchivocamposType;
 use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
 use Gopro\Vipac\MainBundle\Controller\BaseController;
@@ -118,27 +117,17 @@ class ProcesoController extends BaseController
      */
     public function cargadorcpAction(Request $request,$archivoEjecutar)
     {
+
         $operacion='proceso_cargadorcp';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
-        $archivo = new Archivo();
-        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl($operacion),
-            'method' => 'POST',
+        $opciones = array('operacion'=>$operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('archivo_create'),
         ));
 
-        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
-
-        if ($formulario->isValid()){
-            $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion($operacion);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($archivo);
-            $em->flush();
-            return $this->redirect($this->generateUrl($operacion));
-        }
 
         $archivoInfo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$archivoInfo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
@@ -582,24 +571,12 @@ class ProcesoController extends BaseController
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
-        $archivo = new Archivo();
-        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl($operacion),
-            'method' => 'POST',
+        $opciones = array('operacion'=>$operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('archivo_create'),
         ));
 
-        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
-
         $formulario->handleRequest($request);
-
-        if ($formulario->isValid()){
-            $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion($operacion);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($archivo);
-            $em->flush();
-            return $this->redirect($this->generateUrl($operacion));
-        }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
@@ -792,23 +769,13 @@ class ProcesoController extends BaseController
         $operacion='proceso_calxfile';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
-        $archivo = new Archivo();
-        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl($operacion),
-            'method' => 'POST',
+
+        $opciones = array('operacion'=>$operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('archivo_create'),
         ));
 
-        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
-
-        if ($formulario->isValid()){
-            $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion($operacion);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($archivo);
-            $em->flush();
-            return $this->redirect($this->generateUrl($operacion));
-        }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
@@ -869,23 +836,13 @@ class ProcesoController extends BaseController
         $operacion='proceso_calxreserva';
         $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
-        $archivo = new Archivo();
-        $formulario = $this->createForm(new ArchivoType(), $archivo, array(
-            'action' => $this->generateUrl($operacion),
-            'method' => 'POST',
+
+        $opciones = array('operacion'=>$operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('archivo_create'),
         ));
 
-        $formulario->add('submit', 'submit', array('label' => 'Agregar'));
         $formulario->handleRequest($request);
-
-        if ($formulario->isValid()){
-            $archivo->setUsuario($this->getUserName());
-            $archivo->setOperacion($operacion);
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($archivo);
-            $em->flush();
-            return $this->redirect($this->generateUrl($operacion));
-        }
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
         if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){

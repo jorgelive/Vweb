@@ -1,0 +1,8 @@
+<tr data-id="{%=o.id%}">
+    <td class="nombre">{%=o.nombre%}</td>
+    <td>{%=o.creado.date%}</td>
+    <td>
+        <a href="/app_dev.php/dbproceso/proceso/cheque/{%=o.id%}">Procesar</a>
+        <a class="borrarFila" href="/app_dev.php/dbproceso/archivo/{%=o.id%}" data-id="{%=o.id%}">Borrar</a>
+    </td>
+</tr>

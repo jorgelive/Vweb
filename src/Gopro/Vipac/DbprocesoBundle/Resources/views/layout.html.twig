@@ -3,7 +3,7 @@
 {% block titulo %}{% endblock titulo %}
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' '@GoproVipacDbprocesoBundle/Resources/public/css/jquery.fileupload/*' filter='css_url_rewrite' %}
+    {% stylesheets '@GoproVipacDbprocesoBundle/Resources/public/css/*' filter='css_url_rewrite' %}
     <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 {% endblock stylesheets%}
@@ -26,6 +26,9 @@
 {% block javascriptsfinal %}
     <script id="plantillaHighlight" type="text/x-tmpl">
         {{ source("GoproVipacDbprocesoBundle:Plantilla:highlight.js.twig") }}
+    </script>
+    <script id="archivoRow" type="text/x-tmpl">
+        {{ source("GoproVipacDbprocesoBundle:Plantilla:archivorow.js.twig") }}
     </script>
     {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
