@@ -58,35 +58,36 @@ $markupMiddle='</head>';
 $markupMiddle.='<body>';
 $body='<div id="firma" class="plomo">';
 $body.='<table style="width: 613px;">';
+if (!empty($data['saludo'])){$saludo='<p style="font-size:14px; margin-bottom: 9px;">'.$data['saludo'].'</p>';}else{$saludo='';}
     $body.='<tr>';
-    $body.='<td>&nbsp;</td>';
+    $body.='<td>'.$saludo.'</td>';
     $body.='</tr>';
     $body.='<tr>';
         $body.='<td colspan="2">';
             $body.='<table style="width:100%;">';
                     $body.='<td style="width:240px;">';
                         $body.='<p style="font-size:16px; font-weight:bold;">';
-                            $body.=$data['Nombre'];
+                            $body.=$data['nombre'];
                         $body.='</p>';
                         $body.='<p class="amarillo" style="font-size:14px; font-weight:bold;">';
-                            $body.=$data['Cargo'];
+                            $body.=$data['cargo'];
                         $body.='</p>';
                         $body.='<p style="text-decoration:underline; font-size:15px;">';
-                            $body.=$data['E-mail'];
+                            $body.=$data['e-mail'];
                         $body.='</p>';
                     $body.='</td>';
                     $body.='<td style="width:342px;">';
-                        if (empty($data['Opcional'])){ $temp1='margin-bottom: 10px;';}else{$temp1='';}
+                        if (empty($data['opcional'])){ $temp1='margin-bottom: 10px;';}else{$temp1='';}
                         $body.='<p style="font-size:14px; text-align:right; margin-top: 9px;'.$temp1.'">';
-                            $body.='T.'.$this->getTraduccion('telefono',$data['Oficina']);
-                            if (!empty($data['Anexo'])){$body.= " Ext. ".$data['Anexo'];}
+                            $body.='T.'.$this->getTraduccion('telefono',$data['oficina']);
+                            if (!empty($data['anexo'])){$body.= " Ext. ".$data['anexo'];}
                         $body.='</p>';
                         $body.='<p style="font-size:13px; text-align:right;'.$temp1.'">';
-                            $body.=$this->getTraduccion('local',$data['Oficina']);
+                            $body.=$this->getTraduccion('local',$data['oficina']);
                         $body.='</p>';
-                        if (!empty($data['Opcional'])){
+                        if (!empty($data['opcional'])){
                             $body.='<p style="font-size:13px; text-align:right;">';
-                                $body.=$data['Opcional'];
+                                $body.=$data['opcional'];
                             $body.='</p>';
                         }
 
@@ -102,7 +103,7 @@ $body.='<table style="width: 613px;">';
     $body.='</tr>';
     $body.='<tr>';
         $body.='<td colspan="2">';
-            $body.='<a href="http://vipac.pe/firmas/2014/frase.php?idioma='.$data['Idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/'.$this->getTraduccion('frase',$data['Idioma']).'" style="width:613px; height: 87px;"/></a>';
+            $body.='<a href="http://vipac.pe/firmas/2014/frase.php?idioma='.$data['idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/'.$this->getTraduccion('frase',$data['idioma']).'" style="width:613px; height: 87px;"/></a>';
         $body.='</td>';
     $body.='</tr>';
     $body.='<tr>';
@@ -115,7 +116,7 @@ $body.='<table style="width: 613px;">';
             $body.='<table style="width:133px; height: 39px;">';
                 $body.='<tr>';
                     $body.='<td>';
-                        $body.='<img src="http://vipac.pe/firmas/2014/'.$this->getTraduccion('siguenos',$data['Idioma']).'" style="width:58px; height: 40px;" />';
+                        $body.='<img src="http://vipac.pe/firmas/2014/'.$this->getTraduccion('siguenos',$data['idioma']).'" style="width:58px; height: 40px;" />';
                     $body.='</td>';
                     $body.='<td>';
                         $body.='<a href="https://www.facebook.com/vipacperu">';
@@ -131,7 +132,7 @@ $body.='<table style="width: 613px;">';
             $body.='</table>';
         $body.='</td>';
         $body.='<td style="width:465px; margin:0px;">';
-            $body.='<a href="http://vipac.pe/firmas/2014/publi.php?idioma='.$data['Idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/publi/'.$this->getTraduccion('publi',$data['Idioma']).'" style="display:block; width:465px; height:70px;" /></a>';
+            $body.='<a href="http://vipac.pe/firmas/2014/publi.php?idioma='.$data['idioma'].'" target="_blank"><img src="http://vipac.pe/firmas/2014/publi/'.$this->getTraduccion('publi',$data['idioma']).'" style="display:block; width:465px; height:70px;" /></a>';
         $body.='</td>';
     $body.='</tr>';
     $body.='<tr>';
@@ -141,7 +142,7 @@ $body.='<table style="width: 613px;">';
     $body.='</tr>';
     $body.='<tr>';
         $body.='<td colspan="2" align="center" bgcolor="#FFFFFF">';
-            $body.='<p class="verde" style="font-size:13px;"><img src="http://vipac.pe/firmas/2014/hoja.png" style="width:16px; height:15px;" />'.$this->getTraduccion('ambiental',$data['Idioma']).'</p>';
+            $body.='<p class="verde" style="font-size:13px;"><img src="http://vipac.pe/firmas/2014/hoja.png" style="width:16px; height:15px;" />'.$this->getTraduccion('ambiental',$data['idioma']).'</p>';
         $body.='</td>';
     $body.='</tr>';
 $body.='</table>';

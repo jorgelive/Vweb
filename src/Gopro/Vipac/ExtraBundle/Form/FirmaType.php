@@ -21,13 +21,14 @@ class FirmaType extends AbstractType
         $idiomaCh=array('choices'=>$idiomaChOp,'multiple'=>false,'expanded'=>true);
 
         $builder
-            ->add('Nombre', 'text')
-            ->add('E-mail', 'text')
-            ->add('Cargo', 'text')
-            ->add('Anexo', 'text', array('required' => false))
-            ->add('Opcional', 'text', array('required' => false))
-            ->add('Oficina', 'choice', $oficinaCh)
-            ->add('Idioma', 'choice', $idiomaCh)
+            ->add('nombre', 'text')
+            ->add('e-mail', 'text')
+            ->add('cargo', 'text')
+            ->add('anexo', 'text', array('required' => false))
+            ->add('opcional', 'text', array('required' => false))
+            ->add('saludo', 'text', array('required' => false))
+            ->add('oficina', 'choice', $oficinaCh)
+            ->add('idioma', 'choice', $idiomaCh)
         ;
     }
     
