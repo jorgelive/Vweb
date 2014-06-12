@@ -1,0 +1,15 @@
+div#GoproVipacReporteBundle table.listaRegistros,
+div#GoproVipacReporteBundle table.registroPropiedades{border-collapse: collapse;}
+div#GoproVipacReporteBundle table.listaRegistros tr td,
+div#GoproVipacReporteBundle table.registroPropiedades tr td,
+div#GoproVipacReporteBundle table.listaRegistros tr th,
+div#GoproVipacReporteBundle table.registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
+div#GoproVipacReporteBundle table.listaRegistros tr td ul,
+div#GoproVipacReporteBundle table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
+
+div#GoproVipacReporteBundle ul.registroAcciones,
+div#GoproVipacReporteBundle ul.listaAcciones{list-style: none outside none; margin: 10px 20px;}
+div#GoproVipacReporteBundle ul.registroAcciones ul,
+div#GoproVipacReporteBundle ul.listaAcciones ul{}
+div#GoproVipacReporteBundle ul.registroAcciones ul li,
+div#GoproVipacReporteBundle ul.listaAcciones ul li{}

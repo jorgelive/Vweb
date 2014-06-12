@@ -1,13 +1,13 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
 {% block content %}
-    <h1>Operador list</h1>
+    <h1>Lista de operadores de comparacion</h1>
 
-    <table class="records_list">
+    <table class="listaRegistros">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
-                <th>Actions</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -18,10 +18,10 @@
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('operador_show', { 'id': entity.id }) }}">show</a>
+                        <a href="{{ path('operador_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('operador_edit', { 'id': entity.id }) }}">edit</a>
+                        <a href="{{ path('operador_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -30,11 +30,11 @@
         </tbody>
     </table>
 
-        <ul>
+    <ul class="listaAcciones">
         <li>
             <a href="{{ path('operador_new') }}">
-                Create a new entry
+                Crear un nuevo registro
             </a>
         </li>
     </ul>
-    {% endblock content %}
+{% endblock content %}

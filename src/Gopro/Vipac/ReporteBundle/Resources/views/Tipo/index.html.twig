@@ -1,13 +1,12 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
 {% block content %}
-    <h1>Tipo list</h1>
-
-    <table class="records_list">
+    <h1>Lista de tipos de campo</h1>
+    <table class="listaRegistros">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
-                <th>Actions</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -18,10 +17,10 @@
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('tipo_show', { 'id': entity.id }) }}">show</a>
+                        <a href="{{ path('tipo_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('tipo_edit', { 'id': entity.id }) }}">edit</a>
+                        <a href="{{ path('tipo_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -30,11 +29,11 @@
         </tbody>
     </table>
 
-        <ul>
+    <ul class="listaAcciones">
         <li>
             <a href="{{ path('tipo_new') }}">
-                Create a new entry
+                Crear un nuevo registro
             </a>
         </li>
     </ul>
-    {% endblock content %}
+{% endblock content %}

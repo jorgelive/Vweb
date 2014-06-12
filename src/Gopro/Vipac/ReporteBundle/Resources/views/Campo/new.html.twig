@@ -1,14 +1,12 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
 {% block content %}
-    <h1>Campo creation</h1>
-
+    <h1>Creación de Campos</h1>
     {{ form(form) }}
-
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('campo') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+    <ul class="listaAcciones">
+        <li>
+            <a href="{{ path('campo') }}">
+                Volver a la lista
+            </a>
+        </li>
+    </ul>
 {% endblock content %}

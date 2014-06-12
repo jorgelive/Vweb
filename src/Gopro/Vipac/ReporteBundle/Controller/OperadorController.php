@@ -76,7 +76,7 @@ class OperadorController extends Controller
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+        $form->add('submit', 'submit', array('label' => 'Crear'));
 
         return $form;
     }
@@ -113,7 +113,7 @@ class OperadorController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Operador')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Operador entity.');
+            throw $this->createNotFoundException('No se puede encontrar el operador de comparación.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -138,7 +138,7 @@ class OperadorController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Operador')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Operador entity.');
+            throw $this->createNotFoundException('No se puede encontrar el operador de comparación.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -165,7 +165,7 @@ class OperadorController extends Controller
             'method' => 'PUT',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', 'submit', array('label' => 'Actualizar'));
 
         return $form;
     }
@@ -183,7 +183,7 @@ class OperadorController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Operador')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Operador entity.');
+            throw $this->createNotFoundException('No se puede encontrar el operador de comparación.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -218,7 +218,7 @@ class OperadorController extends Controller
             $entity = $em->getRepository('GoproVipacReporteBundle:Operador')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Operador entity.');
+                throw $this->createNotFoundException('No se puede encontrar el operador de comparación.');
             }
 
             $em->remove($entity);
@@ -240,7 +240,7 @@ class OperadorController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('operador_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', 'submit', array('label' => 'Borrar'))
             ->getForm()
         ;
     }

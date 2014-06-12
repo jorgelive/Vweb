@@ -128,7 +128,7 @@ class ArchivoController extends BaseController
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Archivo entity.');
+            throw $this->createNotFoundException('No se encuentra o no tiene permiso sobre el archivo.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -153,7 +153,7 @@ class ArchivoController extends BaseController
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Archivo entity.');
+            throw $this->createNotFoundException('No se encuentra o no tiene permiso sobre el archivo.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -198,7 +198,7 @@ class ArchivoController extends BaseController
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Archivo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Archivo entity.');
+            throw $this->createNotFoundException('No se encuentra o no tiene permiso sobre el archivo.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -236,7 +236,7 @@ class ArchivoController extends BaseController
             if(!$entity&&$request->isXMLHttpRequest()){
                 return new JsonResponse(['mensaje'=>['exito'=>'no','titulo'=>'Fallo','texto'=>'No existe el archivo']]);
             }elseif (!$entity) {
-                throw $this->createNotFoundException('No se encuentra el archivo o no tiene permiso sobre el.');
+                throw $this->createNotFoundException('No se encuentra o no tiene permiso sobre el archivo.');
             }
 
             $em->remove($entity);

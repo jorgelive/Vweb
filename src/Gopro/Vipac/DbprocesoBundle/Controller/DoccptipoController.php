@@ -100,7 +100,7 @@ class DoccptipoController extends Controller
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Doccptipo entity.');
+            throw $this->createNotFoundException('No existe el tipo de Documento CP.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -123,7 +123,7 @@ class DoccptipoController extends Controller
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Doccptipo entity.');
+            throw $this->createNotFoundException('No existe el tipo de Documento CP.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -163,7 +163,7 @@ class DoccptipoController extends Controller
         $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('No existe el archivo.');
+            throw $this->createNotFoundException('No existe el tipo de Documento CP.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -196,7 +196,7 @@ class DoccptipoController extends Controller
             $entity = $em->getRepository('GoproVipacDbprocesoBundle:Doccptipo')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('No existe el archivo.');
+                throw $this->createNotFoundException('No existe el tipo de Documento CP.');
             }
 
             $em->remove($entity);

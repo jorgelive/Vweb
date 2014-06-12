@@ -76,7 +76,7 @@ class TipoController extends Controller
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+        $form->add('submit', 'submit', array('label' => 'Crear'));
 
         return $form;
     }
@@ -113,7 +113,7 @@ class TipoController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Tipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Tipo entity.');
+            throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -138,7 +138,7 @@ class TipoController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Tipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Tipo entity.');
+            throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -165,7 +165,7 @@ class TipoController extends Controller
             'method' => 'PUT',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        $form->add('submit', 'submit', array('label' => 'Actualizar'));
 
         return $form;
     }
@@ -183,7 +183,7 @@ class TipoController extends Controller
         $entity = $em->getRepository('GoproVipacReporteBundle:Tipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find Tipo entity.');
+            throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -218,7 +218,7 @@ class TipoController extends Controller
             $entity = $em->getRepository('GoproVipacReporteBundle:Tipo')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Tipo entity.');
+                throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
             }
 
             $em->remove($entity);
@@ -240,7 +240,7 @@ class TipoController extends Controller
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('tipo_delete', array('id' => $id)))
             ->setMethod('DELETE')
-            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->add('submit', 'submit', array('label' => 'Borrar'))
             ->getForm()
         ;
     }

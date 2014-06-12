@@ -1,8 +1,7 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
 {% block content %}
-    <h1>Sentencia</h1>
-
-    <table class="record_properties">
+    <h1>Sentencia SQL</h1>
+    <table class="registroPropiedades">
         <tbody>
             <tr>
                 <th>Id</th>
@@ -13,7 +12,7 @@
                 <td>{{ entity.nombre }}</td>
             </tr>
             <tr>
-                <th>Descripcion</th>
+                <th>Descripción</th>
                 <td>{{ entity.descripcion }}</td>
             </tr>
             <tr>
@@ -23,17 +22,17 @@
         </tbody>
     </table>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('sentencia') }}">
-            Back to the list
-        </a>
-    </li>
-    <li>
-        <a href="{{ path('sentencia_edit', { 'id': entity.id }) }}">
-            Edit
-        </a>
-    </li>
-    <li>{{ form(delete_form) }}</li>
-</ul>
+    <ul class="registroAcciones">
+        <li>
+            <a href="{{ path('sentencia') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('sentencia_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
 {% endblock content %}
