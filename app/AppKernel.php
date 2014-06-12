@@ -31,6 +31,7 @@ class AppKernel extends Kernel
             new Gopro\Vipac\ExtraBundle\GoproVipacExtraBundle(),
             new Gopro\Vipac\MainBundle\GoproVipacMainBundle(),
             new Fkr\CssURLRewriteBundle\FkrCssURLRewriteBundle(),
+            new Gopro\Vipac\ReporteBundle\GoproVipacReporteBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

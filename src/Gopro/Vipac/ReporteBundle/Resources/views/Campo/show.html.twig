@@ -1,0 +1,39 @@
+{% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Campo</h1>
+
+    <table class="record_properties">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Nombremostrar</th>
+                <td>{{ entity.nombremostrar }}</td>
+            </tr>
+            <tr>
+                <th>Predeterminado</th>
+                <td>{{ entity.predeterminado }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('campo') }}">
+            Back to the list
+        </a>
+    </li>
+    <li>
+        <a href="{{ path('campo_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    </li>
+    <li>{{ form(delete_form) }}</li>
+</ul>
+{% endblock content %}

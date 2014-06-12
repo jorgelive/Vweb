@@ -8,6 +8,7 @@ a{text-decoration: none;}
 a:hover{text-decoration: underline;}
 
 body {color:#444; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 75%;}
+div#viewPort{ min-width: 800px;}
 
 div#header {width: 100%; height: 40px; background: #FCBA15; padding:5px; display:block; position: relative; }
 div#header div#titulo{color: #fff; margin-left: 10px;}
@@ -15,7 +16,7 @@ div#header div#loginStatus {display:block; position: absolute; top: 0px; right:2
 div#header div#loginStatus a{color:#eee;}
 div#header div#loginStatus a:hover{color:#fff;}
 div#sessionFlash{ display:block; width: 250px; margin: 10px auto;}
-div#sidebar{padding:10px; width:20%; display: inline-block; margin-right: 10px;}
+div#sidebar{padding:10px; width:15%; display: inline-block; margin-right: 10px;}
 div#sidebar:empty{display:none;}
 div#sidebar ul{ list-style-type: none;}
 div#sidebar ul li{width: 100%;line-height: 30px;}

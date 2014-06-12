@@ -10,7 +10,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * Dependencia
  *
- * @ORM\Table(name="gp_dependencia")
+ * @ORM\Table(name="use_dependencia")
  * @ORM\Entity
  */
 

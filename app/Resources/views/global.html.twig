@@ -19,6 +19,7 @@
 </head>
 <body>
 {% block body %}
+<div id="viewPort">
     <div id="header">
         <div id='titulo'><h1>{% block titulo %}{% endblock titulo %}</h1></div>
         <div id="loginStatus">
@@ -55,6 +56,6 @@
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascriptsfinal %}
-
+</div>
 </body>
 </html>

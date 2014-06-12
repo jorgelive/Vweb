@@ -30,7 +30,7 @@ twig:
 assetic:
     debug:          %kernel.debug%
     use_controller: true
-    bundles:        [ GoproVipacMainBundle, GoproVipacDbprocesoBundle, GoproVipacExtraBundle, SonataUserBundle, FOSUserBundle]
+    bundles:        [ GoproVipacMainBundle, GoproVipacDbprocesoBundle, GoproVipacExtraBundle, GoproVipacReporteBundle, SonataUserBundle, FOSUserBundle]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~

@@ -1,0 +1,54 @@
+<?php
+
+namespace Gopro\Vipac\ReporteBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Campo
+ *
+ * @ORM\Table(name="rep_campo")
+ * @ORM\Entity
+ */
+class Campo
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nombre", type="string", length=50)
+     */
+    private $nombre;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nombremostrar", type="string", length=100)
+     */
+    private $nombremostrar;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="predeterminado", type="string", length=100)
+     */
+    private $predeterminado;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Sentencia", inversedBy="campos")
+     */
+    private $sentencia;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Tipo", inversedBy="campos")
+     */
+    private $tipo;
+}
