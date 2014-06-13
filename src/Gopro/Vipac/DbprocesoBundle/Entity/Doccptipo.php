@@ -96,10 +96,6 @@ class Doccptipo
      */
     private $modificado;
 
-
-
-
-
     /**
      * Get id
      *

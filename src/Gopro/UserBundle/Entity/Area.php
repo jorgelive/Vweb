@@ -8,13 +8,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Dependencia
+ * Area
  *
- * @ORM\Table(name="use_dependencia")
+ * @ORM\Table(name="use_area")
  * @ORM\Entity
  */
 
-class Dependencia
+class Area
 {
 
     /**
@@ -31,22 +31,7 @@ class Dependencia
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=100, nullable=true)
-     */
-    private $email;
-
-    /**
-     * @ORM\Column(type="string", length=200, nullable=true)
-     */
-    private $direccion;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Organizacion", inversedBy="dependencias")
-     */
-    protected $organizacion;
-
-    /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="dependencia")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="area")
      */
     protected $users;
 
@@ -86,75 +71,6 @@ class Dependencia
     public function getNombre()
     {
         return $this->nombre;
-    }
-
-    /**
-     * Set email
-     *
-     * @param string $email
-     * @return Dependencia
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * Get email
-     *
-     * @return string 
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set direccion
-     *
-     * @param string $direccion
-     * @return Dependencia
-     */
-    public function setDireccion($direccion)
-    {
-        $this->direccion = $direccion;
-
-        return $this;
-    }
-
-    /**
-     * Get direccion
-     *
-     * @return string 
-     */
-    public function getDireccion()
-    {
-        return $this->direccion;
-    }
-
-    /**
-     * Set organizacion
-     *
-     * @param \Gopro\UserBundle\Entity\Organizacion $organizacion
-     * @return Dependencia
-     */
-    public function setOrganizacion(\Gopro\UserBundle\Entity\Organizacion $organizacion = null)
-    {
-        $this->organizacion = $organizacion;
-
-        return $this;
-    }
-
-    /**
-     * Get organizacion
-     *
-     * @return \Gopro\UserBundle\Entity\Organizacion 
-     */
-    public function getOrganizacion()
-    {
-        return $this->organizacion;
     }
 
     /**

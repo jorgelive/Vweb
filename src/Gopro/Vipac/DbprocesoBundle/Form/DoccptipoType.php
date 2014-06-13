@@ -15,9 +15,9 @@ class DoccptipoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre',null, array('label' => 'Nombre'))
-            ->add('tipo',null, array('label' => 'Tipo'))
-            ->add('subtipo',null, array('label' => 'Subtipo'))
+            ->add('nombre')
+            ->add('tipo')
+            ->add('subtipo',null, array('label' => 'Sub Tipo'))
             ->add('subtotal',null, array('label' => 'Sub Total'))
             ->add('impuesto1',null, array('label' => 'Impuesto 1','required' => false))
             ->add('impuesto2',null, array('label' => 'Impuesto 2','required' => false))

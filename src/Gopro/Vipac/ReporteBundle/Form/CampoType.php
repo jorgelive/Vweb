@@ -16,7 +16,7 @@ class CampoType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('nombremostrar')
+            ->add('nombremostrar',null, array('label' => 'Nombre a mostrar'))
             ->add('predeterminado')
             ->add('sentencia')
             ->add('tipo')

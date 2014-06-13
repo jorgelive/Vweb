@@ -31,16 +31,19 @@ class Organizacion
     private $nombre;
 
     /**
+     * @Assert\NotBlank
      * @ORM\Column(type="string", length=11, unique=true)
      */
     private $ruc;
 
     /**
+     * @Assert\NotBlank
      * @ORM\Column(type="string", length=100)
      */
     private $email;
 
     /**
+     * @Assert\NotBlank
      * @ORM\Column(type="string", length=200)
      */
     private $direccion;

@@ -16,7 +16,8 @@ class SentenciaType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('descripcion')
+            ->add('area')
+            ->add('descripcion',null, array('label' => 'Descripción'))
             ->add('contenido')
         ;
     }

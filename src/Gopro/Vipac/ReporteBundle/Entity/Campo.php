@@ -3,6 +3,8 @@
 namespace Gopro\Vipac\ReporteBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Campo
@@ -23,14 +25,14 @@ class Campo
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=50)
      */
     private $nombre;
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="nombremostrar", type="string", length=100)
      */
     private $nombremostrar;
@@ -38,7 +40,7 @@ class Campo
     /**
      * @var string
      *
-     * @ORM\Column(name="predeterminado", type="string", length=100)
+     * @ORM\Column(name="predeterminado", type="string", length=100, nullable=true)
      */
     private $predeterminado;
 

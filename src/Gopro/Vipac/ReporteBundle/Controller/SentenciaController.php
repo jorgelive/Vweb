@@ -17,6 +17,22 @@ use Gopro\Vipac\ReporteBundle\Form\SentenciaType;
  */
 class SentenciaController extends Controller
 {
+    /**
+     * @param string $sql
+     *
+     * @return array
+     */
+    private function getCampos($sql){
+        $campos=array();
+        if(strtoupper(substr($sql,1,6))!='SELECT'){
+            return $campos;
+        }
+        if (preg_match('/SELECT (.*?) FROM /i', $sql, $select)) {
+            $campos = explode(",",$select[1]);
+            $campos = array_map('trim', $campos);
+        }
+        return $campos;
+    }
 
     /**
      * Lists all Sentencia entities.
@@ -30,7 +46,6 @@ class SentenciaController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('GoproVipacReporteBundle:Sentencia')->findAll();
-
         return array(
             'entities' => $entities,
         );

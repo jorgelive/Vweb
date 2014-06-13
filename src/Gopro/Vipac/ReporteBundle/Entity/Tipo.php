@@ -3,6 +3,9 @@
 namespace Gopro\Vipac\ReporteBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Sentencia
@@ -23,7 +26,7 @@ class Tipo
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=100)
      */
     private $nombre;
@@ -40,7 +43,7 @@ class Tipo
     private $operadores;
 
     public function __construct() {
-        $this->operadores = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->operadores = new ArrayCollection();
     }
 
     public function __toString()

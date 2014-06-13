@@ -1,5 +1,7 @@
 div#GoproVipacExtraBundle form {margin-bottom: 25px;}
 div#GoproVipacExtraBundle form div#gopro_vipac_extrabundle_firma div{margin-bottom: 7px;}
-div#GoproVipacExtraBundle form div#gopro_vipac_extrabundle_firma div label{display: inline-block; margin-left: 5px; width: 60px;}
+div#GoproVipacExtraBundle form div#gopro_vipac_extrabundle_firma div label{display: inline-block; margin-left: 5px; width: 60px; vertical-align: top;}
 div#GoproVipacExtraBundle form div#gopro_vipac_extrabundle_firma div div{margin-top: 5px; margin-left: 10px;}
 div#GoproVipacExtraBundle form div#gopro_vipac_extrabundle_firma div div label{display: inline-block; margin-left: 5px; width: 70px;}
+
+

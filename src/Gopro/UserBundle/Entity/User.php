@@ -26,6 +26,11 @@ class User extends BaseUser
      */
     protected $dependencia;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Area", inversedBy="users")
+     */
+    protected $area;
+
 
     /**
      * Get id
@@ -59,6 +64,31 @@ class User extends BaseUser
     {
         return $this->dependencia;
     }
+
+
+    /**
+     * Set area
+     *
+     * @param \Gopro\UserBundle\Entity\Area $area
+     * @return User
+     */
+    public function setArea(\Gopro\UserBundle\Entity\Area $area = null)
+    {
+        $this->area = $area;
+
+        return $this;
+    }
+
+    /**
+     * Get area
+     *
+     * @return \Gopro\UserBundle\Entity\Area
+     */
+    public function getArea()
+    {
+        return $this->area;
+    }
+
 
 
 }

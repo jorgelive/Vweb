@@ -10,3 +10,9 @@ services:
         arguments: [~, Gopro\UserBundle\Entity\Dependencia, GoproUserBundle:DependenciaAdmin]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Admin, label: Dependencia}
+
+    gopro_user.admin.area:
+        class: Gopro\UserBundle\Admin\AreaAdmin
+        arguments: [~, Gopro\UserBundle\Entity\Area, GoproUserBundle:AreaAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Admin, label: Area}

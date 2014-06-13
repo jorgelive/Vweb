@@ -3,6 +3,9 @@
 namespace Gopro\Vipac\ReporteBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Sentencia
@@ -23,32 +26,37 @@ class Sentencia
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=100)
      */
     private $nombre;
 
     /**
      * @var string
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="descripcion", type="string", length=255)
      */
     private $descripcion;
 
     /**
      * @var text
-     *
+     * @Assert\NotBlank
      * @ORM\Column(name="contenido", type="text")
      */
     private $contenido;
 
     /**
-     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Area")
+     */
+    protected $area;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"remove"})
      */
     private $campos;
 
     public function __construct() {
-        $this->campos = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->campos = new ArrayCollection();
     }
 
     public function __toString()
@@ -167,6 +175,29 @@ class Sentencia
     public function getCampos()
     {
         return $this->campos;
+    }
+
+    /**
+     * Set area
+     *
+     * @param \Gopro\UserBundle\Entity\Area $area
+     * @return Sentencia
+     */
+    public function setArea(\Gopro\UserBundle\Entity\Area $area = null)
+    {
+        $this->area = $area;
+
+        return $this;
+    }
+
+    /**
+     * Get area
+     *
+     * @return \Gopro\UserBundle\Entity\Area
+     */
+    public function getArea()
+    {
+        return $this->area;
     }
 
 }
