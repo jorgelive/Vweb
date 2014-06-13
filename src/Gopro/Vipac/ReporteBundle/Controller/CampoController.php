@@ -29,12 +29,15 @@ class CampoController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GoproVipacReporteBundle:Campo')->findAll();
+            $entities = $em->getRepository('GoproVipacReporteBundle:Campo')->findAll();
+
 
         return array(
             'entities' => $entities,
         );
     }
+
+
     /**
      * Creates a new Campo entity.
      *
@@ -98,6 +101,7 @@ class CampoController extends Controller
             'form'   => $form->createView(),
         );
     }
+
 
     /**
      * Finds and displays a Campo entity.

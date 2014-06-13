@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class SentenciaType extends AbstractType
 {
-        /**
+    /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
@@ -19,6 +19,7 @@ class SentenciaType extends AbstractType
             ->add('area')
             ->add('descripcion',null, array('label' => 'Descripción'))
             ->add('contenido')
+            ->add('campos', 'collection', array('type' => new CampoType(), 'options' => array('label' => false)));
         ;
     }
     
