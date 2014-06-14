@@ -51,7 +51,7 @@ class Sentencia
     protected $area;
 
     /**
-     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist","remove"})
      */
     private $campos;
 

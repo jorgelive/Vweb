@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Gopro\Vipac\ReporteBundle\Form\EventListener\AgregarCampoSentenciaSubscriber;
+use Gopro\Vipac\ReporteBundle\Form\EventListener\AgregarCampoNombreSubscriber;
 
 class CampoType extends AbstractType
 {
@@ -16,7 +17,7 @@ class CampoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre')
+            ->addEventSubscriber(new AgregarCampoNombreSubscriber())
             ->add('nombremostrar',null, array('label' => 'Nombre a mostrar'))
             ->add('predeterminado')
             ->add('tipo')

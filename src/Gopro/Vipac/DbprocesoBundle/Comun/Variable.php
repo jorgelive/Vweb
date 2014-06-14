@@ -29,8 +29,29 @@ class Variable extends ContainerAware{
             $with[]='';
         endForeach;
 
-        $proceso = trim(preg_replace($what, $with, $str ));
+        $proceso = trim(preg_replace($what, $with, $str));
         return $proceso;
+    }
+
+    public function sanitizeQuery($query, $tipo='select')
+    {
+        if($tipo=='select'){
+            $what[] = "/insert/i";
+            $what[] = "/update/i";
+        }
+        $what[] = "/;/";
+        $what[] = '/"/';
+        $with=array();
+
+        foreach ($what as $dummy):
+            $with[]='';
+        endForeach;
+
+        $what[] = "/\s/";
+        $with[] = ' ';
+
+        $proceso = trim(preg_replace($what, $with, $query));
+        return preg_replace('/\s+/', ' ', $proceso);;
     }
 
     public function utf($variable,$tipo='to')

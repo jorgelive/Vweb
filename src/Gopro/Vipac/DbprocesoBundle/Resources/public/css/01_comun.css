@@ -46,8 +46,6 @@ div#GoproVipacDbprocesoBundle table.listaRegistros tr td ul,
 div#GoproVipacDbprocesoBundle table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
 
 div#GoproVipacDbprocesoBundle ul.registroAcciones,
-div#GoproVipacDbprocesoBundle ul.listaAcciones{list-style: none outside none; margin: 10px 20px;}
-div#GoproVipacDbprocesoBundle ul.registroAcciones ul,
-div#GoproVipacDbprocesoBundle ul.listaAcciones ul{}
-div#GoproVipacDbprocesoBundle ul.registroAcciones ul li,
-div#GoproVipacDbprocesoBundle ul.listaAcciones ul li{}
+div#GoproVipacDbprocesoBundle ul.listaAcciones{list-style: none outside none; margin: 10px 0;}
+div#GoproVipacDbprocesoBundle ul.registroAcciones li,
+div#GoproVipacDbprocesoBundle ul.listaAcciones li{ display: inline-block;}

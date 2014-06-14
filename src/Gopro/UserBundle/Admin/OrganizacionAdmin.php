@@ -94,11 +94,11 @@ class OrganizacionAdmin extends Admin
         }
         if($agregar===false){
             $repositorio=$this->getConfigurationPool()->getContainer()->get('doctrine')->getRepository('GoproUserBundle:Dependencia');
-            $dependenciasRepositorio=$repositorio->findBy(['organizacion'=>$organizacion->getId()]);
+            $dependenciasExistentes=$repositorio->findBy(['organizacion'=>$organizacion->getId()]);
 
-            foreach($dependenciasRepositorio as $dr):
-                if(!$organizacion->getDependencias()->contains($dr)){
-                    $dr->setOrganizacion(null);
+            foreach($dependenciasExistentes as $dependenciaExistente):
+                if(!$organizacion->getDependencias()->contains($dependenciaExistente)){
+                    $dependenciaExistente->setOrganizacion(null);
                 }
             endforeach;
 

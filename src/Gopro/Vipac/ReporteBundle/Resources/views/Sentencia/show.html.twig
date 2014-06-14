@@ -22,14 +22,16 @@
         </tbody>
     </table>
 
+    {{ form(parametros_form) }}
+
     <ul class="registroAcciones">
         <li>
-            <a href="{{ path('sentencia') }}">
+            <a class="boton" href="{{ path('sentencia') }}">
                 Volver a la lista
             </a>
         </li>
         <li>
-            <a href="{{ path('sentencia_edit', { 'id': entity.id }) }}">
+            <a class="boton" href="{{ path('sentencia_edit', { 'id': entity.id }) }}">
                 Editar
             </a>
         </li>
