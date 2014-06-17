@@ -300,7 +300,7 @@ class Proceso extends ContainerAware{
             }else{
                 if($tipo=='camposInsert' || $tipo=='camposselect'){
                     $procesoValor=$valor;
-                }elseif($tipo=='valoresUpdate' || $tipo=='whereUpdate'){ //todo quitar el whereupdate para el generico
+                }elseif($tipo=='valoresUpdate' || $tipo=='whereUpdate'){ //todo quitar el whereupdate para el generico (comparacion con substr/sha)
                     $procesoPh[]=$key.'= :'.$key;
                     $procesoValor[$key]=$valor;
                 }elseif($tipo=='valoresInsert'){

@@ -55,17 +55,16 @@ class ReporteController extends BaseController
         $destino='archivo';
         $fechaInicio = $parametros['fechaInicio'];
         $fechaFin = $parametros['fechaFin'];
-        $diferencia = $fechaFin->diff($fechaInicio);
-        $numDias=$diferencia->format('%d')+1;
-        if($fechaFin<$fechaInicio){
+        $diferencia = $fechaInicio->diff($fechaFin);
+        $numDias=$diferencia->format("%r%a")+1;
+        if($numDias<=0){
             $this->setMensajes('La fecha de inicio es mayor a la fecha de fin');
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
-        if($numDias>31){
+        if($numDias>60){
             $this->setMensajes('El periodo es muy largo');
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
-
         if($parametros['tipo']=='resumido'){
             $selectQuery='SELECT PROVEEDOR, NOMBRE, FECHA_VENCIMIENTO, MONEDA, sum(SALDO) SALDO FROM VIAPAC.VVW_DOCCP_VENCIMIENTO';
         }else{
