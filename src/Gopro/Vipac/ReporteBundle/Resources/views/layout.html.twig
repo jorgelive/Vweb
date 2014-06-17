@@ -24,6 +24,9 @@
 {% endblock container %}
 
 {% block javascriptsfinal %}
+    <script id="plantillaFiltroRow" type="text/x-tmpl">
+        {{ source("GoproVipacReporteBundle:Plantilla:filtrorow.js.twig") }}
+    </script>
     {% javascripts '@GoproVipacReporteBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}

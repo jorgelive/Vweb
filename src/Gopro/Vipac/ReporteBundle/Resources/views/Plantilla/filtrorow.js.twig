@@ -1,0 +1,15 @@
+<tr data-id="{%=o.id%}">
+    <td class="campo">
+        <select name="{%=o.formName%}[filtro][{%=o.id%}][campo]">
+            <option value=""></option>
+        </select>
+    </td>
+    <td class="operador">
+        <select name="{%=o.formName%}[filtro][{%=o.id%}][operador]">
+            <option value=""></option>
+
+        </select>
+    </td>
+    <td class="valor"><input name="{%=o.formName%}[filtro][{%=o.id%}][valor]" /></td>
+    <td class="accion"><a class="borrarFiltro">Borrar</a></td>
+</tr>

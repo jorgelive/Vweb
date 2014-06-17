@@ -1,5 +1,4 @@
 $(function () {
-
     $('div#sidebar ul li a').button({
             icons: {
                 primary: 'ui-icon ui-icon-play'

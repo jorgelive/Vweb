@@ -144,16 +144,15 @@ class SentenciaController extends Controller
         $deleteForm = $this->createDeleteForm($id);
 
         $campos=array();
+        $tipos=array();
         if(!empty($entity->getCampos())){
-            foreach ($entity->getCampos() as $nroCampo => $campoEntity):
-
+            foreach ($entity->getCampos() as $campoEntity):
                 if(!empty($campoEntity->getTipo())&&!empty($campoEntity->getTipo()->getOperadores())){
-                        $campos[$nroCampo]['nombre'][$campoEntity->getId()]=$campoEntity->getNombre();
-                        $campos[$nroCampo]['tipo'][$campoEntity->getTipo()->getId()]=$campoEntity->getTipo()->getNombre();
+                        $campos[$campoEntity->getId()]=$campoEntity->getNombre();
+                        $tipos[$campoEntity->getId()][$campoEntity->getTipo()->getId()]=$campoEntity->getTipo()->getNombre();
                         foreach ($campoEntity->getTipo()->getOperadores() as $operadorEntity):
-                            $campos[$nroCampo]['operadores'][$operadorEntity->getId()]=$operadorEntity->getNombre();
+                            $operadores[$campoEntity->getId()][$operadorEntity->getId()]=$operadorEntity->getNombre();
                         endforeach;
-
                 };
             endforeach;
         }
@@ -161,7 +160,7 @@ class SentenciaController extends Controller
         if ($request->getMethod() == 'POST'){
         }
 
-        $parametrosForm = $this->parametrosForm($id,json_encode($campos));
+        $parametrosForm = $this->parametrosForm($id,json_encode($campos),json_encode($tipos),json_encode($operadores));
 
         return array(
             'entity' => $entity,
@@ -175,12 +174,21 @@ class SentenciaController extends Controller
      * @param array $campos The entity id
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos)
+    private function parametrosForm($id,$campos,$tipos,$operadores)
     {
-        return $this->createFormBuilder(null,['attr'=>['name'=>'parametrosForm','id'=>'parametrosForm']])
-            ->setAction($this->generateUrl('sentencia_show', ['id' => $id]))
-            ->setMethod('POST')
+        return $this->get('form.factory')->createNamedBuilder(
+            'parametrosForm',
+            'form',
+            null,
+           [
+               'action'=>$this->generateUrl('sentencia_show', ['id' => $id]),
+               'method'=>'POST',
+               'attr'=>['id'=>'parametrosForm']
+           ])
+            //$this->createFormBuilder(null,['attr'=>['name'=>'parametrosForm','id'=>'parametrosForm']])
             ->add('campos', 'hidden', array('data' => $campos))
+            ->add('tipos', 'hidden', array('data' => $tipos))
+            ->add('operadores', 'hidden', array('data' => $operadores))
             ->add('submit', 'submit', array('label' => 'Generar'))
             ->getForm();
     }
@@ -320,9 +328,15 @@ class SentenciaController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder(null,['attr'=>['name'=>'deleteForm','id'=>'deleteForm']])
-            ->setAction($this->generateUrl('sentencia_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('sentencia_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
             ->getForm();
     }
