@@ -2,6 +2,12 @@ $.fn.filtro = function() {
     //console.log(this);
     if(this.length==0){return false;}
     var formName='parametrosForm';
+
+    if($(this).find('#'+formName+'_campos').val()==''
+        ||$(this).find('#'+formName+'_tipos').val()==''
+        ||$(this).find('#'+formName+'_operadores').val()==''){
+        return false;
+    }
     var row={
         id:1,
         formName:formName,
@@ -17,7 +23,7 @@ $.fn.filtro = function() {
             id: "filtroAdd",
             text: "Agregar Filtro",
             click: function(){
-                agregarFila(row);
+                agregarFila();
             }
         })
     };
@@ -33,10 +39,24 @@ $.fn.filtro = function() {
         }
     );
 
-    var agregarFila=function(){
-        console.log(row);
+    $(document).ready(function() {
+
+        if(filtroForm.find('#'+formName+'_filtroaplicado').val()==''|| typeof filtroForm.find('#'+formName+'_filtroaplicado').val() === 'undefined'){
+            return false;
+        }
+
+        var filtroAplicado=JSON.parse(filtroForm.find('#'+formName+'_filtroaplicado').val())
+        for (var key in filtroAplicado)
+        {
+            agregarFila(filtroAplicado[key].campo,filtroAplicado[key].operador,filtroAplicado[key].valor);
+        }
+
+        //console.log(filtroAplicado);
+    })
+
+    var agregarFila=function(currentCampo,currentOperador,currentValor){
+
         el.filtroTable.append(tmpl('plantillaFiltroRow',row));
-        //return true;
         var fila=el.filtroTable.find('tr[data-id='+row.id+']');
         fila.find('a.borrarFiltro').button().click(function() {
             $(this).closest('tr').remove();
@@ -46,6 +66,10 @@ $.fn.filtro = function() {
         var selectOperadores=fila.find('td.operador select');
         var opcionesOperadores=selectOperadores.prop('options');
         var valorInput=fila.find('td.valor input')
+        if(typeof currentCampo !== 'undefined'){
+            selectCampos.val(currentCampo);
+            console.log(selectCampos.val());
+        };
         $.each(row.campos, function(id, texto) {
             opcionesCampos[opcionesCampos.length] = new Option(texto, id);
         });

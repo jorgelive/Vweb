@@ -146,15 +146,11 @@ class SentenciaController extends BaseController
     public function showAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
-
         $entity = $em->getRepository('GoproVipacReporteBundle:Sentencia')->find($id);
-
         if (!$entity) {
             throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
         }
-
         $deleteForm = $this->createDeleteForm($id);
-
         $campos=array();
         $tipos=array();
         if(!empty($entity->getCampos())){
@@ -168,9 +164,7 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
-
         $parametrosForm = $this->parametrosForm($id,json_encode($campos),json_encode($tipos),json_encode($operadores));
-
         if (
             $request->getMethod() == 'POST'
             &&!empty($request->request->all()['parametrosForm']['filtro'])
@@ -179,7 +173,8 @@ class SentenciaController extends BaseController
             $operadoresLista = [1=>' = ', 2=>' != ' , 3=>' IN '];
             $filtroSQL=array();
             foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
-
+                $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['operador']];
+                $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
                 if(
                     empty($campos[$filtro['campo']])
                     ||empty($operadores[$filtro['campo']][$filtro['operador']])
@@ -193,7 +188,6 @@ class SentenciaController extends BaseController
                         'mensajes' => $this->getMensajes()
                     );
                 }
-
                 if(empty($operadores[$filtro['campo']][$filtro['operador']])){
                     $this->setMensajes('No existe el operador');
                     return array(
@@ -203,7 +197,6 @@ class SentenciaController extends BaseController
                         'mensajes' => $this->getMensajes()
                     );
                 }
-
                 $filtroSQLPart=array();
                 if(isset($tipos[$filtro['campo']][1])){
                     $filtroSQLPart[0]='UPPER(';
@@ -264,7 +257,6 @@ class SentenciaController extends BaseController
                 }
                 $filtroSQL[$nroFiltro]=implode('',$filtroSQLPart);
             endforeach;
-            //echo (implode(' AND ',$filtroSQL));
         }
         return array(
             'entity' => $entity,
