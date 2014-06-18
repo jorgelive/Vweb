@@ -171,6 +171,7 @@ class ProcesoController extends BaseController
         $archivoInfo->setParametrosReader($tablaSpecs,$columnaspecs);
         $archivoInfo->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20']);
         $archivoInfo->setDescartarBlanco(true);
+
         if(!$archivoInfo->parseExcel()){
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
@@ -193,6 +194,39 @@ class ProcesoController extends BaseController
             $this->setMensajes('No existe ningun proveedor de los ingresados');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
+
+        $archivoInfoRaw=$archivoInfo->getExistentesRaw();
+
+        if(!empty($archivoInfoRaw)){
+            array_walk_recursive($archivoInfoRaw,[$this,'setStack'],['fechas','FECHA','FECHA_DOCUMENTO']);
+        }
+
+        $fechasDocumento=$this->getStack('fechas');
+
+        $fechasInfo=$this->container->get('gopro_dbproceso_comun_proceso');
+        $fechasInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
+        $fechasInfo->setTabla('TIPO_CAMBIO_EXACTUS');
+        $fechasInfo->setSchema('RESERVAS');
+        $fechasInfo->setCamposSelect([
+            'TIPO_CAMBIO',
+            'FECHA',
+            'MONTO',
+        ]);
+
+        if(!empty($this->getStack('fechas'))){
+            $fechasInfo->setQueryVariables($this->getStack('fechas'),'whereSelect',['FECHA'=>'exceldate']);
+            $fechasInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
+            if(!$fechasInfo->ejecutarSelectQuery()||empty($fechasInfo->getExistentesRaw())){
+                $this->setMensajes($archivoInfo->getMensajes());
+                $this->setMensajes($fechasInfo->getMensajes());
+                $this->setMensajes('No existe ninguno de los files en la lista');
+                return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+            }
+        }
+
+        print_r($fechasInfo->getExistentesIndizados());
+
 
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
 
@@ -275,7 +309,11 @@ class ProcesoController extends BaseController
             $resultado[$nroLinea]['DOCUMENTO']=$dataCP[$nroLinea]['DOCUMENTO'];
             $resultado[$nroLinea]['FECHA_DOCUMENTO']=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
             $resultado[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
-            $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
+            if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
+                $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'].' '.$dataCP[$nroLinea]['APLICACION'];
+            }else{
+                $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
+            }
             $resultado[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
             if(empty($dataCP[$nroLinea]['DIFERIDO'])){
                 $resultado[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
@@ -357,6 +395,9 @@ class ProcesoController extends BaseController
 
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
+                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
+                    $resultado[$nroLinea]['APLICACION']=$file['CENTRO_COSTO'].' '.$resultado[$nroLinea]['APLICACION'];
+                }
                 $resultado[$nroLinea]['FILE'.$i]=$nroFile;
                 if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
                     $file['CENTRO_COSTO']='0.00.00.00';
@@ -454,7 +495,7 @@ class ProcesoController extends BaseController
         $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
         $archivoGenerado->setCeldas($celdas);
         $archivoGenerado->setArchivoGenerado();
-        return $archivoGenerado->getArchivoGenerado();
+        //return $archivoGenerado->getArchivoGenerado();
     }
 
     /*

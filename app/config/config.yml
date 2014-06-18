@@ -213,8 +213,9 @@ sonata_user:
             class:          Gopro\UserBundle\Admin\UserAdmin
             controller:     SonataAdminBundle:CRUD
             translation:    SonataUserBundle
-#services:
-#    fixUser.listener:
-#        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
-#        tags:
-#            - { name: doctrine.event_listener, event: postConnect }
+
+services:
+    nls.set:
+        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
+        tags:
+            - { name: doctrine.event_listener, event: postConnect, connection: vipac }

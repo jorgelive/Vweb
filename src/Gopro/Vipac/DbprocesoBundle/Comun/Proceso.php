@@ -23,6 +23,7 @@ class Proceso extends ContainerAware{
     private $llaves;
 
     //valores temporales por fila
+    private $whereCustom;
     private $whereUpdateValores;
     private $whereUpdatePh;
     private $valoresUpdateValores;
@@ -56,6 +57,15 @@ class Proceso extends ContainerAware{
 
     public function getConexion(){
         return $this->conexion;
+    }
+
+    public function getWhereCustom(){
+        return $this->whereCustom;
+    }
+
+    public function setWhereCustom($whereCustom){
+        $this->whereCustom=$whereCustom;
+        return $this;
     }
 
     public function getWhereSelectValores(){
@@ -281,7 +291,7 @@ class Proceso extends ContainerAware{
         return $statement;
     }
 
-    public function setQueryVariables($informacion,$tipo='whereSelect'){
+    public function setQueryVariables($informacion,$tipo='whereSelect',$parametros=array()){
         if(empty($informacion)){
             $this->setMensajes('No existe informacion para definir las condiciones');
             return false;
@@ -290,23 +300,52 @@ class Proceso extends ContainerAware{
         foreach($informacion as $key => $valor):
             if(is_array($valor)&&($tipo!='valoresUpdate'||$tipo!='valoresInsert'||$tipo!='camposInsert'|| $tipo=='camposselect')){
                 foreach($valor as $subKey => $subValor):
-                    $procesoPh[$key][]=$subKey.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28);
+                    if(isset($parametros[$subKey])){
+                        if($parametros[$subKey]=='exceldate'){
+                            $modif[0]='trunc(';
+                            $modif[1]=')';
+                            $modif[2]='to_date(';
+                            $modif[3]=",'yyyy-mm-dd')";
+                            $subValor = date('Y-m-d', mktime(0,0,0,1,$subValor-1,1900));
+                        }else{
+                            $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
+                        }
+                    }else{
+                        $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
+                    }
+                    $procesoPh[$key][]=$modif[0].$subKey.$modif[1].' = '.$modif[2].':'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28).$modif[3];
                     $procesoValor[$key]['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
                     $selectKeys[]=$subKey;
                 endforeach;
-            }elseif(is_array($valor)&&($tipo=='valoresUpdate'||$tipo=='valoresInsert'||$tipo!='camposInsert' || $tipo=='camposselect')){
-                $this->setMensajes('El valor ingresado para "insert" o "act" no puede ser procesado');
+            }elseif(is_array($valor)&&($tipo=='valoresUpdate'||$tipo=='valoresInsert'||$tipo!='camposInsert'||$tipo=='camposselect')){
+                $this->setMensajes('El valor ingresado para "valores" o "campos" no puede ser procesado');
                 return false;
             }else{
                 if($tipo=='camposInsert' || $tipo=='camposselect'){
                     $procesoValor=$valor;
-                }elseif($tipo=='valoresUpdate' || $tipo=='whereUpdate'){ //todo quitar el whereupdate para el generico (comparacion con substr/sha)
+                }elseif($tipo=='valoresUpdate'){
                     $procesoPh[]=$key.'= :'.$key;
+                    $procesoValor[$key]=$valor;
+                }elseif($tipo=='whereUpdate'){ //todo quitar el whereupdate para el generico (comparacion con substr/sha)
+                    if(isset($parametros[$key])){
+                        if($parametros[$key]=='exceldate'){
+                            $modif[0]='trunc(';
+                            $modif[1]=')';
+                            $modif[2]='to_date(';
+                            $modif[3]=",'yyyy-mm-dd')";
+                            $valor = date('Y-m-d', mktime(0,0,0,1,$valor-1,1900));
+                        }else{
+                            $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
+                        }
+                    }else{
+                        $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
+                    }
+                    $procesoPh[]=$modif[0].$key.$modif[1].' = '.$modif[2].':'.$key.$modif[3];
                     $procesoValor[$key]=$valor;
                 }elseif($tipo=='valoresInsert'){
                     $procesoPh[]=':'.$key;
                     $procesoValor[$key]=$valor;
-                }else{
+                }else{ //todo utilizar esta condicion
                     $procesoPh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28);
                     $procesoValor['v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
                     $selectKeys[]=$key;
@@ -349,7 +388,9 @@ class Proceso extends ContainerAware{
             return false;
         }
         $selectQuery='SELECT '.implode(', ',$this->getCamposSelect()).' FROM '.$this->getSchema().'.'.$this->getTabla().' WHERE '.$this->getSerializedPhString($this->getWhereSelectPh());
-
+        if(!empty($this->getWhereCustom())){
+            $selectQuery=$selectQuery.' AND '.$this->getWhereCustom();
+        }
         $statement = $this->getConexion()->prepare($selectQuery);
         $statement=$this->bindValues($statement,$this->getWhereSelectValores());
         if(!$statement->execute()){

@@ -306,10 +306,17 @@ class Archivo extends ContainerAware{
                                 endforeach;
                             }
                             if($valorArray[0]=='proceso'&&$valorArray[1]=='no'&&isset($this->validCols[$col])&&$this->validCols[$col]!='noProcess'){
-                                $encontrado=array_search($this->columnaSpecs[$this->validCols[$col]]['nombre'], $this->tablaSpecs['columnasProceso'],true);
-                                if($encontrado!==false){
-                                    unset($this->tablaSpecs['columnasProceso'][$encontrado]);
+                                if(preg_match("/-/i", $this->validCols[$col])){
+                                    $nombres=explode('-',$this->validCols[$col]);
+                                }else{
+                                    $nombres=array($this->validCols[$col]);
                                 }
+                                foreach($nombres as $nombre):
+                                    $encontrado=array_search($this->columnaSpecs[$nombre]['nombre'], $this->tablaSpecs['columnasProceso'],true);
+                                    if($encontrado!==false){
+                                        unset($this->tablaSpecs['columnasProceso'][$encontrado]);
+                                    }
+                                endforeach;
                             }
                         }
                     }
@@ -331,7 +338,7 @@ class Archivo extends ContainerAware{
                         }
                         foreach($value as $key => $parteValor):
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
-                                $parteValor = date('d/m/Y', mktime(0,0,0,1,$parteValor-1,1900));
+                                $parteValor = date('Y-m-d', mktime(0,0,0,1,$parteValor-1,1900));
                             }
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);

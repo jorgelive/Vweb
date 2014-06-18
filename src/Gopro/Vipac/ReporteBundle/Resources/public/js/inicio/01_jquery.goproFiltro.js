@@ -45,14 +45,12 @@ $.fn.filtro = function() {
             return false;
         }
 
-        var filtroAplicado=JSON.parse(filtroForm.find('#'+formName+'_filtroaplicado').val())
+        var filtroAplicado=JSON.parse(filtroForm.find('#'+formName+'_filtroaplicado').val());
         for (var key in filtroAplicado)
         {
             agregarFila(filtroAplicado[key].campo,filtroAplicado[key].operador,filtroAplicado[key].valor);
         }
-
-        //console.log(filtroAplicado);
-    })
+    });
 
     var agregarFila=function(currentCampo,currentOperador,currentValor){
 
@@ -60,39 +58,45 @@ $.fn.filtro = function() {
         var fila=el.filtroTable.find('tr[data-id='+row.id+']');
         fila.find('a.borrarFiltro').button().click(function() {
             $(this).closest('tr').remove();
-        })
+        });
         var selectCampos=fila.find('td.campo select');
         var opcionesCampos=selectCampos.prop('options')
         var selectOperadores=fila.find('td.operador select');
         var opcionesOperadores=selectOperadores.prop('options');
-        var valorInput=fila.find('td.valor input')
-        if(typeof currentCampo !== 'undefined'){
-            selectCampos.val(currentCampo);
-            console.log(selectCampos.val());
-        };
+        var inputValor=fila.find('td.valor input')
+
         $.each(row.campos, function(id, texto) {
             opcionesCampos[opcionesCampos.length] = new Option(texto, id);
         });
+
         selectCampos.change(function(){
             $('option', selectOperadores).remove();
             var selected=$(this).val();
-            //console.log(row.operadores[selected]);
             if(typeof row.operadores[selected] === 'undefined'){
                 return false;
-            };
+            }
             $.each(row.operadores[selected], function(id, texto) {
                 opcionesOperadores[opcionesOperadores.length] = new Option(texto, id);
-            })
-            valorInput.val('');
+            });
+            if(typeof currentOperador !== 'undefined'){
+                selectOperadores.val(currentOperador);
+                currentOperador='';
+            }
+            inputValor.val('');
+            if(typeof currentValor !== 'undefined'){
+                inputValor.val(currentValor);
+                currentValor='';
+            }
+
             if(typeof row.tipos[selected] === 'undefined'){
                 return false;
-            };
+            }
             $.each(row.tipos[selected], function(id, texto) {
                 switch(id) {
                     case '3':
-                        valorInput.prop("type", "date");
+                        inputValor.prop("type", "date");
                         if (!Modernizr.inputtypes.date) {
-                            valorInput.datepicker({
+                            inputValor.datepicker({
                                 changeMonth: true,
                                 changeYear: true,
                                 dateFormat: 'yy-mm-dd ',
@@ -101,22 +105,26 @@ $.fn.filtro = function() {
                         }
                         break;
                     case '2':
-                        valorInput.prop("type", "number");
+                        inputValor.prop("type", "number");
                         if (!Modernizr.inputtypes.date) {
-                            valorInput.datepicker("destroy").removeClass("hasDatepicker").removeAttr('id');
+                            inputValor.datepicker("destroy").removeClass("hasDatepicker").removeAttr('id');
                         }
                         break;
                     default:
-                        valorInput.prop("type", "text");
+                        inputValor.prop("type", "text");
                         if (!Modernizr.inputtypes.date) {
-                            valorInput.datepicker("destroy").removeClass("hasDatepicker").removeAttr('id');
+                            inputValor.datepicker("destroy").removeClass("hasDatepicker").removeAttr('id');
                         }
                 }
 
             })
 
-        })
+        });
         row.id=row.id+1;
+        if(typeof currentCampo !== 'undefined'){
+            selectCampos.val(currentCampo);
+            selectCampos.trigger("change");
+        }
     }
 };
 

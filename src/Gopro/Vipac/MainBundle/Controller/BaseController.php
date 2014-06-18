@@ -108,6 +108,11 @@ class BaseController extends Controller
             $this->stack[$vars][]=$valor;
             return true;
         }elseif(is_array($vars)&&count($vars)==2){
+
+            $this->stack[$vars[0]][][$vars[1]]=$valor;
+            return true;
+        }elseif(is_array($vars)&&count($vars)==3&&$key==$vars[2]){
+
             $this->stack[$vars[0]][][$vars[1]]=$valor;
             return true;
         }

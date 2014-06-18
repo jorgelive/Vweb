@@ -20,6 +20,24 @@ class SentenciaController extends BaseController
 {
 
     private $valoresBind;
+
+    /**
+     * @return array
+     */
+    private function getValoresBind(){
+        return $this->valoresBind;
+    }
+
+    /**
+     * @param string $campo
+     * @param string $valor
+     * @return string
+     */
+    private function setValoresBind($campo,$valor){
+        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
+        return ':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28);
+    }
+
     /**
      * @param string $sql
      *
@@ -127,16 +145,6 @@ class SentenciaController extends BaseController
     }
 
     /**
-     * @param string $campo
-     * @param string $valor
-     * @return string
-     */
-    private function setValoresBind($campo,$valor){
-        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
-        return ':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28);
-    }
-
-    /**
      * Finds and displays a Sentencia entity.
      *
      * @Route("/{id}", name="sentencia_show")
@@ -152,11 +160,14 @@ class SentenciaController extends BaseController
         }
         $deleteForm = $this->createDeleteForm($id);
         $campos=array();
+        $camposMostrar=array();
         $tipos=array();
+        $operadores=array();
         if(!empty($entity->getCampos())){
             foreach ($entity->getCampos() as $campoEntity):
                 if(!empty($campoEntity->getTipo())&&!empty($campoEntity->getTipo()->getOperadores())){
                         $campos[$campoEntity->getId()]=$campoEntity->getNombre();
+                        $camposMostrar[$campoEntity->getId()]=$campoEntity->getNombremostrar();
                         $tipos[$campoEntity->getId()][$campoEntity->getTipo()->getId()]=$campoEntity->getTipo()->getNombre();
                         foreach ($campoEntity->getTipo()->getOperadores() as $operadorEntity):
                             $operadores[$campoEntity->getId()][$operadorEntity->getId()]=$operadorEntity->getNombre();
@@ -164,7 +175,17 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
-        $parametrosForm = $this->parametrosForm($id,json_encode($campos),json_encode($tipos),json_encode($operadores));
+        $limite=100;
+        $destino=null;
+        if(!empty($request->request->all()['parametrosForm']['limite'])){
+            $limite=$request->request->all()['parametrosForm']['limite'];
+        }
+
+        if(!empty($request->request->all()['parametrosForm']['destino'])){
+            $destino=$request->request->all()['parametrosForm']['destino'];
+        }
+
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposMostrar),json_encode($tipos),json_encode($operadores),$destino,$limite);
         if (
             $request->getMethod() == 'POST'
             &&!empty($request->request->all()['parametrosForm']['filtro'])
@@ -173,14 +194,12 @@ class SentenciaController extends BaseController
             $operadoresLista = [1=>' = ', 2=>' != ' , 3=>' IN '];
             $filtroSQL=array();
             foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
-                $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['operador']];
-                $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
                 if(
                     empty($campos[$filtro['campo']])
                     ||empty($operadores[$filtro['campo']][$filtro['operador']])
                     ||empty($filtro['valor'])
                 ){
-                    $this->setMensajes('No pueden quedar campos vacios');
+                    $this->setMensajes('No pueden quedar campos vacios en los filtros o los filtros son inválidos');
                     return array(
                         'entity' => $entity,
                         'parametros_form'  => $parametrosForm->createView(),
@@ -188,6 +207,10 @@ class SentenciaController extends BaseController
                         'mensajes' => $this->getMensajes()
                     );
                 }
+                $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
+                $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
+
+
                 if(empty($operadores[$filtro['campo']][$filtro['operador']])){
                     $this->setMensajes('No existe el operador');
                     return array(
@@ -257,11 +280,31 @@ class SentenciaController extends BaseController
                 }
                 $filtroSQL[$nroFiltro]=implode('',$filtroSQLPart);
             endforeach;
+            $limiteSQL=$this->setValoresBind('limite',$limite);
+            $selectQuery = 'select * from ( '.$entity->getContenido().' AND '.implode(' AND ',$filtroSQL).' ) WHERE ROWNUM <= '.$limiteSQL;
+            $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
+
+            foreach($this->getValoresBind() as $campoBind => $valorBind ):
+                $statement->bindValue($campoBind,$valorBind);
+            endforeach;
+            if(!$statement->execute()){
+                $this->setMensajes('Hubo un error en la ejecucion de la consulta');
+                return array(
+                    'entity' => $entity,
+                    'parametros_form'  => $parametrosForm->createView(),
+                    'delete_form' => $deleteForm->createView(),
+                    'mensajes' => $this->getMensajes()
+                );
+            }
+            $existentesRaw=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
+            print_r($selectQuery);
+            print_r($existentesRaw);
         }
         return array(
             'entity' => $entity,
             'parametros_form'  => $parametrosForm->createView(),
             'delete_form' => $deleteForm->createView(),
+            'mensajes' => $this->getMensajes()
         );
     }
 
@@ -270,10 +313,16 @@ class SentenciaController extends BaseController
      * @param array $campos
      * @param array $tipos
      * @param array $operadores
+     * @param string $destino
+     * @param int $limite
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos,$tipos,$operadores)
+    private function parametrosForm($id,$campos,$tipos,$operadores,$destino=null,$limite=null)
     {
+        $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
+        $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
+        $limiteChOp = array(500=>'500',1000=>'1000',5000=>'5000');
+        $limiteCh=array('choices'=>$limiteChOp,'multiple'=>false,'expanded'=>false,'label'=>'Límite','data'=>$limite);
         return $this->get('form.factory')->createNamedBuilder(
             'parametrosForm',
             'form',
@@ -287,6 +336,8 @@ class SentenciaController extends BaseController
             ->add('campos', 'hidden', array('data' => $campos))
             ->add('tipos', 'hidden', array('data' => $tipos))
             ->add('operadores', 'hidden', array('data' => $operadores))
+            ->add('destino', 'choice', $destinoCh)
+            ->add('limite', 'choice', $limiteCh)
             ->add('submit', 'submit', array('label' => 'Generar'))
             ->getForm();
     }
