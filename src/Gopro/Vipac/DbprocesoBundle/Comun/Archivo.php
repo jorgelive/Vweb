@@ -161,11 +161,10 @@ class Archivo extends ContainerAware{
     }
 
     public function setParametrosReader($setTablaSpecs,$setColumnaSpecs){
-        if(is_null($this->getArchivoValido())||is_null($this->getArchivoValido()->getAbsolutePath())){
+        if(empty($this->getArchivoValido())){
             $this->setMensajes('El archivo no existe');
             return false;
         }
-        $this->archivo=$this->getArchivoValido()->getAbsolutePath();
         $this->setTableSpecs=$setTablaSpecs;
         $this->setColumnaSpecs=$setColumnaSpecs;
         if(!is_null($setTablaSpecs)&&!isset($setTablaSpecs['tipo'])){
@@ -207,10 +206,7 @@ class Archivo extends ContainerAware{
             $this->columnaSpecs=array();
             $this->validCols=array();
         }
-        $this->existentesRaw=array();
-        $this->existentesDescartados=array();
-        $this->mensajes=array();
-        $this->parsed='no';
+        return true;
     }
 
     public function parseExcel(){
@@ -221,15 +217,8 @@ class Archivo extends ContainerAware{
         }
         $this->parsed='si';
 
-        $fs = new Filesystem();
-
-        if(empty($this->archivo)||!$fs->exists($this->archivo)){
-            $this->setMensajes('El archivo no existe');
-            return false;
-        }
-
         $excelLoader = $this->container->get('phpexcel');
-        $objPHPExcel = $excelLoader->createPHPExcelObject($this->archivo);
+        $objPHPExcel = $excelLoader->createPHPExcelObject($this->getArchivoValido()->getAbsolutePath());
         $total_sheets=$objPHPExcel->getSheetCount();
         $allSheetName=$objPHPExcel->getSheetNames();
         $hoja = $objPHPExcel->setActiveSheetIndex(0);
@@ -338,7 +327,7 @@ class Archivo extends ContainerAware{
                         }
                         foreach($value as $key => $parteValor):
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
-                                $parteValor = date('Y-m-d', mktime(0,0,0,1,$parteValor-1,1900));
+                                $parteValor = $this->get('gopro_dbproceso_comun_variable')->exceldate($parteValor);
                             }
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
@@ -498,7 +487,11 @@ class Archivo extends ContainerAware{
 
     public function setArchivoGenerado(){
         $excelWriter = $this->container->get('phpexcel');
-        $phpExcelObject = $excelWriter->createPHPExcelObject();
+        if(!empty($this->getArchivoValido())){
+            $phpExcelObject = $excelWriter->createPHPExcelObject($this->getArchivoValido()->getAbsolutePath());
+        }else{
+            $phpExcelObject = $excelWriter->createPHPExcelObject();
+        }
         $phpExcelObject->getProperties()->setCreator("Viapac")
             ->setTitle("Documento Generado")
             ->setDescription("Documento generado para descargar");
@@ -593,16 +586,22 @@ class Archivo extends ContainerAware{
         return $this;
     }
 
-    public function validarArchivo($repositorio,$archivoEjecutar,$funcionArchivo){
+    public function validarArchivo($repositorio,$id,$funcionArchivo){
         $ejecutar=false;
-        if($archivoEjecutar!==null){
-            $archivoAlmacenado=$repositorio->find($archivoEjecutar);
+        if($id!==null){
+            $archivoAlmacenado=$repositorio->find($id);
+        }
+
+        if(!empty($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()==$funcionArchivo){
             $ejecutar=true;
         }
-        if($ejecutar===true&&(empty($archivoAlmacenado)||(!empty($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()!=$funcionArchivo))){
-            $this->setMensajes('El archivo no existe, o no es valido para el proceso');
-            $ejecutar=false;
-        }elseif($ejecutar===true){
+        $fs = new Filesystem();
+
+        if(empty($this->getArchivoValido()->getAbsolutePath())||!$fs->exists($this->getArchivoValido()->getAbsolutePath())){
+            $this->setMensajes('El archivo no existe');
+            return false;
+        }
+        if($ejecutar===true){
             $this->archivoValido=$archivoAlmacenado;
         }
         return $ejecutar;

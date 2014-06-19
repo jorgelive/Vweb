@@ -306,7 +306,7 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $subValor = date('Y-m-d', mktime(0,0,0,1,$subValor-1,1900));
+                            $subValor=$this->get('gopro_dbproceso_comun_variable')->exceldate($subValor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }
@@ -333,7 +333,7 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $valor = date('Y-m-d', mktime(0,0,0,1,$valor-1,1900));
+                            $valor = $this->get('gopro_dbproceso_comun_variable')->exceldate($valor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }

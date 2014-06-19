@@ -76,6 +76,16 @@ class Variable extends ContainerAware{
         return null;
     }
 
+    public function exceldate($variable,$tipo='from')
+    {
+        if($tipo=='from'){
+            return date('Y-m-d', mktime(0,0,0,1,$variable-1,1900));
+        }else{
+            return unixtojd(strtotime($variable)) - gregoriantojd(1, 1, 1900) + 2;
+        }
+
+    }
+
     public function is_multi_array($array) {
         return (count($array) != count($array, 1));
     }

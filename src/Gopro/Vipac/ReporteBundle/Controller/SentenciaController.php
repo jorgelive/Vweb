@@ -297,6 +297,7 @@ class SentenciaController extends BaseController
                 );
             }
             $existentesRaw=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
+
             print_r($selectQuery);
             print_r($existentesRaw);
         }

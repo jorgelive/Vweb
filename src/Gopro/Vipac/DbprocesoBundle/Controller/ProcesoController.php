@@ -219,15 +219,12 @@ class ProcesoController extends BaseController
                 $this->setMensajes($tcInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los files en la lista');
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
-
             }
         }
 
         foreach ($tcInfo->getExistentesIndizados() as $key => $value)
         {
-            $keyExcel = unixtojd(strtotime($key)) - gregoriantojd(1, 1, 1900) +2;
-            $tcInfoFormateado[$keyExcel] = $value;
-
+            $tcInfoFormateado[$this->get('gopro_dbproceso_comun_variable')->exceldate($key,'to')] = $value;
         }
 
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
