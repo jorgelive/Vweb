@@ -201,32 +201,34 @@ class ProcesoController extends BaseController
             array_walk_recursive($archivoInfoRaw,[$this,'setStack'],['fechas','FECHA','FECHA_DOCUMENTO']);
         }
 
-        $fechasDocumento=$this->getStack('fechas');
-
-        $fechasInfo=$this->container->get('gopro_dbproceso_comun_proceso');
-        $fechasInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
-        $fechasInfo->setTabla('TIPO_CAMBIO_EXACTUS');
-        $fechasInfo->setSchema('RESERVAS');
-        $fechasInfo->setCamposSelect([
+        $tcInfo=$this->container->get('gopro_dbproceso_comun_proceso');
+        $tcInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
+        $tcInfo->setTabla('TIPO_CAMBIO_EXACTUS');
+        $tcInfo->setSchema('RESERVAS');
+        $tcInfo->setCamposSelect([
             'TIPO_CAMBIO',
             'FECHA',
             'MONTO',
         ]);
 
         if(!empty($this->getStack('fechas'))){
-            $fechasInfo->setQueryVariables($this->getStack('fechas'),'whereSelect',['FECHA'=>'exceldate']);
-            $fechasInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
-            if(!$fechasInfo->ejecutarSelectQuery()||empty($fechasInfo->getExistentesRaw())){
+            $tcInfo->setQueryVariables($this->getStack('fechas'),'whereSelect',['FECHA'=>'exceldate']);
+            $tcInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
+            if(!$tcInfo->ejecutarSelectQuery()||empty($tcInfo->getExistentesRaw())){
                 $this->setMensajes($archivoInfo->getMensajes());
-                $this->setMensajes($fechasInfo->getMensajes());
+                $this->setMensajes($tcInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los files en la lista');
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
             }
         }
 
-        print_r($fechasInfo->getExistentesIndizados());
+        foreach ($tcInfo->getExistentesIndizados() as $key => $value)
+        {
+            $keyExcel = unixtojd(strtotime($key)) - gregoriantojd(1, 1, 1900) +2;
+            $tcInfoFormateado[$keyExcel] = $value;
 
+        }
 
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
 
@@ -266,7 +268,6 @@ class ProcesoController extends BaseController
         $resultado=array();
         $celdas=array();
 
-
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
             $dataCP[$nroLinea]=$linea;
 
@@ -293,7 +294,6 @@ class ProcesoController extends BaseController
             }else{
                 $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','CENTRO_COSTO'=>'0.00.00.00','MERCADO'=>'ND','PAIS_FILE'=>'ND','NUM_PAX'=>1]];
             }
-
 
             $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
             if(empty($dataCP[$nroLinea]['RUBROS'])){
@@ -366,33 +366,41 @@ class ProcesoController extends BaseController
                 $resultado[$nroLinea]['RUBRO6']='';
             }
 
-            if ($this->getUser()->hasGroup('Cusco')) {
+            if($this->getUser()->hasGroup('Cusco')) {
                 $resultado[$nroLinea]['RUBRO7']='CUZCO';
                 $mercadoSufijo='.CU.OP';
             }else{
                 $resultado[$nroLinea]['RUBRO7']='LIMA';
                 $mercadoSufijo='.LI.OP';
             }
-            if (!empty($dataCP[$nroLinea]['VOUCHER'])) {
+            if(!empty($dataCP[$nroLinea]['VOUCHER'])) {
                 $resultado[$nroLinea]['RUBRO8']=$dataCP[$nroLinea]['VOUCHER'];
             }else{
                 $resultado[$nroLinea]['RUBRO8']='N';
             }
-            if (($dataCP[$nroLinea]['MONTO']>=700&&$resultado[$nroLinea]['TIPO']!='RHP')||$dataCP[$nroLinea]['MONTO']>1500) {
+            if(!empty($tcInfoFormateado[$dataCP[$nroLinea]['FECHA_CONTABLE']])&&$dataCP[$nroLinea]['MONEDA']=='USD'){
+                $montoSoles=$tcInfoFormateado[$dataCP[$nroLinea]['FECHA_CONTABLE']]['MONTO']*$dataCP[$nroLinea]['MONTO'];
+            }elseif($dataCP[$nroLinea]['MONEDA']=='USD'){
+                $montoSoles=0;
+                $this->setMensajes('El tipo de cambio para la fecha contable de la linea: '.($nroLinea+1).', no existe');
+                $generarExcel=false;
+            }else{
+                $montoSoles=$dataCP[$nroLinea]['MONTO'];
+            }
+            if(($montoSoles>=700&&$resultado[$nroLinea]['TIPO']!='RHP')||$montoSoles>1500) {
                 $resultado[$nroLinea]['RUBRO10']=$dataCP[$nroLinea]['CONDICIONES']['retencion'];
                 $resultado[$nroLinea]['RETENCION']=$dataCP[$nroLinea]['CONDICIONES']['codretencion'];
             }else{
                 $resultado[$nroLinea]['RUBRO10']='';
                 $resultado[$nroLinea]['RETENCION']='';
             }
-            if (!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
+            if(!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
                 $resultado[$nroLinea]['TIPO_REFERENCIA']='FAC';
                 $resultado[$nroLinea]['DOC_REFERENCIA']=$dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
             }else{
                 $resultado[$nroLinea]['TIPO_REFERENCIA']='';
                 $resultado[$nroLinea]['DOC_REFERENCIA']='';
             }
-
             $i=1;
             foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
                 if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
@@ -495,7 +503,7 @@ class ProcesoController extends BaseController
         $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
         $archivoGenerado->setCeldas($celdas);
         $archivoGenerado->setArchivoGenerado();
-        //return $archivoGenerado->getArchivoGenerado();
+        return $archivoGenerado->getArchivoGenerado();
     }
 
     /*
