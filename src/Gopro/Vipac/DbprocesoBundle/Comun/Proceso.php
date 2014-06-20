@@ -296,6 +296,9 @@ class Proceso extends ContainerAware{
             $this->setMensajes('No existe informacion para definir las condiciones');
             return false;
         }
+        $procesoPh=array();
+        $procesoValor=array();
+        $selectKeys=array();
 
         foreach($informacion as $key => $valor):
             if(is_array($valor)&&($tipo!='valoresUpdate'||$tipo!='valoresInsert'||$tipo!='camposInsert'|| $tipo=='camposselect')){
@@ -306,7 +309,7 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $subValor=$this->get('gopro_dbproceso_comun_variable')->exceldate($subValor);
+                            $subValor=$this->container->get('gopro_dbproceso_comun_variable')->exceldate($subValor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }
@@ -333,7 +336,7 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $valor = $this->get('gopro_dbproceso_comun_variable')->exceldate($valor);
+                            $valor = $this->container->get('gopro_dbproceso_comun_variable')->exceldate($valor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }
@@ -352,7 +355,7 @@ class Proceso extends ContainerAware{
                 }
             }
         endforeach;
-        if(!isset($procesoPh)||!isset($procesoValor)){
+        if(empty($procesoPh)||empty($procesoValor)){
             $this->setMensajes('No existe informacion para definir las condiciones');
             return false;
         }

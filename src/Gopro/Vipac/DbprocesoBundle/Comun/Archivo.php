@@ -48,6 +48,11 @@ class Archivo extends ContainerAware{
         return $this->columnaSpecs;
     }
 
+    public function setArchivoValido($archivoValido){
+        $this->archivoValido=$archivoValido;
+        return $this;
+    }
+
     public function getArchivoValido(){
         return $this->archivoValido;
     }
@@ -327,7 +332,7 @@ class Archivo extends ContainerAware{
                         }
                         foreach($value as $key => $parteValor):
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
-                                $parteValor = $this->get('gopro_dbproceso_comun_variable')->exceldate($parteValor);
+                                $parteValor = $this->container->get('gopro_dbproceso_comun_variable')->exceldate($parteValor);
                             }
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
@@ -593,11 +598,12 @@ class Archivo extends ContainerAware{
         }
 
         if(!empty($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()==$funcionArchivo){
+            $this->setArchivoValido($archivoAlmacenado);
             $ejecutar=true;
         }
         $fs = new Filesystem();
 
-        if(empty($this->getArchivoValido()->getAbsolutePath())||!$fs->exists($this->getArchivoValido()->getAbsolutePath())){
+        if(!is_object($this->getArchivoValido())||empty($this->getArchivoValido()->getAbsolutePath())||!$fs->exists($this->getArchivoValido()->getAbsolutePath())){
             $this->setMensajes('El archivo no existe');
             return false;
         }

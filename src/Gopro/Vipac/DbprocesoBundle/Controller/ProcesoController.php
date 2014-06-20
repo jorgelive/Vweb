@@ -257,17 +257,13 @@ class ProcesoController extends BaseController
 
             }
         }
-
         $generarExcel=true;
-
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Doccptipo tipo INDEX BY tipo.id");
         $docCpTipos = $query->getArrayResult();
         $resultado=array();
         $celdas=array();
-
         foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
             $dataCP[$nroLinea]=$linea;
-
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
                 $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
             }
@@ -375,11 +371,12 @@ class ProcesoController extends BaseController
             }else{
                 $resultado[$nroLinea]['RUBRO8']='N';
             }
-            if(!empty($tcInfoFormateado[$dataCP[$nroLinea]['FECHA_CONTABLE']])&&$dataCP[$nroLinea]['MONEDA']=='USD'){
-                $montoSoles=$tcInfoFormateado[$dataCP[$nroLinea]['FECHA_CONTABLE']]['MONTO']*$dataCP[$nroLinea]['MONTO'];
+
+            if(!empty($tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']])&&$dataCP[$nroLinea]['MONEDA']=='USD'){
+                $montoSoles=$tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']]['MONTO']*$dataCP[$nroLinea]['MONTO'];
             }elseif($dataCP[$nroLinea]['MONEDA']=='USD'){
                 $montoSoles=0;
-                $this->setMensajes('El tipo de cambio para la fecha contable de la linea: '.($nroLinea+1).', no existe');
+                $this->setMensajes('El tipo de cambio para la fecha contable '.$this->get('gopro_dbproceso_comun_variable')->exceldate($dataCP[$nroLinea]['FECHA_DOCUMENTO'],'from').' de la linea: '.($nroLinea+1).', no existe');
                 $generarExcel=false;
             }else{
                 $montoSoles=$dataCP[$nroLinea]['MONTO'];
@@ -420,9 +417,12 @@ class ProcesoController extends BaseController
                     $montoProcesado=0;
                     if($i<count($dataCP[$nroLinea]['FILES'])){
 
-                        if(!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
+                        if(!empty($file['NUM_PAX'])&&!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
                             $montoProcesado=round($montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'],2);
                             $this->setCantidadTotal($montoProcesado,null,[$nombreRubro,null]);
+                        }elseif(empty($file['NUM_PAX'])){
+                            $this->setMensajes('El numero de pasajeros del file : '.$nroFile.', en la linea: '.($nroLinea+1).', tiene un error.');
+                            $generarExcel=false;
                         }
                     }else{
                         $montoProcesado=$montoRubro-$this->getCantidadTotal($nombreRubro);
@@ -922,6 +922,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
+        $fusion=array();
         foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
             if (!array_key_exists($key, $existente)) {
                 $existente[$key]['mensaje']='No se encuentra en la BD';
