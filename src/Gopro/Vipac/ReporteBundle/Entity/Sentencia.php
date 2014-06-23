@@ -46,9 +46,27 @@ class Sentencia
     private $contenido;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Area")
+     * @var datetime $creado
+     *
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
      */
-    protected $area;
+    private $creado;
+
+    /**
+     * @var datetime $modificado
+     *
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $modificado;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
+     * @ORM\JoinTable(name="rep_sentencias_areas")
+     *
+     */
+    protected $areas;
 
     /**
      * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist","remove"})
@@ -57,6 +75,7 @@ class Sentencia
 
     public function __construct() {
         $this->campos = new ArrayCollection();
+        $this->areas = new ArrayCollection();
     }
 
     public function __toString()
@@ -145,6 +164,85 @@ class Sentencia
     }
 
     /**
+     * Set creado
+     *
+     * @param \DateTime $creado
+     * @return Sentencia
+     */
+    public function setCreado($creado)
+    {
+        $this->creado = $creado;
+
+        return $this;
+    }
+
+    /**
+     * Get creado
+     *
+     * @return \DateTime 
+     */
+    public function getCreado()
+    {
+        return $this->creado;
+    }
+
+    /**
+     * Set modificado
+     *
+     * @param \DateTime $modificado
+     * @return Sentencia
+     */
+    public function setModificado($modificado)
+    {
+        $this->modificado = $modificado;
+
+        return $this;
+    }
+
+    /**
+     * Get modificado
+     *
+     * @return \DateTime 
+     */
+    public function getModificado()
+    {
+        return $this->modificado;
+    }
+
+    /**
+     * Add areas
+     *
+     * @param \Gopro\UserBundle\Entity\Area $areas
+     * @return Sentencia
+     */
+    public function addArea(\Gopro\UserBundle\Entity\Area $areas)
+    {
+        $this->areas[] = $areas;
+
+        return $this;
+    }
+
+    /**
+     * Remove areas
+     *
+     * @param \Gopro\UserBundle\Entity\Area $areas
+     */
+    public function removeArea(\Gopro\UserBundle\Entity\Area $areas)
+    {
+        $this->areas->removeElement($areas);
+    }
+
+    /**
+     * Get areas
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getAreas()
+    {
+        return $this->areas;
+    }
+
+    /**
      * Add campos
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campos
@@ -176,28 +274,4 @@ class Sentencia
     {
         return $this->campos;
     }
-
-    /**
-     * Set area
-     *
-     * @param \Gopro\UserBundle\Entity\Area $area
-     * @return Sentencia
-     */
-    public function setArea(\Gopro\UserBundle\Entity\Area $area = null)
-    {
-        $this->area = $area;
-
-        return $this;
-    }
-
-    /**
-     * Get area
-     *
-     * @return \Gopro\UserBundle\Entity\Area
-     */
-    public function getArea()
-    {
-        return $this->area;
-    }
-
 }

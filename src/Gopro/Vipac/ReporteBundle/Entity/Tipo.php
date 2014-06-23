@@ -32,6 +32,22 @@ class Tipo
     private $nombre;
 
     /**
+     * @var datetime $creado
+     *
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $creado;
+
+    /**
+     * @var datetime $modificado
+     *
+     * @Gedmo\Timestampable(on="update")
+     * @ORM\Column(type="datetime")
+     */
+    private $modificado;
+
+    /**
      * @ORM\OneToMany(targetEntity="Campo", mappedBy="tipo", cascade={"persist"})
      */
     private $campos;
@@ -44,6 +60,7 @@ class Tipo
 
     public function __construct() {
         $this->operadores = new ArrayCollection();
+        $this->campos = new ArrayCollection();
     }
 
     public function __toString()
@@ -82,6 +99,52 @@ class Tipo
     public function getNombre()
     {
         return $this->nombre;
+    }
+
+    /**
+     * Set creado
+     *
+     * @param \DateTime $creado
+     * @return Tipo
+     */
+    public function setCreado($creado)
+    {
+        $this->creado = $creado;
+
+        return $this;
+    }
+
+    /**
+     * Get creado
+     *
+     * @return \DateTime
+     */
+    public function getCreado()
+    {
+        return $this->creado;
+    }
+
+    /**
+     * Set modificado
+     *
+     * @param \DateTime $modificado
+     * @return Tipo
+     */
+    public function setModificado($modificado)
+    {
+        $this->modificado = $modificado;
+
+        return $this;
+    }
+
+    /**
+     * Get modificado
+     *
+     * @return \DateTime
+     */
+    public function getModificado()
+    {
+        return $this->modificado;
     }
 
     /**

@@ -1,20 +1,20 @@
 <?php
 
-namespace Gopro\Vipac\ReporteBundle\Entity;
+namespace Gopro\InventarioBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\ArrayCollection;
 
 
 /**
- * Campo
+ * Mantenimientoestado
  *
- * @ORM\Table(name="rep_operador")
+ * @ORM\Table(name="inv_mantenimientoestado")
  * @ORM\Entity
  */
-class Operador
+class Mantenimientoestado
 {
     /**
      * @var integer
@@ -27,10 +27,12 @@ class Operador
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="nombre", type="string", length=100)
      * @Assert\NotBlank
-     * @ORM\Column(name="nombre", type="string", length=50)
      */
     private $nombre;
+
 
     /**
      * @var datetime $creado
@@ -49,17 +51,12 @@ class Operador
     private $modificado;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Tipo", mappedBy="operadores")
+     * @ORM\OneToMany(targetEntity="Mantenimiento", mappedBy="mantenimientoestado", cascade={"persist"})
      */
-    private $tipos;
+    private $mantenimientos;
 
     public function __construct() {
-        $this->tipos = new ArrayCollection();
-    }
-
-    public function __toString()
-    {
-        return $this->nombre;
+        $this->mantenimientos = new ArrayCollection();
     }
 
 
@@ -77,7 +74,7 @@ class Operador
      * Set nombre
      *
      * @param string $nombre
-     * @return Operador
+     * @return Mantenimientoestado
      */
     public function setNombre($nombre)
     {
@@ -100,7 +97,7 @@ class Operador
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Operador
+     * @return Mantenimientoestado
      */
     public function setCreado($creado)
     {
@@ -112,7 +109,7 @@ class Operador
     /**
      * Get creado
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getCreado()
     {
@@ -123,7 +120,7 @@ class Operador
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Operador
+     * @return Mantenimientoestado
      */
     public function setModificado($modificado)
     {
@@ -135,7 +132,7 @@ class Operador
     /**
      * Get modificado
      *
-     * @return \DateTime
+     * @return \DateTime 
      */
     public function getModificado()
     {
@@ -143,35 +140,43 @@ class Operador
     }
 
     /**
-     * Add tipos
+     * Add mantenimientos
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos
-     * @return Operador
+     * @param \Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos
+     * @return Mantenimientoestado
      */
-    public function addTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos)
+    public function addMantenimiento(\Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos)
     {
-        $this->tipos[] = $tipos;
+        $this->mantenimientos[] = $mantenimientos;
 
         return $this;
     }
 
     /**
-     * Remove tipos
+     * Remove mantenimientos
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos
+     * @param \Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos
      */
-    public function removeTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos)
+    public function removeMantenimiento(\Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos)
     {
-        $this->tipos->removeElement($tipos);
+        $this->mantenimientos->removeElement($mantenimientos);
     }
 
     /**
-     * Get tipos
+     * Get mantenimientos
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getTipos()
+    public function getMantenimientos()
     {
-        return $this->tipos;
+        return $this->mantenimientos;
+    }
+
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
     }
 }

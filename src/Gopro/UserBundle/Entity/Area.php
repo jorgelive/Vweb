@@ -106,6 +106,9 @@ class Area
         return $this->users;
     }
 
+    /**
+     * @return string
+     */
     function __toString()
     {
         return $this->getNombre();
