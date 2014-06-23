@@ -90,6 +90,10 @@ security:
         - { path: ^/dbproceso/carga, role: ROLE_ADMIN }
         - { path: ^/dbproceso/, role: ROLE_STAFF }
 
+        #- { path: ^/reporte/sentencia/, ROLE_ADMIN } en annotaciones
+        - { path: ^/reporte/campo, role: ROLE_ADMIN }
+        - { path: ^/reporte/tipo, role: ROLE_ADMIN }
+        - { path: ^/reporte/operador, role: ROLE_ADMIN }
 
         - { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
 

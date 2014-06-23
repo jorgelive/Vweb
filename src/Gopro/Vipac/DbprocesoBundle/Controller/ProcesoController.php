@@ -578,8 +578,8 @@ class ProcesoController extends BaseController
             &&!empty($condiciones['rubro2'])
             &&!empty($condiciones['rubro2porcentaje'])
         ){
-            $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
-            $rubros['impuesto1']=round($rubros['subtotal']/$igv*100,2);
+            $rubros['subtotal']=round($monto/((100+$igv+$condiciones['rubro2porcentaje'])/100),2);
+            $rubros['impuesto1']=round($rubros['subtotal']*$igv/100,2);
             $rubros['rubro1']=0;
             $rubros['impuesto2']=0;
             $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto1'],2);
@@ -591,10 +591,10 @@ class ProcesoController extends BaseController
             &&!empty($condiciones['rubro2'])
             &&!empty($condiciones['rubro2porcentaje'])
         ){
-            $rubros['subtotal']=round($monto/(1+$igv/100+$condiciones['rubro2porcentaje']/100),2);
+            $rubros['subtotal']=round($monto/((100+$igv+$condiciones['rubro2porcentaje'])/100),2);
             $rubros['impuesto1']=0;
             $rubros['rubro1']=0;
-            $rubros['impuesto2']=round($rubros['subtotal']/$igv*100,2);
+            $rubros['impuesto2']=round($rubros['subtotal']*$igv/100,2);
             $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto2'],2);
         }
 

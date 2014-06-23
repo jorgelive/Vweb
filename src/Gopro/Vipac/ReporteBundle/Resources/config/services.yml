@@ -1,0 +1,7 @@
+parameters:
+    gopro.vipac.controller.sentencia.class: Gopro\Vipac\ReporteBundle\Controller\SentenciaController
+
+services:
+    gopro.vipac.sentencia.controller:
+        class: "%gopro.vipac.controller.sentencia.class%"
+        tags: [ { name: "security.secure_service" } ]

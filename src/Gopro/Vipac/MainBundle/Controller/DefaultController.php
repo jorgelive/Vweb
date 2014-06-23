@@ -33,8 +33,7 @@ class DefaultController extends Controller
             array('nombre'=>'Cargador de CP','route'=>'proceso_cargadorcp'),
             array('nombre'=>'Tipos de documentos CP','route'=>'doccptipo'),
             array('nombre'=>'Vencimiento CP','route'=>'reporte_vencimientocp'),
-
-
+            array('nombre'=>'Reportes','route'=>'sentencia'),
         );
         return array('items'=> $items);
     }

@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gopro\Vipac\ReporteBundle\Entity\Sentencia;
 use Gopro\Vipac\ReporteBundle\Entity\Campo;
 use Gopro\Vipac\ReporteBundle\Form\SentenciaType;
+use JMS\SecurityExtraBundle\Annotation\Secure;
 
 /**
  * Sentencia controller.
@@ -60,6 +61,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/", name="sentencia")
      * @Method("GET")
+     * @Secure(roles="ROLE_STAFF")
      * @Template()
      */
     public function indexAction()
@@ -76,6 +78,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/", name="sentencia_create")
      * @Method("POST")
+     * @Secure(roles="ROLE_ADMIN")
      * @Template("GoproVipacReporteBundle:Sentencia:new.html.twig")
      */
     public function createAction(Request $request)
@@ -131,6 +134,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/new", name="sentencia_new")
      * @Method("GET")
+     * @Secure(roles="ROLE_ADMIN")
      * @Template()
      */
     public function newAction()
@@ -149,6 +153,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/{id}", name="sentencia_show")
      * @Method({"GET","POST"})
+     * @Secure(roles="ROLE_STAFF")
      * @Template()
      */
     public function showAction(Request $request, $id)
@@ -161,10 +166,13 @@ class SentenciaController extends BaseController
         $deleteForm = $this->createDeleteForm($id);
         $campos=array();
         $camposMostrar=array();
+        $camposDropdown=array();
         $tipos=array();
         $operadores=array();
+        $camposSQL=$this->getCampos($entity->getContenido());
         if(!empty($entity->getCampos())){
             foreach ($entity->getCampos() as $campoEntity):
+                $camposPorNombre[$campoEntity->getNombre()]=$campoEntity->getNombremostrar();
                 if(!empty($campoEntity->getTipo())&&!empty($campoEntity->getTipo()->getOperadores())){
                         $campos[$campoEntity->getId()]=$campoEntity->getNombre();
                         $camposMostrar[$campoEntity->getId()]=$campoEntity->getNombremostrar();
@@ -175,6 +183,17 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
+
+        foreach($camposSQL as $campoSQL):
+            if(empty($camposPorNombre[$campoSQL])){
+                throw $this->createNotFoundException('No existe el encabezado: '.$campoSQL.'.');
+            }
+            $key=array_search($campoSQL,$campos);
+            if(!empty($key)){
+                $camposDropdown[]=array('key'=>$key,'valor'=>$camposMostrar[$key]);
+            }
+            $encabezados[]=$camposPorNombre[$campoSQL];
+        endforeach;
         $limite=100;
         $destino=null;
         if(!empty($request->request->all()['parametrosForm']['limite'])){
@@ -185,13 +204,25 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposMostrar),json_encode($tipos),json_encode($operadores),$destino,$limite);
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),$destino,$limite);
+
+
         if (
             $request->getMethod() == 'POST'
             &&!empty($request->request->all()['parametrosForm']['filtro'])
             &&!empty($campos)
         ){
-            $operadoresLista = [1=>' = ', 2=>' != ' , 3=>' IN '];
+            $operadoresLista = [
+                1=>' = ',
+                2=>' != ',
+                3=>' IN ',
+                4=>' LIKE ',
+                5=>' LIKE ',
+                6=>' LIKE ',
+                7=>' >= ',
+                8=>' <= '
+
+            ];
             $filtroSQL=array();
             foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
                 if(
@@ -199,7 +230,7 @@ class SentenciaController extends BaseController
                     ||empty($operadores[$filtro['campo']][$filtro['operador']])
                     ||empty($filtro['valor'])
                 ){
-                    $this->setMensajes('No pueden quedar campos vacios en los filtros o los filtros son inválidos');
+                    $this->setMensajes('No pueden quedar campos vacios en los filtros o los filtros son inválidos.');
                     return array(
                         'entity' => $entity,
                         'parametros_form'  => $parametrosForm->createView(),
@@ -209,7 +240,6 @@ class SentenciaController extends BaseController
                 }
                 $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
                 $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
-
 
                 if(empty($operadores[$filtro['campo']][$filtro['operador']])){
                     $this->setMensajes('No existe el operador');
@@ -237,7 +267,16 @@ class SentenciaController extends BaseController
                         $filtroSQLPart[6]=')';
                     }else{
                         $filtroSQLPart[4]='UPPER(';
-                        $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                        if($filtro['operador']==4){
+                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor'].'%');
+                        }elseif($filtro['operador']==5){
+                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor'].'%');
+                        }elseif($filtro['operador']==6){
+                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor']);
+                        }else{
+                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                        }
+
                         $filtroSQLPart[6]=')';
                     }
                 }elseif(isset($tipos[$filtro['campo']][2])){
@@ -254,6 +293,14 @@ class SentenciaController extends BaseController
                         $filtroSQLPart[4]='(';
                         $filtroSQLPart[5]=implode(',',$valoresIn);
                         $filtroSQLPart[6]=')';
+                    }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                        $this->setMensajes('El operador no es valido para numeros.');
+                        return array(
+                            'entity' => $entity,
+                            'parametros_form'  => $parametrosForm->createView(),
+                            'delete_form' => $deleteForm->createView(),
+                            'mensajes' => $this->getMensajes()
+                        );
                     }else{
                         $filtroSQLPart[4]='';
                         $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
@@ -265,7 +312,15 @@ class SentenciaController extends BaseController
                     $filtroSQLPart[2]=')';
                     $filtroSQLPart[3]=$operadoresLista[$filtro['operador']];
                     if($filtro['operador']==3){
-                        $this->setMensajes('El operador no es valido para fechas');
+                        $this->setMensajes('El operador no es valido para fechas.');
+                        return array(
+                            'entity' => $entity,
+                            'parametros_form'  => $parametrosForm->createView(),
+                            'delete_form' => $deleteForm->createView(),
+                            'mensajes' => $this->getMensajes()
+                        );
+                    }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                        $this->setMensajes('El operador no es valido para fechas.');
                         return array(
                             'entity' => $entity,
                             'parametros_form'  => $parametrosForm->createView(),
@@ -288,7 +343,7 @@ class SentenciaController extends BaseController
                 $statement->bindValue($campoBind,$valorBind);
             endforeach;
             if(!$statement->execute()){
-                $this->setMensajes('Hubo un error en la ejecucion de la consulta');
+                $this->setMensajes('Hubo un error en la ejecucion de la consulta.');
                 return array(
                     'entity' => $entity,
                     'parametros_form'  => $parametrosForm->createView(),
@@ -296,10 +351,24 @@ class SentenciaController extends BaseController
                     'mensajes' => $this->getMensajes()
                 );
             }
-            $existentesRaw=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
+            $resultados=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
 
-            print_r($selectQuery);
-            print_r($existentesRaw);
+            if($destino=='archivo'){
+                $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
+                $archivoGenerado->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$encabezados,$resultados);
+                $archivoGenerado->setArchivoGenerado();
+                return $archivoGenerado->getArchivoGenerado();
+            }else{
+                return array(
+                    'entity' => $entity,
+                    'parametros_form'  => $parametrosForm->createView(),
+                    'delete_form' => $deleteForm->createView(),
+                    'mensajes' => $this->getMensajes(),
+                    'encabezados'=> $encabezados,
+                    'resultados'=>$resultados
+                );
+
+            }
         }
         return array(
             'entity' => $entity,
@@ -348,6 +417,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/{id}/edit", name="sentencia_edit")
      * @Method("GET")
+     * @Secure(roles="ROLE_ADMIN")
      * @Template()
      */
     public function editAction($id)
@@ -393,6 +463,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/{id}", name="sentencia_update")
      * @Method("PUT")
+     * @Secure(roles="ROLE_ADMIN")
      * @Template("GoproVipacReporteBundle:Sentencia:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
@@ -447,6 +518,7 @@ class SentenciaController extends BaseController
      * Deletes a Sentencia entity.
      *
      * @Route("/{id}", name="sentencia_delete")
+     * @Secure(roles="ROLE_ADMIN")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)

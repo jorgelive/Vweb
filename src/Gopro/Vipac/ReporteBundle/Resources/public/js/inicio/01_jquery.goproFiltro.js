@@ -65,8 +65,9 @@ $.fn.filtro = function() {
         var opcionesOperadores=selectOperadores.prop('options');
         var inputValor=fila.find('td.valor input')
 
-        $.each(row.campos, function(id, texto) {
-            opcionesCampos[opcionesCampos.length] = new Option(texto, id);
+        $.each(row.campos, function(id, contenido) {
+            console.log(contenido);
+            opcionesCampos[opcionesCampos.length] = new Option(contenido.valor, contenido.key);
         });
 
         selectCampos.change(function(){

@@ -35,12 +35,31 @@
                 Editar
             </a>
         </li>
-        <li>{{ form(delete_form) }}</li>
     </ul>
+
+    {% if resultados|default and encabezados|default %}
+        <div id="resultados">
+            <h1>Resultado del proceso</h1>
+            <table border="1">
+                <tr>
+                    {% for encabezado in encabezados %}
+                        <th>{{ encabezado }}</th>
+                    {% endfor %}
+                </tr>
+                {% for fila in resultados %}
+                    <tr>
+                        {% for celda in fila %}
+                            <td>{{ celda }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 
     {% if mensajes|default %}
         <div id="mensajes">
-            <h1>Resultados del proceso</h1>
+            <h1>Resultados de la consulta</h1>
             <ul>
                 {% for mensaje in mensajes %}
                     <li>{{ mensaje }}</li>
