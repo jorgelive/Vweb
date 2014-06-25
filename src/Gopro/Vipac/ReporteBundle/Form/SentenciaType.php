@@ -16,7 +16,7 @@ class SentenciaType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('area')
+            ->add('areas')
             ->add('descripcion',null, array('label' => 'Descripción'))
             ->add('contenido')
             ->add('campos', 'collection', array('label'=>false,'type' => new CampoType(), 'options' => array('label' => false)));

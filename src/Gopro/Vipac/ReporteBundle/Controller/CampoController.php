@@ -21,7 +21,7 @@ class CampoController extends Controller
     /**
      * Lists all Campo entities.
      *
-     * @Route("/", name="campo")
+     * @Route("/", name="gopro_vipac_reporte_campo")
      * @Method("GET")
      * @Template()
      */
@@ -41,7 +41,7 @@ class CampoController extends Controller
     /**
      * Creates a new Campo entity.
      *
-     * @Route("/", name="campo_create")
+     * @Route("/", name="gopro_vipac_reporte_campo_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Campo:new.html.twig")
      */
@@ -56,7 +56,7 @@ class CampoController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('campo_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_campo_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -75,7 +75,7 @@ class CampoController extends Controller
     private function createCreateForm(Campo $entity)
     {
         $form = $this->createForm(new CampoType(), $entity, array(
-            'action' => $this->generateUrl('campo_create'),
+            'action' => $this->generateUrl('gopro_vipac_reporte_campo_create'),
             'method' => 'POST',
         ));
 
@@ -87,7 +87,7 @@ class CampoController extends Controller
     /**
      * Displays a form to create a new Campo entity.
      *
-     * @Route("/new", name="campo_new")
+     * @Route("/new", name="gopro_vipac_reporte_campo_new")
      * @Method("GET")
      * @Template()
      */
@@ -106,7 +106,7 @@ class CampoController extends Controller
     /**
      * Finds and displays a Campo entity.
      *
-     * @Route("/{id}", name="campo_show")
+     * @Route("/{id}", name="gopro_vipac_reporte_campo_show")
      * @Method("GET")
      * @Template()
      */
@@ -131,7 +131,7 @@ class CampoController extends Controller
     /**
      * Displays a form to edit an existing Campo entity.
      *
-     * @Route("/{id}/edit", name="campo_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_reporte_campo_edit")
      * @Method("GET")
      * @Template()
      */
@@ -165,7 +165,7 @@ class CampoController extends Controller
     private function createEditForm(Campo $entity)
     {
         $form = $this->createForm(new CampoType(), $entity, array(
-            'action' => $this->generateUrl('campo_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_reporte_campo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -176,7 +176,7 @@ class CampoController extends Controller
     /**
      * Edits an existing Campo entity.
      *
-     * @Route("/{id}", name="campo_update")
+     * @Route("/{id}", name="gopro_vipac_reporte_campo_update")
      * @Method("PUT")
      * @Template("GoproVipacReporteBundle:Campo:edit.html.twig")
      */
@@ -197,7 +197,7 @@ class CampoController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('campo_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_campo_edit', array('id' => $id)));
         }
 
         return array(
@@ -209,7 +209,7 @@ class CampoController extends Controller
     /**
      * Deletes a Campo entity.
      *
-     * @Route("/{id}", name="campo_delete")
+     * @Route("/{id}", name="gopro_vipac_reporte_campo_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -229,7 +229,7 @@ class CampoController extends Controller
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('campo'));
+        return $this->redirect($this->generateUrl('gopro_vipac_reporte_campo'));
     }
 
     /**
@@ -241,11 +241,16 @@ class CampoController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('campo_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('gopro_vipac_reporte_campo_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

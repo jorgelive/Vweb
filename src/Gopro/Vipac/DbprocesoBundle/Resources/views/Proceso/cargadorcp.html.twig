@@ -27,8 +27,8 @@
                         <td class="nombre">{{ archivo.nombre }}</td>
                         <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
                         <td>
-                            <a href="{{ path('proceso_cargadorcp', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
-                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('archivo_delete',{'id':archivo.id})}}">Borrar</a>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_cargadorcp', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
                 {% endfor %}

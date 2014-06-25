@@ -16,7 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class FirmaController extends Controller
 {
     /**
-     * @Route("/", name="extra_firma")
+     * @Route("/", name="gopro_vipac_extra_firma")
      * @Template()
      */
     public function firmaAction(Request $request)
@@ -26,7 +26,7 @@ class FirmaController extends Controller
         $body='';
         $css='';
         $formulario = $this->createForm(new FirmaType(), $datos, array(
-            'action' => $this->generateUrl('extra_firma'),
+            'action' => $this->generateUrl('gopro_vipac_extra_firma'),
             'method' => 'POST',
         ));
 

@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class VariosController extends Controller
 {
     /**
-     * @Route("/centrocuenta", name="varios_centrocuenta")
+     * @Route("/centrocuenta", name="gopro_vipac_extra_varios_centrocuenta")
      * @Template()
      */
     public function variosAction(Request $request)

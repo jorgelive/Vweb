@@ -21,16 +21,7 @@ class ProcesoController extends BaseController
 {
 
     /**
-     * @Route("/index", name="proceso_index")
-     * @Template()
-     */
-    public function indexAction(){
-
-
-    }
-
-    /**
-     * @Route("/cheque/{archivoEjecutar}", name="proceso_cheque", defaults={"archivoEjecutar" = null})
+     * @Route("/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function chequeAction(Request $request,$archivoEjecutar)
@@ -41,7 +32,7 @@ class ProcesoController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -111,7 +102,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/cargadorcp/{archivoEjecutar}", name="proceso_cargadorcp", defaults={"archivoEjecutar" = null})
+     * @Route("/cargadorcp/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cargadorcp", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function cargadorcpAction(Request $request,$archivoEjecutar)
@@ -123,7 +114,7 @@ class ProcesoController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -606,7 +597,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/calcc/{archivoEjecutar}", name="proceso_calcc", defaults={"archivoEjecutar" = null})
+     * @Route("/calcc/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calcc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calccAction(Request $request,$archivoEjecutar)
@@ -617,7 +608,7 @@ class ProcesoController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -804,7 +795,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/calxfile/{archivoEjecutar}", name="proceso_calxfile", defaults={"archivoEjecutar" = null})
+     * @Route("/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxfileAction(Request $request,$archivoEjecutar)
@@ -816,7 +807,7 @@ class ProcesoController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -872,7 +863,7 @@ class ProcesoController extends BaseController
     }
 
     /**
-     * @Route("/calxreserva/{archivoEjecutar}", name="proceso_calxreserva", defaults={"archivoEjecutar" = null})
+     * @Route("/calxreserva/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxreserva", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function calxreservaAction(Request $request,$archivoEjecutar)
@@ -883,7 +874,7 @@ class ProcesoController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);

@@ -1,0 +1,46 @@
+{% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Lista de mantenimientos</h1>
+
+    <table class="listaRegistros">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Descripcion</th>
+                <th>Fecha</th>
+                <th>Creado</th>
+                <th>Modificado</th>
+                <th>Actciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('gopro_inventario_mantenimiento_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.descripcion }}</td>
+                <td>{% if entity.fecha %}{{ entity.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{% if entity.modificado %}{{ entity.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('gopro_inventario_mantenimiento_show', { 'id': entity.id }) }}">mostrar</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('gopro_inventario_mantenimiento_edit', { 'id': entity.id }) }}">editar</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_mantenimiento_new') }}">
+                Agregar un mantenimiento
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

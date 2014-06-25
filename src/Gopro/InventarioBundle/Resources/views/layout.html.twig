@@ -1,0 +1,31 @@
+{% extends "::global.html.twig" %}
+{% block title %}Inventario - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets '@GoproInventarioBundle/Resources/public/css/*' filter='css_url_rewrite' %}
+    <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+{% endblock stylesheets%}
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts '@GoproInventarioBundle/Resources/public/js/inicio/*' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock javascripts %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="GoproInventarioBundle">
+        {% block content %}
+        {% endblock content %}
+    </div>
+{% endblock container %}
+
+{% block javascriptsfinal %}
+    {% javascripts '@GoproInventarioBundle/Resources/public/js/fin/*'%}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

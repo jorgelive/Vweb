@@ -1,7 +1,7 @@
 gopro_inventario:
     resource: "@GoproInventarioBundle/Controller/"
     type:     annotation
-    prefix:   /
+    prefix:   /inventario
 
 gopro_vipac_reporte:
     resource: "@GoproVipacReporteBundle/Controller/"

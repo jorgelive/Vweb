@@ -59,7 +59,7 @@ class SentenciaController extends BaseController
     /**
      * Lists all Sentencia entities.
      *
-     * @Route("/", name="sentencia")
+     * @Route("/", name="gopro_vipac_reporte_sentencia")
      * @Method("GET")
      * @Secure(roles="ROLE_STAFF")
      * @Template()
@@ -76,7 +76,7 @@ class SentenciaController extends BaseController
     /**
      * Creates a new Sentencia entity.
      *
-     * @Route("/", name="sentencia_create")
+     * @Route("/", name="gopro_vipac_reporte_sentencia_create")
      * @Method("POST")
      * @Secure(roles="ROLE_ADMIN")
      * @Template("GoproVipacReporteBundle:Sentencia:new.html.twig")
@@ -101,7 +101,7 @@ class SentenciaController extends BaseController
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('sentencia_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_sentencia_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -120,7 +120,7 @@ class SentenciaController extends BaseController
     private function createCreateForm(Sentencia $entity)
     {
         $form = $this->createForm(new SentenciaType(), $entity, array(
-            'action' => $this->generateUrl('sentencia_create'),
+            'action' => $this->generateUrl('gopro_vipac_reporte_sentencia_create'),
             'method' => 'POST',
         ));
 
@@ -132,7 +132,7 @@ class SentenciaController extends BaseController
     /**
      * Displays a form to create a new Sentencia entity.
      *
-     * @Route("/new", name="sentencia_new")
+     * @Route("/new", name="gopro_vipac_reporte_sentencia_new")
      * @Method("GET")
      * @Secure(roles="ROLE_ADMIN")
      * @Template()
@@ -151,7 +151,7 @@ class SentenciaController extends BaseController
     /**
      * Finds and displays a Sentencia entity.
      *
-     * @Route("/{id}", name="sentencia_show")
+     * @Route("/{id}", name="gopro_vipac_reporte_sentencia_show")
      * @Method({"GET","POST"})
      * @Secure(roles="ROLE_STAFF")
      * @Template()
@@ -398,7 +398,7 @@ class SentenciaController extends BaseController
             'form',
             null,
            [
-               'action'=>$this->generateUrl('sentencia_show', ['id' => $id]),
+               'action'=>$this->generateUrl('gopro_vipac_reporte_sentencia_show', ['id' => $id]),
                'method'=>'POST',
                'attr'=>['id'=>'parametrosForm']
            ])
@@ -415,7 +415,7 @@ class SentenciaController extends BaseController
     /**
      * Displays a form to edit an existing Sentencia entity.
      *
-     * @Route("/{id}/edit", name="sentencia_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_reporte_sentencia_edit")
      * @Method("GET")
      * @Secure(roles="ROLE_ADMIN")
      * @Template()
@@ -450,7 +450,7 @@ class SentenciaController extends BaseController
     private function createEditForm(Sentencia $entity)
     {
         $form = $this->createForm(new SentenciaType(), $entity, array(
-            'action' => $this->generateUrl('sentencia_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_reporte_sentencia_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -461,7 +461,7 @@ class SentenciaController extends BaseController
     /**
      * Edits an existing Sentencia entity.
      *
-     * @Route("/{id}", name="sentencia_update")
+     * @Route("/{id}", name="gopro_vipac_reporte_sentencia_update")
      * @Method("PUT")
      * @Secure(roles="ROLE_ADMIN")
      * @Template("GoproVipacReporteBundle:Sentencia:edit.html.twig")
@@ -517,7 +517,7 @@ class SentenciaController extends BaseController
     /**
      * Deletes a Sentencia entity.
      *
-     * @Route("/{id}", name="sentencia_delete")
+     * @Route("/{id}", name="gopro_vipac_reporte_sentencia_delete")
      * @Secure(roles="ROLE_ADMIN")
      * @Method("DELETE")
      */
@@ -555,7 +555,7 @@ class SentenciaController extends BaseController
             'form',
             null,
             [
-                'action'=>$this->generateUrl('sentencia_delete', ['id' => $id]),
+                'action'=>$this->generateUrl('gopro_vipac_reporte_sentencia_delete', ['id' => $id]),
                 'method'=>'DELETE',
                 'attr'=>['id'=>'deleteForm']
             ])

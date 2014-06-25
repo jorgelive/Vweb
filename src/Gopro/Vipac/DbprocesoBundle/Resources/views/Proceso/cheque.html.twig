@@ -8,7 +8,6 @@
         <div id="cargadorArchivos">Subir Archivo</div>
     </div>
 
-
     <div id="archivos">
         <h1>Listado de Archivos</h1>
         <table id="listaArchivos">
@@ -26,15 +25,15 @@
                         <td class="nombre">{{ archivo.nombre }}</td>
                         <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
                         <td>
-                            <a href="{{ path('proceso_cheque', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
-                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('archivo_delete',{'id':archivo.id})}}">Borrar</a>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_cheque', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
                 {% endfor %}
             {% endif %}
             </tbody>
-            </table>
-        </div>
+        </table>
+    </div>
 
     {% if resultados|default %}
         <div id="resultados">

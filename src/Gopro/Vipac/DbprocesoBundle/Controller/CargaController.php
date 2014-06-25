@@ -18,18 +18,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
  */
 class CargaController extends BaseController
 {
-    /**
-     * @Route("/index/{name}", name="carga_index")
-     * @Template()
-     */
-    public function indexAction($pais)
-    {
-
-        return array('paises' => $pais);
-    }
 
     /**
-     * @Route("/generico/{archivoEjecutar}", name="carga_generico", defaults={"archivoEjecutar" = null})
+     * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_generico", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function genericoAction(Request $request,$archivoEjecutar)
@@ -41,7 +32,7 @@ class CargaController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -73,7 +64,7 @@ class CargaController extends BaseController
     }
 
     /**
-     * @Route("/arreglartc/{archivoEjecutar}", name="carga_arreglartc", defaults={"archivoEjecutar" = null})
+     * @Route("/arreglartc/{archivoEjecutar}", name="gopro_vipac_dbproceso_carga_arreglartc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
     public function arreglartcAction(Request $request,$archivoEjecutar)
@@ -85,7 +76,7 @@ class CargaController extends BaseController
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
@@ -106,7 +97,7 @@ class CargaController extends BaseController
             $documentoCp=$this->get('gopro_dbproceso_comun_cargador');
             $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $documentoCp->ejecutar();
-            $exiDocumentoCp=$documentoCp->getMensajes()->getExistentesIndizados();
+            $exiDocumentoCp=$documentoCp->getProceso()->getExistentesIndizados();
             if(empty($exiDocumentoCp)){
                 $mensajes=array_merge($mensajes,array('No existen los asientos en Documentos CP'));
                 return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $mensajes);

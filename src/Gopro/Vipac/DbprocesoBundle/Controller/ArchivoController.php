@@ -22,7 +22,7 @@ class ArchivoController extends BaseController
     /**
      * Lists all Archivo entities.
      *
-     * @Route("/", name="archivo")
+     * @Route("/", name="gopro_vipac_dbproceso_archivo")
      * @Method("GET")
      * @Template()
      */
@@ -39,7 +39,7 @@ class ArchivoController extends BaseController
     /**
      * Creates a new Archivo entity.
      *
-     * @Route("/", name="archivo_create")
+     * @Route("/", name="gopro_vipac_dbproceso_archivo_create")
      * @Method("POST")
      * @Template("GoproVipacDbprocesoBundle:Archivo:new.html.twig")
      */
@@ -62,13 +62,12 @@ class ArchivoController extends BaseController
                         'id'=>$entity->getId(),
                         'nombre'=>$entity->getNombre(),
                         'creado'=>$entity->getCreado(),
-                        'procesarRoute'=>$this->get('router')->generate($entity->getOperacion(), array('archivoEjecutar' => $entity->getId())),
-                        'borrarRoute'=>$this->get('router')->generate('archivo_delete', array('id' => $entity->getId())),
+                        'procesarRoute'=>$this->get('router')->generate('gopro_vipac_dbproceso_'.$entity->getOperacion(), array('archivoEjecutar' => $entity->getId())),
+                        'borrarRoute'=>$this->get('router')->generate('gopro_vipac_dbproceso_archivo_delete', array('id' => $entity->getId())),
                     ]
                 ]);
             }
-
-            return $this->redirect($this->generateUrl('archivo_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_archivo_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -87,7 +86,7 @@ class ArchivoController extends BaseController
     private function createCreateForm(Archivo $entity)
     {
         $form = $this->createForm(new ArchivoType(), $entity, array(
-            'action' => $this->generateUrl('archivo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
             'method' => 'POST',
         ));
 
@@ -99,7 +98,7 @@ class ArchivoController extends BaseController
     /**
      * Displays a form to create a new Archivo entity.
      *
-     * @Route("/new", name="archivo_new")
+     * @Route("/new", name="gopro_vipac_dbproceso_archivo_new")
      * @Method("GET")
      * @Template()
      */
@@ -117,7 +116,7 @@ class ArchivoController extends BaseController
     /**
      * Finds and displays a Archivo entity.
      *
-     * @Route("/{id}", name="archivo_show")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_archivo_show")
      * @Method("GET")
      * @Template()
      */
@@ -142,7 +141,7 @@ class ArchivoController extends BaseController
     /**
      * Displays a form to edit an existing Archivo entity.
      *
-     * @Route("/{id}/edit", name="archivo_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_dbproceso_archivo_edit")
      * @Method("GET")
      * @Template()
      */
@@ -176,7 +175,7 @@ class ArchivoController extends BaseController
     private function createEditForm(Archivo $entity)
     {
         $form = $this->createForm(new ArchivoType(), $entity, array(
-            'action' => $this->generateUrl('archivo_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -187,7 +186,7 @@ class ArchivoController extends BaseController
     /**
      * Edits an existing Archivo entity.
      *
-     * @Route("/{id}", name="archivo_update")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_archivo_update")
      * @Method("PUT")
      * @Template("GoproVipacDbprocesoBundle:Archivo:edit.html.twig")
      */
@@ -208,7 +207,7 @@ class ArchivoController extends BaseController
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('archivo_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_archivo_edit', array('id' => $id)));
         }
 
         return array(
@@ -220,7 +219,7 @@ class ArchivoController extends BaseController
     /**
      * Deletes a Archivo entity.
      *
-     * @Route("/{id}", name="archivo_delete")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_archivo_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -246,7 +245,7 @@ class ArchivoController extends BaseController
                 return new JsonResponse(['mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'Se ha eliminado el archivo']]);
             }
         }
-        return $this->redirect($this->generateUrl('archivo'));
+        return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_archivo'));
     }
 
     /**
@@ -258,11 +257,16 @@ class ArchivoController extends BaseController
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('archivo_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('gopro_vipac_dbproceso_archivo_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

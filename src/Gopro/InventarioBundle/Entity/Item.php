@@ -62,9 +62,10 @@ class Item
     private $componentes;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Area")
+     * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
+     * @ORM\JoinTable(name="inv_items_areas")
      */
-    private $area;
+    private $areas;
 
     /**
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Dependencia")
@@ -91,10 +92,9 @@ class Item
     public function __construct() {
         $this->componentes = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->areas = new ArrayCollection();
         $this->mantenimientos = new ArrayCollection();
     }
-
-
 
 
     /**
@@ -233,26 +233,36 @@ class Item
     }
 
     /**
-     * Set area
+     * Add areas
      *
-     * @param \Gopro\UserBundle\Entity\Area $area
+     * @param \Gopro\UserBundle\Entity\Area $areas
      * @return Item
      */
-    public function setArea(\Gopro\UserBundle\Entity\Area $area = null)
+    public function addArea(\Gopro\UserBundle\Entity\Area $areas)
     {
-        $this->area = $area;
+        $this->areas[] = $areas;
 
         return $this;
     }
 
     /**
-     * Get area
+     * Remove areas
      *
-     * @return \Gopro\UserBundle\Entity\Area 
+     * @param \Gopro\UserBundle\Entity\Area $areas
      */
-    public function getArea()
+    public function removeArea(\Gopro\UserBundle\Entity\Area $areas)
     {
-        return $this->area;
+        $this->areas->removeElement($areas);
+    }
+
+    /**
+     * Get areas
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAreas()
+    {
+        return $this->areas;
     }
 
     /**
@@ -271,7 +281,7 @@ class Item
     /**
      * Get dependencia
      *
-     * @return \Gopro\UserBundle\Entity\Dependencia 
+     * @return \Gopro\UserBundle\Entity\Dependencia
      */
     public function getDependencia()
     {

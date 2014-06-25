@@ -21,7 +21,7 @@
                 <td>{{ entity.usuario }}</td>
             </tr>
             <tr>
-                <th>Operacion</th>
+                <th>Operación</th>
                 <td>{{ entity.operacion }}</td>
             </tr>
             <tr>
@@ -37,12 +37,12 @@
 
     <ul class="registroAcciones">
         <li>
-            <a class="boton" href="{{ path('archivo') }}">
+            <a class="boton" href="{{ path('gopro_vipac_dbproceso_archivo') }}">
                 Volver a la lista
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('archivo_edit', { 'id': entity.id }) }}">
+            <a class="boton" href="{{ path('gopro_vipac_dbproceso_archivo_edit', { 'id': entity.id }) }}">
                 Editar
             </a>
         </li>

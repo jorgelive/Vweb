@@ -15,17 +15,17 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('sentencia_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td><a href="{{ path('gopro_vipac_reporte_sentencia_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.nombre }}</td>
                 <td>{{ entity.descripcion }}</td>
                 <td>{{ entity.contenido }}</td>
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('sentencia_show', { 'id': entity.id }) }}">mostrar</a>
+                        <a href="{{ path('gopro_vipac_reporte_sentencia_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('sentencia_edit', { 'id': entity.id }) }}">editar</a>
+                        <a href="{{ path('gopro_vipac_reporte_sentencia_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -36,7 +36,7 @@
 
     <ul class="listaAcciones">
         <li>
-            <a class="boton" href="{{ path('sentencia_new') }}">
+            <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia_new') }}">
                 Crear un nuevo registro
             </a>
         </li>

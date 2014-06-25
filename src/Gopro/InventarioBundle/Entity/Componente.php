@@ -58,6 +58,11 @@ class Componente
      */
     private $componentetipo;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Componenteestado", inversedBy="componentes")
+     */
+    private $componenteestado;
+
 
     /**
      * Get id
@@ -182,6 +187,29 @@ class Componente
     public function getComponentetipo()
     {
         return $this->componentetipo;
+    }
+
+    /**
+     * Set componenteestado
+     *
+     * @param \Gopro\InventarioBundle\Entity\Componenteestado $componenteestado
+     * @return Componente
+     */
+    public function setComponenteestado(\Gopro\InventarioBundle\Entity\Componenteestado $componenteestado = null)
+    {
+        $this->componenteestado = $componenteestado;
+
+        return $this;
+    }
+
+    /**
+     * Get componenteestado
+     *
+     * @return \Gopro\InventarioBundle\Entity\Componenteestado
+     */
+    public function getComponenteestado()
+    {
+        return $this->componenteestado;
     }
 
     /**

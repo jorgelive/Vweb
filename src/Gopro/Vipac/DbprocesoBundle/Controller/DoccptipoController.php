@@ -17,7 +17,7 @@ class DoccptipoController extends Controller
 {
 
     /**
-     * @Route("/", name="doccptipo")
+     * @Route("/", name="gopro_vipac_dbproceso_doccptipo")
      * @Method("GET")
      * @Template()
      */
@@ -32,7 +32,7 @@ class DoccptipoController extends Controller
         );
     }
     /**
-     * @Route("/", name="doccptipo_create")
+     * @Route("/", name="gopro_vipac_dbproceso_doccptipo_create")
      * @Method("POST")
      * @Template("GoproVipacDbprocesoBundle:Doccptipo:new.html.twig")
      */
@@ -47,7 +47,7 @@ class DoccptipoController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('doccptipo_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_doccptipo_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -63,7 +63,7 @@ class DoccptipoController extends Controller
     private function createCreateForm(Doccptipo $entity)
     {
         $form = $this->createForm(new DoccptipoType(), $entity, array(
-            'action' => $this->generateUrl('doccptipo_create'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_doccptipo_create'),
             'method' => 'POST',
         ));
 
@@ -73,7 +73,7 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * @Route("/new", name="doccptipo_new")
+     * @Route("/new", name="gopro_vipac_dbproceso_doccptipo_new")
      * @Method("GET")
      * @Template()
      */
@@ -89,7 +89,7 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * @Route("/{id}", name="doccptipo_show")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_show")
      * @Method("GET")
      * @Template()
      */
@@ -112,7 +112,7 @@ class DoccptipoController extends Controller
     }
 
     /**
-     * @Route("/{id}/edit", name="doccptipo_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_dbproceso_doccptipo_edit")
      * @Method("GET")
      * @Template()
      */
@@ -143,7 +143,7 @@ class DoccptipoController extends Controller
     private function createEditForm(Doccptipo $entity)
     {
         $form = $this->createForm(new DoccptipoType(), $entity, array(
-            'action' => $this->generateUrl('doccptipo_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_doccptipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -152,7 +152,7 @@ class DoccptipoController extends Controller
         return $form;
     }
     /**
-     * @Route("/{id}", name="doccptipo_update")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_update")
      * @Method("PUT")
      * @Template("GoproVipacDbprocesoBundle:Doccptipo:edit.html.twig")
      */
@@ -173,7 +173,7 @@ class DoccptipoController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('doccptipo_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_doccptipo_edit', array('id' => $id)));
         }
 
         return array(
@@ -183,7 +183,7 @@ class DoccptipoController extends Controller
         );
     }
     /**
-     * @Route("/{id}", name="doccptipo_delete")
+     * @Route("/{id}", name="gopro_vipac_dbproceso_doccptipo_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -203,7 +203,7 @@ class DoccptipoController extends Controller
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('doccptipo'));
+        return $this->redirect($this->generateUrl('gopro_vipac_dbproceso_doccptipo'));
     }
 
     /**
@@ -212,11 +212,16 @@ class DoccptipoController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder(NULL,array('attr'=>array('name'=>'deleteForm','id'=>'deleteForm')))
-            ->setAction($this->generateUrl('doccptipo_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('gopro_vipac_dbproceso_doccptipo_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

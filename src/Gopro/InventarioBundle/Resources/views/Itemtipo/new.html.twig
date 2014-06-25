@@ -1,0 +1,12 @@
+{% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Nuevo tipo de item</h1>
+    {{ form(form) }}
+    <ul class="listaAcciones">
+        <li>
+            <a href="{{ path('gopro_inventario_itemtipo') }}">
+                Vover a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

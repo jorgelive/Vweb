@@ -50,8 +50,8 @@ div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div div lab
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div label{display: inline-block; margin-left: 5px; width: 70px; text-align: left;}
 
-
-div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div textarea {height: 260px;width: 530px;}
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div input#gopro_vipac_reportebundle_sentencia_descripcion{width:527px;}
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div textarea#gopro_vipac_reportebundle_sentencia_contenido {height: 260px;width: 530px;}
 
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div#gopro_vipac_reportebundle_sentencia_campos{margin:0;}
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div#gopro_vipac_reportebundle_sentencia_campos div {display:inline-block;}

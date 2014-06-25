@@ -21,7 +21,7 @@ class OperadorController extends Controller
     /**
      * Lists all Operador entities.
      *
-     * @Route("/", name="operador")
+     * @Route("/", name="gopro_vipac_reporte_operador")
      * @Method("GET")
      * @Template()
      */
@@ -38,7 +38,7 @@ class OperadorController extends Controller
     /**
      * Creates a new Operador entity.
      *
-     * @Route("/", name="operador_create")
+     * @Route("/", name="gopro_vipac_reporte_operador_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Operador:new.html.twig")
      */
@@ -53,7 +53,7 @@ class OperadorController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('operador_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_operador_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -72,7 +72,7 @@ class OperadorController extends Controller
     private function createCreateForm(Operador $entity)
     {
         $form = $this->createForm(new OperadorType(), $entity, array(
-            'action' => $this->generateUrl('operador_create'),
+            'action' => $this->generateUrl('gopro_vipac_reporte_operador_create'),
             'method' => 'POST',
         ));
 
@@ -84,7 +84,7 @@ class OperadorController extends Controller
     /**
      * Displays a form to create a new Operador entity.
      *
-     * @Route("/new", name="operador_new")
+     * @Route("/new", name="gopro_vipac_reporte_operador_new")
      * @Method("GET")
      * @Template()
      */
@@ -102,7 +102,7 @@ class OperadorController extends Controller
     /**
      * Finds and displays a Operador entity.
      *
-     * @Route("/{id}", name="operador_show")
+     * @Route("/{id}", name="gopro_vipac_reporte_operador_show")
      * @Method("GET")
      * @Template()
      */
@@ -127,7 +127,7 @@ class OperadorController extends Controller
     /**
      * Displays a form to edit an existing Operador entity.
      *
-     * @Route("/{id}/edit", name="operador_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_reporte_operador_edit")
      * @Method("GET")
      * @Template()
      */
@@ -161,7 +161,7 @@ class OperadorController extends Controller
     private function createEditForm(Operador $entity)
     {
         $form = $this->createForm(new OperadorType(), $entity, array(
-            'action' => $this->generateUrl('operador_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_reporte_operador_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -172,7 +172,7 @@ class OperadorController extends Controller
     /**
      * Edits an existing Operador entity.
      *
-     * @Route("/{id}", name="operador_update")
+     * @Route("/{id}", name="gopro_vipac_reporte_operador_update")
      * @Method("PUT")
      * @Template("GoproVipacReporteBundle:Operador:edit.html.twig")
      */
@@ -193,7 +193,7 @@ class OperadorController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('operador_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_operador_edit', array('id' => $id)));
         }
 
         return array(
@@ -205,7 +205,7 @@ class OperadorController extends Controller
     /**
      * Deletes a Operador entity.
      *
-     * @Route("/{id}", name="operador_delete")
+     * @Route("/{id}", name="gopro_vipac_reporte_operador_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -225,7 +225,7 @@ class OperadorController extends Controller
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('operador'));
+        return $this->redirect($this->generateUrl('gopro_vipac_reporte_operador'));
     }
 
     /**
@@ -237,11 +237,16 @@ class OperadorController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('operador_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('gopro_vipac_reporte_operador_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
-            ->getForm()
-        ;
+            ->getForm();
     }
 }

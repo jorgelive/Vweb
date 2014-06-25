@@ -18,24 +18,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class ReporteController extends BaseController
 {
 
-    /**
-     * @Route("/index", name="proceso_index")
-     * @Template()
-     */
-    public function indexAction(){
-
-
-    }
 
     /**
-     * @Route("/vencimientocp", name="reporte_vencimientocp")
+     * @Route("/vencimientocp", name="gopro_vipac_dbproceso_reporte_vencimientocp")
      * @Template()
      */
     public function vencimientocpAction(Request $request)
     {
         $datos = array();
         $formulario = $this->createForm(new ParametrosType(), $datos, array(
-            'action' => $this->generateUrl('reporte_vencimientocp'),
+            'action' => $this->generateUrl('gopro_vipac_dbproceso_reporte_vencimientocp'),
             'method' => 'POST',
         ));
 

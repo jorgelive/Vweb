@@ -1,0 +1,40 @@
+{% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Lista de tipos de mantenimiento</h1>
+
+    <table class="listaRegistros">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('gopro_inventario_mantenimientotipo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.nombre }}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('gopro_inventario_mantenimientotipo_show', { 'id': entity.id }) }}">mostrar</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('gopro_inventario_mantenimientotipo_edit', { 'id': entity.id }) }}">editar</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_mantenimientotipo_new') }}">
+                Agregar un tipo de mantenimiento
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

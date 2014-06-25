@@ -21,7 +21,7 @@ class TipoController extends Controller
     /**
      * Lists all Tipo entities.
      *
-     * @Route("/", name="tipo")
+     * @Route("/", name="gopro_vipac_reporte_tipo")
      * @Method("GET")
      * @Template()
      */
@@ -38,7 +38,7 @@ class TipoController extends Controller
     /**
      * Creates a new Tipo entity.
      *
-     * @Route("/", name="tipo_create")
+     * @Route("/", name="gopro_vipac_reporte_tipo_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Tipo:new.html.twig")
      */
@@ -53,7 +53,7 @@ class TipoController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('tipo_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_tipo_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -72,7 +72,7 @@ class TipoController extends Controller
     private function createCreateForm(Tipo $entity)
     {
         $form = $this->createForm(new TipoType(), $entity, array(
-            'action' => $this->generateUrl('tipo_create'),
+            'action' => $this->generateUrl('gopro_vipac_reporte_tipo_create'),
             'method' => 'POST',
         ));
 
@@ -84,7 +84,7 @@ class TipoController extends Controller
     /**
      * Displays a form to create a new Tipo entity.
      *
-     * @Route("/new", name="tipo_new")
+     * @Route("/new", name="gopro_vipac_reporte_tipo_new")
      * @Method("GET")
      * @Template()
      */
@@ -102,7 +102,7 @@ class TipoController extends Controller
     /**
      * Finds and displays a Tipo entity.
      *
-     * @Route("/{id}", name="tipo_show")
+     * @Route("/{id}", name="gopro_vipac_reporte_tipo_show")
      * @Method("GET")
      * @Template()
      */
@@ -127,7 +127,7 @@ class TipoController extends Controller
     /**
      * Displays a form to edit an existing Tipo entity.
      *
-     * @Route("/{id}/edit", name="tipo_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_reporte_tipo_edit")
      * @Method("GET")
      * @Template()
      */
@@ -161,7 +161,7 @@ class TipoController extends Controller
     private function createEditForm(Tipo $entity)
     {
         $form = $this->createForm(new TipoType(), $entity, array(
-            'action' => $this->generateUrl('tipo_update', array('id' => $entity->getId())),
+            'action' => $this->generateUrl('gopro_vipac_reporte_tipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -172,7 +172,7 @@ class TipoController extends Controller
     /**
      * Edits an existing Tipo entity.
      *
-     * @Route("/{id}", name="tipo_update")
+     * @Route("/{id}", name="gopro_vipac_reporte_tipo_update")
      * @Method("PUT")
      * @Template("GoproVipacReporteBundle:Tipo:edit.html.twig")
      */
@@ -193,7 +193,7 @@ class TipoController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('tipo_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_tipo_edit', array('id' => $id)));
         }
 
         return array(
@@ -205,7 +205,7 @@ class TipoController extends Controller
     /**
      * Deletes a Tipo entity.
      *
-     * @Route("/{id}", name="tipo_delete")
+     * @Route("/{id}", name="gopro_vipac_reporte_tipo_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -237,11 +237,17 @@ class TipoController extends Controller
      */
     private function createDeleteForm($id)
     {
-        return $this->createFormBuilder()
-            ->setAction($this->generateUrl('tipo_delete', array('id' => $id)))
-            ->setMethod('DELETE')
+        return $this->get('form.factory')->createNamedBuilder(
+            'deleteForm',
+            'form',
+            null,
+            [
+                'action'=>$this->generateUrl('gopro_vipac_reporte_tipo_delete', ['id' => $id]),
+                'method'=>'DELETE',
+                'attr'=>['id'=>'deleteForm']
+            ])
             ->add('submit', 'submit', array('label' => 'Borrar'))
-            ->getForm()
-        ;
+            ->getForm();
     }
+
 }

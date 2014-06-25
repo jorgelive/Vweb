@@ -18,7 +18,7 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('archivo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td><a href="{{ path('gopro_vipac_dbproceso_archivo_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.nombre }}</td>
                 <td>{{ entity.extension }}</td>
                 <td>{{ entity.usuario }}</td>
@@ -28,10 +28,10 @@
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('archivo_show', { 'id': entity.id }) }}">mostrar</a>
+                        <a href="{{ path('gopro_vipac_dbproceso_archivo_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('archivo_edit', { 'id': entity.id }) }}">editar</a>
+                        <a href="{{ path('gopro_vipac_dbproceso_archivo_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -42,8 +42,8 @@
 
     <ul class="listaAcciones">
         <li>
-            <a class="boton" href="{{ path('archivo_new') }}">
-                Agregar un nuevo archivo
+            <a class="boton" href="{{ path('gopro_vipac_dbproceso_archivo_new') }}">
+                Agregar un archivo
             </a>
         </li>
     </ul>
