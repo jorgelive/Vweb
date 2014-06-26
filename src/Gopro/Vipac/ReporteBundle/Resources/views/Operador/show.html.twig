@@ -1,6 +1,7 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block title %}Operador de comparación{% endblock title %}
+{% block titulo %}Operador de comparación{% endblock titulo %}
 {% block content %}
-    <h1>Operador de comparación</h1>
     <table class="registroPropiedades">
         <tbody>
             <tr>
@@ -23,6 +24,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_vipac_reporte_operador_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_operador_new') }}">
+                Crear otro
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

@@ -1,6 +1,7 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block title %}Sentencia SQL{% endblock title %}
+{% block titulo %}Sentencia SQL{% endblock titulo %}
 {% block content %}
-    <h1>Sentencia SQL</h1>
     <table class="registroPropiedades">
         <tbody>
             <tr>
@@ -33,6 +34,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia_new') }}">
+                Crear otro
             </a>
         </li>
     </ul>

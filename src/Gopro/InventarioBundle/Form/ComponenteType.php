@@ -15,7 +15,6 @@ class ComponenteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombre')
             ->add('item')
             ->add('componentetipo',null, array('label' => 'Tipo'))
             ->add('componenteestado',null, array('label' => 'Estado'))

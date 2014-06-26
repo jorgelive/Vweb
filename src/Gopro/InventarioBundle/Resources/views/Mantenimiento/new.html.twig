@@ -1,10 +1,11 @@
 {% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block title %}Nuevo mantenimiento{% endblock title %}
+{% block titulo %}Nuevo mantenimiento{% endblock titulo %}
 {% block content %}
-    <h1>Nuevo mantenimiento</h1>
     {{ form(form) }}
     <ul class="listaAcciones">
         <li>
-            <a href="{{ path('gopro_inventario_mantenimiento') }}">
+            <a class="boton" href="{{ path('gopro_inventario_mantenimiento') }}">
                 Vover a la lista
             </a>
         </li>

@@ -1,7 +1,7 @@
 {% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block title %}Mantenimientos{% endblock title %}
+{% block titulo %}Mantenimientos{% endblock titulo %}
 {% block content %}
-    <h1>Mantenimientos</h1>
-
     <table class="registroPropiedades">
         <tbody>
             <tr>
@@ -36,6 +36,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_inventario_mantenimiento_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_mantenimiento_new') }}">
+                Crear otro
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

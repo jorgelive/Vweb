@@ -1,7 +1,7 @@
 {% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block title %}Tipos de componente{% endblock title %}
+{% block titulo %}Tipos de componente{% endblock titulo %}
 {% block content %}
-    <h1>Tipos de componente</h1>
-
     <table class="registroPropiedades">
         <tbody>
             <tr>
@@ -25,13 +25,18 @@
 
     <ul class="registroAcciones">
         <li>
-            <a class="boton" href="{{ path('componentetipo') }}">
+            <a class="boton" href="{{ path('gopro_inventario_componentetipo') }}">
                 Volver a la lista
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('componentetipo_edit', { 'id': entity.id }) }}">
+            <a class="boton" href="{{ path('gopro_inventario_componentetipo_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componentetipo_new') }}">
+                Crear otro
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

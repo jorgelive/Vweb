@@ -1,9 +1,8 @@
 {% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Editor de tipos de documentos CP% endblock title %}
+{% block titulo %}Editor de tipos de documentos CP{% endblock titulo %}
 {% block content %}
-    <h1>Editor de tipos de documentos CP</h1>
-
     {{ form(edit_form) }}
-
     <ul class="registroAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_vipac_dbproceso_doccptipo') }}">

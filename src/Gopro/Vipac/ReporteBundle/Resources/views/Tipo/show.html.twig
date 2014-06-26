@@ -1,6 +1,7 @@
 {% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block title %}Tipo de campo{% endblock title %}
+{% block titulo %}Tipo de campo{% endblock titulo %}
 {% block content %}
-    <h1>Tipo de campo</h1>
     <table class="registroPropiedades">
         <tbody>
             <tr>
@@ -23,6 +24,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_vipac_reporte_tipo_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_tipo_new') }}">
+                Crear otro
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

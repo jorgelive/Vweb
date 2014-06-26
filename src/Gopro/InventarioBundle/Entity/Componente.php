@@ -25,14 +25,6 @@ class Componente
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="nombre", type="string", length=100)
-     * @Assert\NotBlank
-     */
-    private $nombre;
-
-    /**
      * @var datetime $creado
      *
      * @Gedmo\Timestampable(on="create")
@@ -72,29 +64,6 @@ class Componente
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set nombre
-     *
-     * @param string $nombre
-     * @return Componente
-     */
-    public function setNombre($nombre)
-    {
-        $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    /**
-     * Get nombre
-     *
-     * @return string 
-     */
-    public function getNombre()
-    {
-        return $this->nombre;
     }
 
     /**
