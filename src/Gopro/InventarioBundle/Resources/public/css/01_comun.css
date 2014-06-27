@@ -12,6 +12,8 @@ div#GoproInventarioBundle ul.listaAcciones{list-style: none outside none; margin
 div#GoproInventarioBundle ul.registroAcciones li,
 div#GoproInventarioBundle ul.listaAcciones li{ display: inline-block;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div,
@@ -21,6 +23,8 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientoestado di
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientotipo div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div{margin-bottom: 7px;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div label,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div label,
@@ -28,8 +32,10 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_itemtipo div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_item div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientoestado div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientotipo div label,
-div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div label{text-align:right; display: inline-block; margin-right: 5px; width: 90px; vertical-align: top;}
+div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div label{text-align:right; display: inline-block; margin-right: 5px; width: 100px; vertical-align: top;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div ul,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div ul,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div ul,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div ul,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div ul,
@@ -39,6 +45,8 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientoestado di
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientotipo div ul,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div ul{list-style: none;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div ul li,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div ul li,
@@ -48,6 +56,8 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientoestado di
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientotipo div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div ul li{color:#cd0a0a; font-size: 9px;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div div,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div div,
@@ -57,6 +67,8 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientoestado di
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimientotipo div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_mantenimiento div div{margin-top: 5px; margin-left: 100px;}
 
+div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div div label,
+div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentetipo div div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_campo div div label,

@@ -57,6 +57,14 @@ class Componentetipo
         $this->componentes = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
+    }
+
 
     /**
      * Get id
@@ -168,13 +176,5 @@ class Componentetipo
     public function getComponentes()
     {
         return $this->componentes;
-    }
-
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getNombre();
     }
 }

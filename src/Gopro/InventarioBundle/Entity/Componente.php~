@@ -149,30 +149,6 @@ class Componente
         return $this->fechafingarantia;
     }
 
-
-    /**
-     * Set fechabaja
-     *
-     * @param \DateTime $fechabaja
-     * @return Componente
-     */
-    public function setFechabaja($fechabaja)
-    {
-        $this->fechabaja = $fechabaja;
-
-        return $this;
-    }
-
-    /**
-     * Get fechabaja
-     *
-     * @return \DateTime
-     */
-    public function getFechabaja()
-    {
-        return $this->fechabaja;
-    }
-
     /**
      * Set creado
      *
@@ -320,5 +296,4 @@ class Componente
     {
         return $this->componentecaracteristicas;
     }
-
 }

@@ -96,6 +96,14 @@ class Item
         $this->mantenimientos = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
+    }
+
 
     /**
      * Get id
@@ -375,13 +383,5 @@ class Item
     public function getMantenimientos()
     {
         return $this->mantenimientos;
-    }
-
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getNombre();
     }
 }

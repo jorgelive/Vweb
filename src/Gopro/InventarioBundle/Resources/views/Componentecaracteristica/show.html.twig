@@ -1,6 +1,6 @@
 {% extends 'GoproInventarioBundle::layout.html.twig' %}
-{% block title %}Componentes{% endblock title %}
-{% block titulo %}Componentes{% endblock titulo %}
+{% block title %}Características del componente{% endblock title %}
+{% block titulo %}Características del componente{% endblock titulo %}
 {% block content %}
     <table class="registroPropiedades">
         <tbody>
@@ -11,18 +11,6 @@
             <tr>
                 <th>Nombre</th>
                 <td>{{ entity.nombre }}</td>
-            </tr>
-            <tr>
-                <th>Fecha de compra</th>
-                <td>{{ entity.fechacompra|date('Y-m-d') }}</td>
-            </tr>
-            <tr>
-                <th>Finde garantía</th>
-                <td>{{ entity.fechafingarantia|date('Y-m-d') }}</td>
-            </tr>
-            <tr>
-                <th>Fecha de baja</th>
-                <td>{{ entity.baja|date('Y-m-d') }}</td>
             </tr>
             <tr>
                 <th>Creado</th>
@@ -37,17 +25,17 @@
 
     <ul class="registroAcciones">
         <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente') }}">
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica') }}">
                 Volver a la lista
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente_edit', { 'id': entity.id }) }}">
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_edit', { 'id': entity.id }) }}">
                 Editar
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente_new') }}">
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_new') }}">
                 Crear otro
             </a>
         </li>

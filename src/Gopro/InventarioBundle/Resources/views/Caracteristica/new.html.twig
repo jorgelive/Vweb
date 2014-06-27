@@ -1,0 +1,13 @@
+{% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block title %}Nueva característica{% endblock title %}
+{% block titulo %}Nueva característica{% endblock titulo %}
+{% block content %}
+    {{ form(form) }}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_caracteristica') }}">
+                Vover a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

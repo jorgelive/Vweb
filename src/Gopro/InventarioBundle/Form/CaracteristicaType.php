@@ -1,14 +1,12 @@
 <?php
 
-namespace Gopro\Vipac\ReporteBundle\Form;
+namespace Gopro\InventarioBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Gopro\Vipac\ReporteBundle\Form\EventListener\AgregarCampoSentenciaSubscriber;
-use Gopro\Vipac\ReporteBundle\Form\EventListener\AgregarCampoNombreSubscriber;
 
-class CampoType extends AbstractType
+class CaracteristicaType extends AbstractType
 {
         /**
      * @param FormBuilderInterface $builder
@@ -17,11 +15,7 @@ class CampoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('nombremostrar',null, array('label' => 'Nombre a mostrar'))
-            ->add('predeterminado')
-            ->add('tipo')
-            ->addEventSubscriber(new AgregarCampoNombreSubscriber())
-            ->addEventSubscriber(new AgregarCampoSentenciaSubscriber());
+            ->add('nombre')
         ;
     }
     
@@ -31,7 +25,7 @@ class CampoType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Gopro\Vipac\ReporteBundle\Entity\Campo'
+            'data_class' => 'Gopro\InventarioBundle\Entity\Caracteristica'
         ));
     }
 
@@ -40,6 +34,6 @@ class CampoType extends AbstractType
      */
     public function getName()
     {
-        return 'gopro_vipac_reportebundle_campo';
+        return 'gopro_inventariobundle_caracteristica';
     }
 }

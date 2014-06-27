@@ -76,6 +76,13 @@ class Mantenimiento
      */
     private $user;
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getDescripcion();
+    }
 
     /**
      * Get id
@@ -269,13 +276,5 @@ class Mantenimiento
     public function getUser()
     {
         return $this->user;
-    }
-
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getDescripcion();
     }
 }

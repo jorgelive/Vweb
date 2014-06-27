@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Componenteestado
+ * Componentespec
  *
- * @ORM\Table(name="inv_componenteestado")
+ * @ORM\Table(name="inv_componentecaracteristica")
  * @ORM\Entity
  */
-class Componenteestado
+class Componentecaracteristica
 {
     /**
      * @var integer
@@ -27,10 +27,10 @@ class Componenteestado
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=100)
+     * @ORM\Column(name="contenido", type="string", length=100)
      * @Assert\NotBlank
      */
-    private $nombre;
+    private $contenido;
 
     /**
      * @var datetime $creado
@@ -49,20 +49,21 @@ class Componenteestado
     private $modificado;
 
     /**
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componenteestado", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecarateristicas")
      */
-    private $componentes;
+    private $componente;
 
-    public function __construct() {
-        $this->componentes = new ArrayCollection();
-    }
+    /**
+     * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="componentecaracteristicas")
+     */
+    private $caracteristica;
 
     /**
      * @return string
      */
     function __toString()
     {
-        return $this->getNombre();
+        return $this->getContenido();
     }
 
 
@@ -77,33 +78,33 @@ class Componenteestado
     }
 
     /**
-     * Set nombre
+     * Set contenido
      *
-     * @param string $nombre
-     * @return Componenteestado
+     * @param string $contenido
+     * @return Componentecaracteristica
      */
-    public function setNombre($nombre)
+    public function setContenido($contenido)
     {
-        $this->nombre = $nombre;
+        $this->contenido = $contenido;
 
         return $this;
     }
 
     /**
-     * Get nombre
+     * Get contenido
      *
      * @return string 
      */
-    public function getNombre()
+    public function getContenido()
     {
-        return $this->nombre;
+        return $this->contenido;
     }
 
     /**
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Componenteestado
+     * @return Componentecaracteristica
      */
     public function setCreado($creado)
     {
@@ -126,7 +127,7 @@ class Componenteestado
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Componenteestado
+     * @return Componentecaracteristica
      */
     public function setModificado($modificado)
     {
@@ -146,35 +147,49 @@ class Componenteestado
     }
 
     /**
-     * Add componentes
+     * Set componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
-     * @return Componenteestado
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
+     * @return Componentecaracteristica
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function setComponente(\Gopro\InventarioBundle\Entity\Componente $componente = null)
     {
-        $this->componentes[] = $componentes;
+        $this->componente = $componente;
 
         return $this;
     }
 
     /**
-     * Remove componentes
+     * Get componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
+     * @return \Gopro\InventarioBundle\Entity\Componente 
      */
-    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function getComponente()
     {
-        $this->componentes->removeElement($componentes);
+        return $this->componente;
     }
 
     /**
-     * Get componentes
+     * Set caracteristica
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristica
+     * @return Componentecaracteristica
      */
-    public function getComponentes()
+    public function setCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica = null)
     {
-        return $this->componentes;
+        $this->caracteristica = $caracteristica;
+
+        return $this;
     }
+
+    /**
+     * Get caracteristica
+     *
+     * @return \Gopro\InventarioBundle\Entity\Caracteristica 
+     */
+    public function getCaracteristica()
+    {
+        return $this->caracteristica;
+    }
+
 }

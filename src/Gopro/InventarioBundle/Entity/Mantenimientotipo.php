@@ -42,6 +42,14 @@ class Mantenimientotipo
         $this->mantenimientos = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
+    }
+
 
 
 
@@ -110,14 +118,4 @@ class Mantenimientotipo
     {
         return $this->mantenimientos;
     }
-
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getNombre();
-    }
-
-
 }

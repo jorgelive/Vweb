@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Componenteestado
+ * Caracteristica
  *
- * @ORM\Table(name="inv_componenteestado")
+ * @ORM\Table(name="inv_caracteristica")
  * @ORM\Entity
  */
-class Componenteestado
+class Caracteristica
 {
     /**
      * @var integer
@@ -49,12 +49,12 @@ class Componenteestado
     private $modificado;
 
     /**
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componenteestado", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="caracteristica", cascade={"persist"})
      */
-    private $componentes;
+    private $componentecaracteristicas;
 
     public function __construct() {
-        $this->componentes = new ArrayCollection();
+        $this->componentecaracteristicas = new ArrayCollection();
     }
 
     /**
@@ -64,7 +64,6 @@ class Componenteestado
     {
         return $this->getNombre();
     }
-
 
     /**
      * Get id
@@ -80,7 +79,7 @@ class Componenteestado
      * Set nombre
      *
      * @param string $nombre
-     * @return Componenteestado
+     * @return Caracteristica
      */
     public function setNombre($nombre)
     {
@@ -103,7 +102,7 @@ class Componenteestado
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Componenteestado
+     * @return Caracteristica
      */
     public function setCreado($creado)
     {
@@ -126,7 +125,7 @@ class Componenteestado
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Componenteestado
+     * @return Caracteristica
      */
     public function setModificado($modificado)
     {
@@ -146,35 +145,35 @@ class Componenteestado
     }
 
     /**
-     * Add componentes
+     * Add componentecaracteristicas
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
-     * @return Componenteestado
+     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
+     * @return Caracteristica
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function addComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
     {
-        $this->componentes[] = $componentes;
+        $this->componentecaracteristicas[] = $componentecaracteristicas;
 
         return $this;
     }
 
     /**
-     * Remove componentes
+     * Remove componentecaracteristicas
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
+     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
      */
-    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
     {
-        $this->componentes->removeElement($componentes);
+        $this->componentecaracteristicas->removeElement($componentecaracteristicas);
     }
 
     /**
-     * Get componentes
+     * Get componentecaracteristicas
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getComponentes()
+    public function getComponentecaracteristicas()
     {
-        return $this->componentes;
+        return $this->componentecaracteristicas;
     }
 }

@@ -57,6 +57,14 @@ class Itemtipo
         $this->items = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
+    }
+
 
     /**
      * Get id
@@ -170,11 +178,4 @@ class Itemtipo
         return $this->items;
     }
 
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getNombre();
-    }
 }

@@ -1,0 +1,14 @@
+{% extends 'GoproInventarioBundle::layout.html.twig' %}
+{% block title %}Actualizar característica del componente{% endblock title %}
+{% block titulo %}Actualizar característica del componente{% endblock titulo %}
+{% block content %}
+    {{ form(edit_form) }}
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

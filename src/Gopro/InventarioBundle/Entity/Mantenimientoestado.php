@@ -59,6 +59,14 @@ class Mantenimientoestado
         $this->mantenimientos = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
+    function __toString()
+    {
+        return $this->getNombre();
+    }
+
 
     /**
      * Get id
@@ -170,13 +178,5 @@ class Mantenimientoestado
     public function getMantenimientos()
     {
         return $this->mantenimientos;
-    }
-
-    /**
-     * @return string
-     */
-    function __toString()
-    {
-        return $this->getNombre();
     }
 }
