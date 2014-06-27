@@ -49,7 +49,7 @@ class Componentecaracteristica
     private $modificado;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecarateristicas")
+     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecaracteristicas")
      */
     private $componente;
 

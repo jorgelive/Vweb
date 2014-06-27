@@ -101,6 +101,103 @@ class MantenimientoController extends BaseController
     }
 
     /**
+     * @Route("/generar/{ano}/{semestre}", name="gopro_inventario_mantenimiento_generar")
+     * @Method("GET")
+     * @Template()
+     */
+    public function generarAction($ano,$semestre)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $qb=$em->createQueryBuilder();
+        $qbApl=clone $qb;
+
+        $dependencias=$qbApl
+            ->select('d.id')
+            ->from('GoproUserBundle:Dependencia','d','d.id')
+            ->orderBy('d.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        $qbApl=clone $qb;
+        $mantenimientos=$qbApl
+            ->select('m.id')
+            ->from('GoproInventarioBundle:Mantenimiento','m','m.id')
+            ->orderBy('m.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach(array_keys($dependencias) as $dependencia):
+
+            $qbApl = clone $qb;
+            $items = $qbApl
+                ->select('i')
+                ->from('GoproInventarioBundle:Item', 'i')
+                ->orderBy('i.id', 'ASC')
+                ->where($qbApl->expr()->eq('i.dependencia', ':dependencia'))
+                ->setParameter('dependencia', $dependencia)
+                ->getQuery()
+                ->getArrayResult();
+
+            $periodo=(180/count($items));
+            $fecha=new \DateTime($ano.'-0'.((($semestre-1)*6)+1).'-01');
+
+            print_r($items);
+
+
+
+            foreach($items as $key => $item):
+                if($key%2==0){
+                    //echo round($periodo,0,PHP_ROUND_HALF_UP).'<br>';
+                    $diasAdd=round($periodo,0,PHP_ROUND_HALF_UP);
+                }else{
+                    //echo floor($periodo).'<br>';
+                    $diasAdd=floor($periodo);
+                }
+
+
+
+                $fecha->add(new \DateInterval('P'.$diasAdd.'D'));
+                //echo $fecha->format('Y-m-d').'<br>';
+            endforeach;
+            //print_r($periodo); echo ' '.count($items).'<br>';
+
+        endforeach;
+        /*
+
+               $items = $qb
+                   ->select('i')
+                   ->from('GoproInventarioBundle:Item', 'i')
+                   ->orderBy('i.id', 'ASC')
+                   ->where($qb->expr()->eq('i.dependencia', ':dependencia'))
+                   ->setParameter('dependencia', '1')
+                   ->getQuery()
+                   ->getArrayResult();
+
+             $dependencias = $em->createQueryBuilder()
+                   ->select('i','d')
+                   ->from('GoproInventarioBundle:Item', 'i')
+                   ->leftJoin('i.dependencia', 'd')
+                   ->orderBy('i.id', 'ASC')
+                   ->getQuery()
+                   ->getArrayResult();*/
+
+
+
+
+
+
+
+
+        $entity = new Mantenimiento();
+        $form   = $this->createCreateForm($entity);
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+
+    /**
      * Finds and displays a Mantenimiento entity.
      *
      * @Route("/{id}", name="gopro_inventario_mantenimiento_show")

@@ -9,8 +9,12 @@
                 <td>{{ entity.id }}</td>
             </tr>
             <tr>
-                <th>Nombre</th>
-                <td>{{ entity.nombre }}</td>
+                <th>Item</th>
+                <td>{% if entity.item %}{{ entity.item.nombre }}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Tipo de componente</th>
+                <td>{% if entity.componentetipo %}{{ entity.componentetipo.nombre }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Fecha de compra</th>
@@ -22,7 +26,7 @@
             </tr>
             <tr>
                 <th>Fecha de baja</th>
-                <td>{{ entity.baja|date('Y-m-d') }}</td>
+                <td>{{ entity.fechabaja|date('Y-m-d') }}</td>
             </tr>
             <tr>
                 <th>Creado</th>
@@ -34,6 +38,33 @@
             </tr>
         </tbody>
     </table>
+
+    <h2>Características</h2>
+
+    <table class="listaRegistros">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Característica</th>
+            <th>Contenido</th>
+            <th>Creado</th>
+            <th>Modificado</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for componentecaracteristica in entity.componentecaracteristicas %}
+            <tr>
+                <td>{{ componentecaracteristica.id }}</td>
+                <td>{{ componentecaracteristica.caracteristica.nombre }}</td>
+                <td>{{ componentecaracteristica.contenido }}</td>
+                <td>{{ componentecaracteristica.creado|date('Y-m-d H:i:s') }}</td>
+                <td>{{ componentecaracteristica.modificado|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
 
     <ul class="registroAcciones">
         <li>
