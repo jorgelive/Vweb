@@ -8,6 +8,9 @@
                 <th>Id</th>
                 <th>Descripcion</th>
                 <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Ejecutor</th>
                 <th>Creado</th>
                 <th>Modificado</th>
                 <th>Actciones</th>
@@ -18,9 +21,12 @@
             <tr>
                 <td><a href="{{ path('gopro_inventario_mantenimiento_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.descripcion }}</td>
-                <td>{% if entity.fecha %}{{ entity.fecha|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.modificado %}{{ entity.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>{{ entity.fecha|date('Y-m-d') }}</td>
+                <td>{% if entity.mantenimientotipo %}{{ entity.mantenimientotipo.nombre }}{% endif %}</td>
+                <td>{% if entity.mantenimientoestado %}{{ entity.mantenimientoestado.nombre }}{% endif %}</td>
+                <td>{% if entity.user %}{{ entity.user.nombre }}{% endif %}</td>
+                <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
+                <td>{{ entity.modificado|date('Y-m-d H:i:s') }}</td>
                 <td>
                 <ul>
                     <li>

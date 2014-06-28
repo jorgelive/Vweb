@@ -38,7 +38,7 @@ class CargaController extends BaseController
         $formulario->handleRequest($request);
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -81,7 +81,7 @@ class CargaController extends BaseController
 
         $formulario->handleRequest($request);
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }

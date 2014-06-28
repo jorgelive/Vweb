@@ -119,10 +119,9 @@ class ReporteController extends BaseController
 
         if($destino='archivo'){
             $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$encabezado,$resultados);
+            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$resultados,$encabezado);
             $archivoGenerado->setAnchoColumna(['A'=>12,'B'=>'auto','2:'=>12]);
-            $archivoGenerado->setArchivoGenerado();
-            return $archivoGenerado->getArchivoGenerado();
+            return $archivoGenerado->getArchivo();
         }
         return array('formulario' => $formulario->createView(), 'mensajes' => $this->getMensajes());
     }

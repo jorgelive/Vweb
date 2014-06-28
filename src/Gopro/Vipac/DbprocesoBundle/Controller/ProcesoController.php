@@ -37,7 +37,7 @@ class ProcesoController extends BaseController
 
         $formulario->handleRequest($request);
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -120,7 +120,7 @@ class ProcesoController extends BaseController
         $formulario->handleRequest($request);
 
         $archivoInfo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$archivoInfo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$archivoInfo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($archivoInfo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -487,11 +487,10 @@ class ProcesoController extends BaseController
         }
 
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($archivoInfo->getArchivoValido()->getNombre(),$encabezados,$resultado);
+        $archivoGenerado->setParametrosWriter($archivoInfo->getArchivoBase()->getNombre(),$resultado,$encabezados);
         $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
         $archivoGenerado->setCeldas($celdas);
-        $archivoGenerado->setArchivoGenerado();
-        return $archivoGenerado->getArchivoGenerado();
+        return $archivoGenerado->getArchivo();
     }
 
     /*
@@ -614,7 +613,7 @@ class ProcesoController extends BaseController
         $formulario->handleRequest($request);
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -788,9 +787,8 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($resultado[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$resultado);
-        $archivoGenerado->setArchivoGenerado();
-        return $archivoGenerado->getArchivoGenerado();
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$resultado,$encabezados);
+        return $archivoGenerado->getArchivo();
 
     }
 
@@ -813,7 +811,7 @@ class ProcesoController extends BaseController
         $formulario->handleRequest($request);
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -857,9 +855,8 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($fusion[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
-        $archivoGenerado->setArchivoGenerado();
-        return $archivoGenerado->getArchivoGenerado();
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados);
+        return $archivoGenerado->getArchivo();
     }
 
     /**
@@ -880,7 +877,7 @@ class ProcesoController extends BaseController
         $formulario->handleRequest($request);
 
         $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->validarArchivo($repositorio,$archivoEjecutar,$operacion)){
+        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
             $this->setMensajes($procesoArchivo->getMensajes());
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
@@ -925,8 +922,7 @@ class ProcesoController extends BaseController
 
         $encabezados=array_keys($fusion[0]);
         $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoValido()->getNombre(),$encabezados,$fusion);
-        $archivoGenerado->setArchivoGenerado();
-        return $archivoGenerado->getArchivoGenerado();
+        $archivoGenerado->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados);
+        return $archivoGenerado->getArchivo();
     }
 }

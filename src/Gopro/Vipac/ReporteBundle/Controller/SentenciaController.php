@@ -355,9 +355,8 @@ class SentenciaController extends BaseController
 
             if($destino=='archivo'){
                 $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-                $archivoGenerado->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$encabezados,$resultados);
-                $archivoGenerado->setArchivoGenerado();
-                return $archivoGenerado->getArchivoGenerado();
+                $archivoGenerado->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$resultados,$encabezados);
+                return $archivoGenerado->getArchivo();
             }else{
                 return array(
                     'entity' => $entity,

@@ -89,6 +89,16 @@ class User extends BaseUser
         return $this->area;
     }
 
+    /**
+     * Get area
+     *
+     * @return string
+     */
+    public function getNombre()
+    {
+        return $this->getFirstname().' '.$this->getLastname();
+    }
+
 
 
 }

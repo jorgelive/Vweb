@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gopro\InventarioBundle\Entity\Mantenimiento;
 use Gopro\InventarioBundle\Form\MantenimientoType;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Mantenimiento controller.
@@ -103,12 +104,19 @@ class MantenimientoController extends BaseController
     /**
      * @Route("/generar/{ano}/{semestre}", name="gopro_inventario_mantenimiento_generar")
      * @Method("GET")
-     * @Template()
      */
     public function generarAction($ano,$semestre)
     {
+        if(!in_array($semestre,[1,2])||!in_array($ano,[2013,2014,2015,2016,2017,2018,2019,2020])){
+            return $this->redirect($this->generateUrl('gopro_inventario_mantenimiento'));
+
+        }
         $em = $this->getDoctrine()->getManager();
         $qb=$em->createQueryBuilder();
+        $estadoEjecutado=$em->getRepository('GoproInventarioBundle:Mantenimientoestado')->find(2);
+        $estadoPlanificado=$em->getRepository('GoproInventarioBundle:Mantenimientoestado')->find(1);
+        $tipo=$em->getRepository('GoproInventarioBundle:Mantenimientotipo')->find(2);
+        $ejecutor=$em->getRepository('GoproUserBundle:User')->find(1);
         $qbApl=clone $qb;
 
         $dependencias=$qbApl
@@ -118,83 +126,58 @@ class MantenimientoController extends BaseController
             ->getQuery()
             ->getArrayResult();
 
-        $qbApl=clone $qb;
-        $mantenimientos=$qbApl
-            ->select('m.id')
-            ->from('GoproInventarioBundle:Mantenimiento','m','m.id')
-            ->orderBy('m.id')
-            ->getQuery()
-            ->getArrayResult();
+        $fechaInicio=new \DateTime($ano.'-0'.((($semestre-1)*6)+1).'-01');
+        if($semestre==1){
+            $fechaFin=new \DateTime($ano.'-07-01');
+        }else{
+            $fechaFin=new \DateTime(($ano+1).'-01-01');
+        }
+
+
 
         foreach(array_keys($dependencias) as $dependencia):
-
             $qbApl = clone $qb;
             $items = $qbApl
-                ->select('i')
+                ->addSelect('i')
                 ->from('GoproInventarioBundle:Item', 'i')
+                ->leftJoin('i.mantenimientos', 'm', 'WITH', 'm.fecha>=:fechaInicio and m.fecha<:fechaFin')
+                ->addSelect('m')
                 ->orderBy('i.id', 'ASC')
                 ->where($qbApl->expr()->eq('i.dependencia', ':dependencia'))
                 ->setParameter('dependencia', $dependencia)
+                ->setParameter('fechaInicio', $fechaInicio)
+                ->setParameter('fechaFin', $fechaFin)
                 ->getQuery()
                 ->getArrayResult();
-
             $periodo=(180/count($items));
             $fecha=new \DateTime($ano.'-0'.((($semestre-1)*6)+1).'-01');
-
-            print_r($items);
-
-
-
             foreach($items as $key => $item):
                 if($key%2==0){
-                    //echo round($periodo,0,PHP_ROUND_HALF_UP).'<br>';
                     $diasAdd=round($periodo,0,PHP_ROUND_HALF_UP);
                 }else{
-                    //echo floor($periodo).'<br>';
                     $diasAdd=floor($periodo);
                 }
-
-
-
                 $fecha->add(new \DateInterval('P'.$diasAdd.'D'));
-                //echo $fecha->format('Y-m-d').'<br>';
+                if(empty($item['mantenimientos'])){
+                    ${'mantenimiento'.$key} = new Mantenimiento();
+                    ${'mantenimiento'.$key}
+                        ->setItem($em->getRepository('GoproInventarioBundle:Item')->find($item['id']))
+                        ->setFecha(clone $fecha)
+                        ->setMantenimientotipo($tipo)
+                        ->setUser($ejecutor)
+                        ->setDescripcion('Limpieza interna y externa, optimizacion de programas y archivos, actualización de software.')
+                    ;
+                    if($fecha > new \DateTime()){
+                        ${'mantenimiento'.$key}->setMantenimientoestado($estadoPlanificado);
+                    }else{
+                        ${'mantenimiento'.$key}->setMantenimientoestado($estadoEjecutado);
+                    }
+                    $em->persist(${'mantenimiento'.$key});
+                }
             endforeach;
-            //print_r($periodo); echo ' '.count($items).'<br>';
-
         endforeach;
-        /*
-
-               $items = $qb
-                   ->select('i')
-                   ->from('GoproInventarioBundle:Item', 'i')
-                   ->orderBy('i.id', 'ASC')
-                   ->where($qb->expr()->eq('i.dependencia', ':dependencia'))
-                   ->setParameter('dependencia', '1')
-                   ->getQuery()
-                   ->getArrayResult();
-
-             $dependencias = $em->createQueryBuilder()
-                   ->select('i','d')
-                   ->from('GoproInventarioBundle:Item', 'i')
-                   ->leftJoin('i.dependencia', 'd')
-                   ->orderBy('i.id', 'ASC')
-                   ->getQuery()
-                   ->getArrayResult();*/
-
-
-
-
-
-
-
-
-        $entity = new Mantenimiento();
-        $form   = $this->createCreateForm($entity);
-
-        return array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
-        );
+        $em->flush();
+        return $this->redirect($this->generateUrl('gopro_inventario_mantenimiento'));
     }
 
     /**

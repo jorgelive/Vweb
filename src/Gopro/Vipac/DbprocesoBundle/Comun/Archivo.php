@@ -8,14 +8,21 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
 class Archivo extends ContainerAware{
 
-    private $archivo;
+
+//general
+
     private $mensajes=array();
+    private $archivoBase;
+    private $proceso;
+    private $archivo;
+    private $hoja;
+
+//reader
     private $setTablaSpecs;
     private $setColumnaSpecs;
     private $validCols;
     private $parsed;
     private $descartarBlanco;
-
     private $tablaSpecs;
     private $columnaSpecs;
     private $existentesRaw;
@@ -28,34 +35,11 @@ class Archivo extends ContainerAware{
     private $existentesCustomIndizadosMulti;
     private $existentesDescartados;
     private $camposCustom;
-    private $archivoValido;
 
-//generado
-    private $archivoGenerado;
+//writer
+    private $filaBase=1;
     private $nombre;
     private $tipo;
-    private $contenido;
-    private $encabezado;
-    private $formatoColumna;
-    private $anchoColumna;
-    private $celdas;
-
-    public function getTablaSpecs(){
-        return $this->tablaSpecs;
-    }
-
-    public function getColumnaSpecs(){
-        return $this->columnaSpecs;
-    }
-
-    public function setArchivoValido($archivoValido){
-        $this->archivoValido=$archivoValido;
-        return $this;
-    }
-
-    public function getArchivoValido(){
-        return $this->archivoValido;
-    }
 
     public function getMensajes(){
         return $this->mensajes;
@@ -66,108 +50,55 @@ class Archivo extends ContainerAware{
         return $this;
     }
 
-    public function getExistentesRaw(){
-        return $this->existentesRaw;
+    public function getArchivoBase(){
+        return $this->archivoBase;
     }
 
-    public function getDescartarBlanco(){
-        return $this->descartarBlanco;
+    private function getProceso(){
+        return $this->proceso;
     }
 
-    public function setDescartarBlanco($descartarBlanco){
-        $this->descartarBlanco=$descartarBlanco;
-        return $this;
+    private function getHoja(){
+        return $this->hoja;
     }
 
-    public function getExistentesIndizados(){
-        return $this->existentesIndizados;
+    public function setArchivoBase($repositorio,$id,$funcionArchivo){
+
+        if(empty($repositorio)||empty($id)||empty($funcionArchivo)){
+            return false;
+        }
+        $archivoAlmacenado=$repositorio->find($id);
+        if(empty($archivoAlmacenado)||$archivoAlmacenado->getOperacion()!=$funcionArchivo||!is_object($archivoAlmacenado)){
+            return false;
+        }
+        $fs = new Filesystem();
+        if(empty($this->getArchivoBase()->getAbsolutePath())||!$fs->exists($this->getArchivoBase()->getAbsolutePath())){
+            $this->setMensajes('El archivo no existe');
+            return false;
+        }
+        $this->archivoBase=$archivoAlmacenado;
     }
 
-    private function setExistentesIndizados($existentesIndizados){
-        $this->existentesIndizados=$existentesIndizados;
-        return $this;
+    public function setArchivo(){
+        $this->proceso = $this->container->get('phpexcel');
+        if(!empty($this->getArchivoBase())){
+            $this->archivo = $this->getProceso()->createPHPExcelObject($this->getArchivoBase()->getAbsolutePath());
+        }else{
+            $this->archivo = $this->getProceso()->createPHPExcelObject();
+        }
+        $this->archivo->getProperties()->setCreator("Viapac")
+            ->setTitle("Documento Generado")
+            ->setDescription("Documento generado para descargar");
+        $this->hoja = $this->archivo->setActiveSheetIndex(0);
+        //$total_sheets=$this->archivo->getSheetCount();
+        //$allSheetName=$this->archivo->getSheetNames();
     }
 
-    public function getExistentesIndizadosMulti(){
-        return $this->existentesIndizadosMulti;
-    }
 
-    private function setExistentesIndizadosMulti($existentesIndizadosMulti){
-        $this->existentesIndizadosMulti=$existentesIndizadosMulti;
-        return $this;
-    }
-
-    public function getExistentesIndizadosKp(){
-        return $this->existentesIndizadosKp;
-    }
-
-    private function setExistentesIndizadosKp($existentesIndizadosKp){
-        $this->existentesIndizadosKp=$existentesIndizadosKp;
-        return $this;
-    }
-
-    public function getExistentesIndizadosMultiKp(){
-        return $this->existentesIndizadosMultiKp;
-    }
-
-    private function setExistentesIndizadosMultiKp($existentesIndizadosMultiKp){
-        $this->existentesIndizadosMultiKp=$existentesIndizadosMultiKp;
-        return $this;
-    }
-
-    private function setExistentesRaw($existentesRaw){
-        $this->existentesRaw=$existentesRaw;
-        return $this;
-    }
-
-    public function setCamposCustom($campos){
-        $this->camposCustom=$campos;
-        return $this;
-    }
-
-    public function getCamposCustom(){
-        return $this->camposCustom;
-    }
-
-    public function getExistentesCustomIndizados(){
-        return $this->existentesCustomIndizados;
-    }
-
-    private function setExistentesCustomIndizados($existentesCustomIndizados){
-        $this->existentesCustomIndizados=$existentesCustomIndizados;
-        return $this;
-    }
-
-    public function getExistentesCustomIndizadosMulti(){
-        return $this->existentesCustomIndizadosMulti;
-    }
-
-    private function setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti){
-        $this->existentesCustomIndizadosMulti=$existentesCustomIndizadosMulti;
-        return $this;
-    }
-
-    public function getExistentesCustomRaw(){
-        return $this->existentesCustomRaw;
-    }
-
-    private function setExistentesCustomRaw($existentesCustomRaw){
-        $this->existentesCustomRaw=$existentesCustomRaw;
-        return $this;
-    }
-
-    public function getExistentesDescartados(){
-        return $this->existentesDescartados;
-    }
-
-    public function setExistentesDescartados($existentesDescartados){
-        $this->existentesDescartados=$existentesDescartados;
-        return $this;
-    }
 
     public function setParametrosReader($setTablaSpecs,$setColumnaSpecs){
-        if(empty($this->getArchivoValido())){
-            $this->setMensajes('El archivo no existe');
+        if(empty($this->getArchivoBase())){
+            $this->setMensajes('El archivo no existe.');
             return false;
         }
         $this->setTableSpecs=$setTablaSpecs;
@@ -216,20 +147,20 @@ class Archivo extends ContainerAware{
 
     public function parseExcel(){
 
+        if(empty($this->getArchivo)){
+            $this->setMensajes('El archivo no pudo ser puesto en memoria');
+            return false;
+        }
+
         if($this->parsed=='si'){
             $this->setMensajes('El archivo ya fue procesado anteriormente');
             return true;
         }
         $this->parsed='si';
 
-        $excelLoader = $this->container->get('phpexcel');
-        $objPHPExcel = $excelLoader->createPHPExcelObject($this->getArchivoValido()->getAbsolutePath());
-        $total_sheets=$objPHPExcel->getSheetCount();
-        $allSheetName=$objPHPExcel->getSheetNames();
-        $hoja = $objPHPExcel->setActiveSheetIndex(0);
-        $highestRow = $hoja->getHighestRow();
-        $highestColumn = $hoja->getHighestColumn();
-        $highestColumnIndex = $excelLoader->columnIndexFromString($highestColumn);
+        $highestRow = $this->getHoja()->getHighestRow();
+        $highestColumn = $this->getHoja()->getHighestColumn();
+        $highestColumnIndex = $this->getProceso()->columnIndexFromString($highestColumn);
         $specRow=false;
         $specRowType='';
         $existentesRaw=array();
@@ -243,7 +174,7 @@ class Archivo extends ContainerAware{
             $procesandoNombre=false;
             for ($col = 0; $col <$highestColumnIndex;++$col)
             {
-                $value=$hoja->getCellByColumnAndRow($col, $row)->getValue();
+                $value=$this->getHoja()->getCellByColumnAndRow($col, $row)->getValue();
                 if ($col==0 && substr($value,0,1)=="&" && substr($value,3,1)=="&"){
                     $specRow=true;
                     if(substr($value,0,4)=="&ta&"){
@@ -353,7 +284,7 @@ class Archivo extends ContainerAware{
         }
 
         if(empty($existentesRaw)){
-            $this->setMensajes('No hay valores que procesar');
+            $this->setMensajes('No hay valores que procesar.');
             return false;
         }
 
@@ -411,37 +342,156 @@ class Archivo extends ContainerAware{
         return true;
     }
 
+    public function getTablaSpecs(){
+        return $this->tablaSpecs;
+    }
+
+    public function getColumnaSpecs(){
+        return $this->columnaSpecs;
+    }
+
+    public function getDescartarBlanco(){
+        return $this->descartarBlanco;
+    }
+
+    public function setDescartarBlanco($descartarBlanco){
+        $this->descartarBlanco=$descartarBlanco;
+        return $this;
+    }
+
+    public function getExistentesRaw(){
+        return $this->existentesRaw;
+    }
+
+    public function getExistentesIndizados(){
+        return $this->existentesIndizados;
+    }
+
+    private function setExistentesIndizados($existentesIndizados){
+        $this->existentesIndizados=$existentesIndizados;
+        return $this;
+    }
+
+    public function getExistentesIndizadosMulti(){
+        return $this->existentesIndizadosMulti;
+    }
+
+    private function setExistentesIndizadosMulti($existentesIndizadosMulti){
+        $this->existentesIndizadosMulti=$existentesIndizadosMulti;
+        return $this;
+    }
+
+    public function getExistentesIndizadosKp(){
+        return $this->existentesIndizadosKp;
+    }
+
+    private function setExistentesIndizadosKp($existentesIndizadosKp){
+        $this->existentesIndizadosKp=$existentesIndizadosKp;
+        return $this;
+    }
+
+    public function getExistentesIndizadosMultiKp(){
+        return $this->existentesIndizadosMultiKp;
+    }
+
+    private function setExistentesIndizadosMultiKp($existentesIndizadosMultiKp){
+        $this->existentesIndizadosMultiKp=$existentesIndizadosMultiKp;
+        return $this;
+    }
+
+    private function setExistentesRaw($existentesRaw){
+        $this->existentesRaw=$existentesRaw;
+        return $this;
+    }
+
+    public function setCamposCustom($campos){
+        $this->camposCustom=$campos;
+        return $this;
+    }
+
+    public function getCamposCustom(){
+        return $this->camposCustom;
+    }
+
+    public function getExistentesCustomIndizados(){
+        return $this->existentesCustomIndizados;
+    }
+
+    private function setExistentesCustomIndizados($existentesCustomIndizados){
+        $this->existentesCustomIndizados=$existentesCustomIndizados;
+        return $this;
+    }
+
+    public function getExistentesCustomIndizadosMulti(){
+        return $this->existentesCustomIndizadosMulti;
+    }
+
+    private function setExistentesCustomIndizadosMulti($existentesCustomIndizadosMulti){
+        $this->existentesCustomIndizadosMulti=$existentesCustomIndizadosMulti;
+        return $this;
+    }
+
+    public function getExistentesCustomRaw(){
+        return $this->existentesCustomRaw;
+    }
+
+    private function setExistentesCustomRaw($existentesCustomRaw){
+        $this->existentesCustomRaw=$existentesCustomRaw;
+        return $this;
+    }
+
+    public function getExistentesDescartados(){
+        return $this->existentesDescartados;
+    }
+
+    public function setExistentesDescartados($existentesDescartados){
+        $this->existentesDescartados=$existentesDescartados;
+        return $this;
+    }
 
 
-    public function setParametrosWriter($nombre,$encabezado=null,$contenido){
+    public function setParametrosWriter($nombre='archivoGenerado',$contenido=null,$encabezado=null,$tipo='xlsx'){
         $this->setNombre($nombre);
-        if($encabezado!=null){
-            $this->setEncabezado($encabezado);
+        if(is_array($encabezado)){
+            $this->setFila($encabezado,'A1');
+            $this->filaBase=2;
+        }
+        if(is_array($contenido)){
+            $this->setTabla($contenido,'A'.$this->getFilaBase());
         }
 
-        $this->setContenido($contenido);
-        $this->setTipo();
+        $this->setTipo($tipo);
     }
 
-    public function setEncabezado($encabezado){
-        $this->encabezado=$encabezado;
+    public function setFila($fila,$posicion){
+        if(empty($this->getHoja())||empty($fila)||!is_array($fila)||$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($fila)||empty($posicion)){
+            $this->setMensajes('El formato de fila no es correcto');
+            return false;
+        }
+        $posicionX=preg_replace("/[0-9]/", '', $posicion);
+        $posicionY=preg_replace("/[^0-9]/", '', $posicion);
+        $posicionXNumerico=$this->getProceso()->columnIndexFromSring($posicionX);
+        foreach($fila as $key=>$celda):
+            $columna = $this->getProceso()->stringFromColumnIndex($key+$posicionXNumerico-1);
+            $this->getHoja()->setCellValue($columna.$posicionY, $celda);
+        endforeach;
+
+    }
+
+    public function getFilaBase(){
+        return $this->filaBase;
+    }
+
+    public function setTabla($tabla,$posicion){
+        if(empty($this->getHoja())||empty($tabla)||!is_array($tabla)||!$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($tabla)||empty($posicion)){
+            $this->setMensajes('El formato de tabla no es correcto');
+            return false;
+        }
+        $this->getHoja()->fromArray($tabla, NULL, $posicion);
         return $this;
     }
 
-    public function getEncabezado(){
-        return $this->encabezado;
-    }
-
-    public function setContenido($contenido){
-        $this->contenido=$contenido;
-        return $this;
-    }
-
-    public function getContenido(){
-        return $this->contenido;
-    }
-
-    public function setTipo($tipo='xlsx'){
+    public function setTipo($tipo){
         $this->tipo=$tipo;
         return $this;
     }
@@ -450,7 +500,7 @@ class Archivo extends ContainerAware{
         return $this->tipo;
     }
 
-    public function setNombre($nombre='archivoGenerado'){
+    public function setNombre($nombre){
         $this->nombre=$nombre;
         return $this;
     }
@@ -459,157 +509,104 @@ class Archivo extends ContainerAware{
         return $this->nombre;
     }
 
-    public function getArchivoGenerado(){
-        return $this->archivoGenerado;
-    }
-
     public function setFormatoColumna($formatoColumna){
-        $this->formatoColumna=$formatoColumna;
-        return $this;
-    }
 
-    public function getFormatoColumna(){
-        return $this->formatoColumna;
-    }
-
-    public function setAnchoColumna($anchoColumna){
-        $this->anchoColumna=$anchoColumna;
-        return $this;
-    }
-
-    public function getAnchoColumna(){
-        return $this->anchoColumna;
-    }
-
-    public function setCeldas($celdas){
-        $this->celdas=$celdas;
-        return $this;
-    }
-
-    public function getCeldas(){
-        return $this->celdas;
-    }
-
-    public function setArchivoGenerado(){
-        $excelWriter = $this->container->get('phpexcel');
-        if(!empty($this->getArchivoValido())){
-            $phpExcelObject = $excelWriter->createPHPExcelObject($this->getArchivoValido()->getAbsolutePath());
-        }else{
-            $phpExcelObject = $excelWriter->createPHPExcelObject();
+        if(empty($this->getHoja())||empty($formatoColumna)||!$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($formatoColumna)){
+            $this->setMensajes('El formato de columna no es correcto');
+            return false;
         }
-        $phpExcelObject->getProperties()->setCreator("Viapac")
-            ->setTitle("Documento Generado")
-            ->setDescription("Documento generado para descargar");
-        $hoja=$phpExcelObject->setActiveSheetIndex(0);
-        $filaBase=1;
-        if(!empty($this->getEncabezado())){
-            foreach($this->getEncabezado() as $key=>$encabezado):
-                $columna = $excelWriter->stringFromColumnIndex($key);
-                $hoja->setCellValue($columna.'1', $encabezado);
-            endforeach;
-            $filaBase=2;
-        }
-        $hoja->fromArray($this->getContenido(), NULL, 'A'.$filaBase);
-
-        if(!empty($this->getFormatoColumna())&&$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($this->getFormatoColumna())){
-            $highestRow = $hoja->getHighestRow();
-            foreach($this->getFormatoColumna() as $formato => $columnas):
-                foreach($columnas as $columna):
-                    if (strpos($columna, ':') !== false){
-                        $columna=explode(':',$columna,2);
-                        if(is_numeric($columna[0])&&(is_numeric($columna[1])||empty($columna[1]))){
-                            if(empty($columna[1])){
-                                $columna[1]=$excelWriter->columnIndexFromString($hoja->getHighestColumn());
-                            }
-                            foreach(range($columna[0], $columna[1]) as $columnaProceso) {
-                                $columnaString=$excelWriter->stringFromColumnIndex($columnaProceso);
-                                $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
-                                    ->getNumberFormat()
-                                    ->setFormatCode($columnaString);
-                            }
-                        }
-
-                    }else{
-                        if(is_numeric($columna)){
-                            $columna=$excelWriter->stringFromColumnIndex($columna);
-                        }
-                        $hoja->getStyle($columna.$filaBase.':'.$columna.$highestRow)
-                            ->getNumberFormat()
-                            ->setFormatCode($formato);
-                    }
-                endforeach;
-            endforeach;
-        }
-
-        if(!empty($this->getAnchoColumna())&&is_array($this->getAnchoColumna())){
-            foreach($this->getAnchoColumna() as $columna => $ancho):
+        $highestRow = $this->getHoja()->getHighestRow();
+        foreach($formatoColumna as $formato => $columnas):
+            foreach($columnas as $columna):
                 if (strpos($columna, ':') !== false){
                     $columna=explode(':',$columna,2);
                     if(is_numeric($columna[0])&&(is_numeric($columna[1])||empty($columna[1]))){
                         if(empty($columna[1])){
-                            $columna[1]=$excelWriter->columnIndexFromString($hoja->getHighestColumn());
+                            $columna[1]=$this->getProceso()->columnIndexFromString($highestRow);
                         }
                         foreach(range($columna[0], $columna[1]) as $columnaProceso) {
-                            $columnaString=$excelWriter->stringFromColumnIndex($columnaProceso);
-                            if(is_numeric($ancho)){
-                                $hoja->getColumnDimension($columnaString)->setWidth($ancho);
-                            }elseif($ancho=='auto'){
-                                $hoja->getColumnDimension($columnaString)->setAutoSize(true);
-                            }
+                            $columnaString=$this->getProceso()->stringFromColumnIndex($columnaProceso);
+                            $this->getHoja()->getStyle($columna.$this->getFilaBase().':'.$columna.$highestRow)
+                                ->getNumberFormat()
+                                ->setFormatCode($columnaString);
                         }
                     }
                 }else{
                     if(is_numeric($columna)){
-                        $columna=$excelWriter->stringFromColumnIndex($columna);
+                        $columna=$this->getProceso()->stringFromColumnIndex($columna);
                     }
-                    if(is_numeric($ancho)){
-                        $hoja->getColumnDimension($columna)->setWidth($ancho);
-                    }elseif($ancho=='auto'){
-                        $hoja->getColumnDimension($columna)->setAutoSize(true);
-                    }
+                    $this->getHoja()->getStyle($columna.$this->getFilaBase().':'.$columna.$highestRow)
+                        ->getNumberFormat()
+                        ->setFormatCode($formato);
                 }
             endforeach;
-        }
+        endforeach;
 
-        if(!empty($this->getCeldas())&&$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($this->getCeldas())){
-            if(!empty($this->getCeldas()['texto'])){
-                foreach($this->getCeldas()['texto'] as $celda => $valor):
-                        $hoja->setCellValueExplicit($celda,$valor,'s');
-                endforeach;
-            }
-        }
-
-        $phpExcelObject->getActiveSheet()->setTitle('Hoja de datos');
-        $phpExcelObject->setActiveSheetIndex(0);
-        $writer = $this->container->get('phpexcel')->createWriter($phpExcelObject, 'Excel2007');
-        $response = $this->container->get('phpexcel')->createStreamedResponse($writer);
-        $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->getNombre().'.'.$this->getTipo()));
-        $response->headers->set('Pragma', 'public');
-        $response->headers->set('Cache-Control', 'maxage=1');
-        $this->archivoGenerado=$response;
         return $this;
     }
 
-    public function validarArchivo($repositorio,$id,$funcionArchivo){
-        $ejecutar=false;
-        if($id!==null){
-            $archivoAlmacenado=$repositorio->find($id);
-        }
-
-        if(!empty($archivoAlmacenado)&&$archivoAlmacenado->getOperacion()==$funcionArchivo){
-            $this->setArchivoValido($archivoAlmacenado);
-            $ejecutar=true;
-        }
-        $fs = new Filesystem();
-
-        if(!is_object($this->getArchivoValido())||empty($this->getArchivoValido()->getAbsolutePath())||!$fs->exists($this->getArchivoValido()->getAbsolutePath())){
-            $this->setMensajes('El archivo no existe');
+    public function setAnchoColumna($anchoColumna){
+        if(empty($this->getHoja())||empty($anchoColumna)||!is_array($anchoColumna)){
+            $this->setMensajes('El ancho no tiene el formato correcto');
             return false;
         }
-        if($ejecutar===true){
-            $this->archivoValido=$archivoAlmacenado;
+
+        foreach($anchoColumna as $columna => $ancho):
+            if (strpos($columna, ':') !== false){
+                $columna=explode(':',$columna,2);
+                if(is_numeric($columna[0])&&(is_numeric($columna[1])||empty($columna[1]))){
+                    if(empty($columna[1])){
+                        $columna[1]=$this->getProceso()->columnIndexFromString($this->getHoja()->getHighestColumn());
+                    }
+                    foreach(range($columna[0], $columna[1]) as $columnaProceso) {
+                        $columnaString=$this->getProceso()->stringFromColumnIndex($columnaProceso);
+                        if(is_numeric($ancho)){
+                            $this->getHoja()->getColumnDimension($columnaString)->setWidth($ancho);
+                        }elseif($ancho=='auto'){
+                            $this->getHoja()->getColumnDimension($columnaString)->setAutoSize(true);
+                        }
+                    }
+                }
+            }else{
+                if(is_numeric($columna)){
+                    $columna=$this->getProceso()->stringFromColumnIndex($columna);
+                }
+                if(is_numeric($ancho)){
+                    $this->getHoja()->getColumnDimension($columna)->setWidth($ancho);
+                }elseif($ancho=='auto'){
+                    $this->getHoja()->getColumnDimension($columna)->setAutoSize(true);
+                }
+            }
+        endforeach;
+
+        return $this;
+    }
+
+    public function setCeldas($celdas){
+        if(empty($this->getHoja())||empty($celdas)||!$this->container->get('gopro_dbproceso_comun_variable')->is_multi_array($celdas)){
+            $this->setMensajes('Las celdas no tienen el formato correcto');
+            return false;
         }
-        return $ejecutar;
+
+        if(!empty($celdas['texto'])){
+            foreach($celdas['texto'] as $celda => $valor):
+                $this->getHoja()->setCellValueExplicit($celda,$valor,'s');
+            endforeach;
+        }
+        return $this;
+    }
+
+    public function getArchivo($tipo='response'){
+
+        if($tipo=='response'){
+            $tipoWriter['xslx']='Excel2007';
+            $writer = $this->getProceso()->createWriter($this->archivo, $tipoWriter[$this->getTipo()]);
+            $response = $this->getProceso()->createStreamedResponse($writer);
+            $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
+            $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_dbproceso_comun_variable')->sanitizeString($this->getNombre().'.'.$this->getTipo()));
+            $response->headers->set('Pragma', 'public');
+            $response->headers->set('Cache-Control', 'maxage=1');
+            return $response;
+        }
     }
 }
