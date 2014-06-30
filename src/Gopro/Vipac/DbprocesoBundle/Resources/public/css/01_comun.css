@@ -1,51 +1,23 @@
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div{margin-bottom: 7px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div {margin-bottom: 7px;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div label {display: inline-block; margin: 2px 10px; text-align: right; width: 150px; vertical-align: top;}
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div label,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div label{display: inline-block; margin-left: 5px; width: 90px; vertical-align: top;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div label {display: inline-block; margin-left: 5px; width: 90px; vertical-align: top;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div ul,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div ul,
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul{list-style: none;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div ul li,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div ul li,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul li{color:#cd0a0a; font-size: 9px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div ul li {color:#cd0a0a; font-size: 9px;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div div,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div div,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div{margin-top: 5px; margin-left: 10px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div {margin-top: 5px; margin-left: 10px;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div div label,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_archivo div div label,
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div label{display: inline-block; margin-left: 5px; width: 70px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div label {display: inline-block; margin-left: 5px; width: 70px;}
 
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker{width: 120px;}
 
 div#GoproVipacDbprocesoBundle div#mensajes{margin-top: 10px;}
-div#GoproVipacDbprocesoBundle div#mensajes ul{margin-left: 30px;}
 div#GoproVipacDbprocesoBundle div#archivos{margin-top: 10px;}
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos {margin:10px 0; border-collapse: collapse;}
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos thead tr th{font-size: 95%;}
 
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos thead tr th,
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos tbody tr td{min-width:170px; border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos tbody tr td.nombre{text-align: left; font-weight: bold;}
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos tbody tr td a{ margin:0 5px; color:#444;}
-div#GoproVipacDbprocesoBundle div#archivos table#listaArchivos tbody tr td a:hover{ margin:0 5px; color:#444;}
-
-div#GoproVipacDbprocesoBundle table.listaRegistros,
-div#GoproVipacDbprocesoBundle table.registroPropiedades{border-collapse: collapse;}
-div#GoproVipacDbprocesoBundle table.listaRegistros tr td,
-div#GoproVipacDbprocesoBundle table.registroPropiedades tr td,
-div#GoproVipacDbprocesoBundle table.listaRegistros tr th,
-div#GoproVipacDbprocesoBundle table.registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
-div#GoproVipacDbprocesoBundle table.listaRegistros tr td ul,
-div#GoproVipacDbprocesoBundle table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
-
-div#GoproVipacDbprocesoBundle ul.registroAcciones,
-div#GoproVipacDbprocesoBundle ul.listaAcciones{list-style: none outside none; margin: 10px 0;}
-div#GoproVipacDbprocesoBundle ul.registroAcciones li,
-div#GoproVipacDbprocesoBundle ul.listaAcciones li{ display: inline-block;}

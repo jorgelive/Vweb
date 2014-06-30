@@ -1,0 +1,15 @@
+{% extends "::global.html.twig" %}
+{% block title %}Bibliteca de funciones - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="GoproMainBundle">
+        {% block content %}
+        {% endblock content %}
+    </div>
+{% endblock container %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

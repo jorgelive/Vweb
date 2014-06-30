@@ -29,7 +29,7 @@ class AppKernel extends Kernel
             new Gopro\Vipac\DbprocesoBundle\GoproVipacDbprocesoBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
             new Gopro\Vipac\ExtraBundle\GoproVipacExtraBundle(),
-            new Gopro\Vipac\MainBundle\GoproVipacMainBundle(),
+            new Gopro\MainBundle\GoproMainBundle(),
             new Fkr\CssURLRewriteBundle\FkrCssURLRewriteBundle(),
             new Gopro\Vipac\ReporteBundle\GoproVipacReporteBundle(),
             new JMS\AopBundle\JMSAopBundle(),

@@ -18,7 +18,7 @@ class TransferenciaCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        $datos=$this->getContainer()->get('gopro_dbproceso_comun_proceso');
+        $datos=$this->getContainer()->get('gopro_dbproceso_proceso');
         $datos->setConexion($this->getContainer()->get('doctrine.dbal.vipac_connection'));
         $datos->setTabla('EXTRA_TRANSFERENCIA_CB');
         $datos->setSchema('VWEB');
@@ -42,7 +42,7 @@ class TransferenciaCommand extends ContainerAwareCommand
             $output->writeln('No hay datos que procesar');
             return false;
         }
-        $datosTransferencia=$this->getContainer()->get('gopro_dbproceso_comun_proceso');
+        $datosTransferencia=$this->getContainer()->get('gopro_dbproceso_proceso');
         $datosTransferencia->setConexion($this->getContainer()->get('doctrine.dbal.vipac_connection'));
         $datosTransferencia->setTabla('VVW_TRANSFERENCIA_CB');
         $datosTransferencia->setSchema('VIAPAC');
@@ -72,7 +72,7 @@ class TransferenciaCommand extends ContainerAwareCommand
             return false;
         }
 
-        $resultado = $this->getContainer()->get('gopro_dbproceso_comun_variable')->utf($datosTransferencia->getExistentesRaw());
+        $resultado = $this->getContainer()->get('gopro_main_variable')->utf($datosTransferencia->getExistentesRaw());
 
         foreach($resultado as $linea):
             if(!empty(trim($linea['E_MAIL']))){

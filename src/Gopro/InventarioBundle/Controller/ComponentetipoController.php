@@ -2,7 +2,7 @@
 
 namespace Gopro\InventarioBundle\Controller;
 
-use Gopro\Vipac\MainBundle\Controller\BaseController;
+use Gopro\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;

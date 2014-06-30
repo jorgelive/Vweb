@@ -3,7 +3,7 @@
 namespace Gopro\Vipac\ReporteBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Gopro\Vipac\MainBundle\Controller\BaseController;
+use Gopro\MainBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -35,8 +35,8 @@ class SentenciaController extends BaseController
      * @return string
      */
     private function setValoresBind($campo,$valor){
-        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
-        return ':v'.substr(sha1($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($campo.$valor)),0,28);
+        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
+        return ':v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeQuery($campo.$valor)),0,28);
     }
 
     /**
@@ -88,7 +88,7 @@ class SentenciaController extends BaseController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $entity->setContenido($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($entity->getContenido()));
+            $entity->setContenido($this->container->get('gopro_main_variable')->sanitizeQuery($entity->getContenido()));
             $em = $this->getDoctrine()->getManager();
             $campos = $this->getCampos($form->getData()->getContenido());
             foreach($campos as $campo){
@@ -183,6 +183,7 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
+        $encabezados=array();
 
         foreach($camposSQL as $campoSQL):
             if(empty($camposPorNombre[$campoSQL])){
@@ -205,7 +206,6 @@ class SentenciaController extends BaseController
         }
 
         $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),$destino,$limite);
-
 
         if (
             $request->getMethod() == 'POST'
@@ -351,12 +351,14 @@ class SentenciaController extends BaseController
                     'mensajes' => $this->getMensajes()
                 );
             }
-            $resultados=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
+            $resultados=$this->container->get('gopro_main_variable')->utf($statement->fetchAll());
 
             if($destino=='archivo'){
-                $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-                $archivoGenerado->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$resultados,$encabezados);
-                return $archivoGenerado->getArchivo();
+                $archivoGenerado=$this->get('gopro_main_archivoexcel');
+                return $archivoGenerado
+                    ->setArchivo()
+                    ->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$resultados,$encabezados)
+                    ->getArchivo();
             }else{
                 return array(
                     'entity' => $entity,
@@ -480,7 +482,7 @@ class SentenciaController extends BaseController
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-            $entity->setContenido($this->container->get('gopro_dbproceso_comun_variable')->sanitizeQuery($entity->getContenido()));
+            $entity->setContenido($this->container->get('gopro_main_variable')->sanitizeQuery($entity->getContenido()));
             $campos = $this->getCampos($editForm->getData()->getContenido());
             $camposExistentes=$em->getRepository('GoproVipacReporteBundle:Campo')->findBy(['sentencia'=>$entity->getId()]);
 

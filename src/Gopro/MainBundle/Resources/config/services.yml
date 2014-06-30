@@ -1,0 +1,20 @@
+parameters:
+    archivoexcel.class:  Gopro\MainBundle\Service\Archivoexcel
+    archivozip.class:  Gopro\MainBundle\Service\Archivozip
+    variable.class:  Gopro\MainBundle\Service\Variable
+
+services:
+    gopro_main_archivozip:
+        class: %archivozip.class%
+        calls:
+            - [ setContainer,[ @service_container ] ]
+        scope: prototype
+    gopro_main_archivoexcel:
+        class: %archivoexcel.class%
+        calls:
+            - [ setContainer,[ @service_container ] ]
+        scope: prototype
+    gopro_main_variable:
+        class: %variable.class%
+        calls:
+            - [ setContainer,[ @service_container ] ]

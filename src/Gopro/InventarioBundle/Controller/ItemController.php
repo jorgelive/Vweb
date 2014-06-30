@@ -1,7 +1,7 @@
 <?php
 
 namespace Gopro\InventarioBundle\Controller;
-use Gopro\Vipac\MainBundle\Controller\BaseController;
+use Gopro\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -149,6 +149,99 @@ class ItemController extends BaseController
             'edit_form'   => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         );
+    }
+
+    /**
+     * Displays a form to edit an existing Item entity.
+     *
+     * @Route("/{id}/servicio", name="gopro_inventario_item_edit")
+     * @Method("GET")
+     * @Template()
+     */
+    public function servicioAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $items = $em->createQueryBuilder()
+            ->addSelect('i')
+            ->from('GoproInventarioBundle:Item', 'i')
+            ->leftJoin('i.servicios', 'm')
+            ->addSelect('m')
+            ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
+            ->addSelect('c')
+            ->leftJoin('c.componentecaracteristicas','cc')
+            ->addSelect('cc')
+            ->leftJoin('cc.caracteristica','ca')
+            ->addSelect('ca')
+            ->orderBy('i.id', 'ASC');
+
+        if(is_numeric($id)){
+            $items=$items->where($em->createQueryBuilder()->expr()->eq('i.id', ':item'))
+                ->setParameter('item', $id);
+
+        }elseif($id!='todo'){
+            throw $this->createNotFoundException('No se puede procesar este identificador.');
+        }
+
+        $items=$items->getQuery()
+            ->getResult();
+
+        if (empty($items)) {
+            throw $this->createNotFoundException('No se encontraton resultados.');
+        }
+
+        $archivos=array();
+        foreach($items as $item):
+            //echo $item->getNombre().'<br>';
+            //echo $item->getCodigo().'<br>';
+            $componenteCadena='';
+            if(!empty($item->getComponentes()[0])){
+                $componentePrincipal=$item->getComponentes()[0];
+
+                foreach($componentePrincipal->getComponentecaracteristicas() as $componentecaracteristica):
+                    $componenteCadena .= $componentecaracteristica->getCaracteristica()->getNombre().': ';
+                    $componenteCadena .= $componentecaracteristica->getContenido().'. ';
+                endforeach;
+
+            }
+            //echo $componenteCadena.'<br>';
+            $mantenimientos=array();
+            foreach($item->getServicios() as $key => $servicio):
+                $mantenimientos[$key][]=$key+1;
+                $mantenimientos[$key][]=$servicio->getFecha()->format('Y-m-d');
+                $mantenimientos[$key][]=$servicio->getServiciotipo()->getNombre().': '.$servicio->getDescripcion();
+                if($servicio->getServiciotipo()->getId()==1){
+                    $mantenimientos[$key][]='';
+                    $mantenimientos[$key][]='X';
+                }else{
+                    $mantenimientos[$key][]='X';
+                    $mantenimientos[$key][]='';
+                }
+                $mantenimientos[$key][]= $servicio->getUser()->getNombre();
+            endforeach;
+
+            $archivoGenerado=$this->get('gopro_main_archivoexcel')
+                ->setArchivo()
+                ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
+                ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
+                ->setTabla($mantenimientos,'A9');
+
+            $archivos[]=[
+                'path'=>$archivoGenerado->getArchivo('archivo'),
+                'nombre'=>$archivoGenerado->getNombre().'.'.$archivoGenerado->getTipo()
+            ];
+
+        endforeach;
+
+        if(empty($archivos)){
+            throw $this->createNotFoundException('No se pueden generar los archivos.');
+        }
+
+        return $this->get('gopro_main_archivozip')
+            ->setParametros($archivos,'mantenimientos_'.time())
+            ->setArchivo()
+            ->getArchivo();
+
     }
 
     /**

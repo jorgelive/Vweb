@@ -2,11 +2,10 @@
 
 namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
-use Gopro\Vipac\DbprocesoBundle\Form\ArchivocamposType;
-use Gopro\Vipac\DbprocesoBundle\Entity\Archivo;
-use Gopro\Vipac\MainBundle\Controller\BaseController;
+use Gopro\MainBundle\Form\ArchivocamposType;
+use Gopro\MainBundle\Entity\Archivo;
+use Gopro\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
-use Gopro\Vipac\DbprocesoBundle\Comun\Archivo as ArchivoOpe;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -26,31 +25,35 @@ class CargaController extends BaseController
     public function genericoAction(Request $request,$archivoEjecutar)
     {
 
-        $operacion='carga_generico';
-        $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
+        $operacion='vipac_dbproceso_carga_generico';
+        $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
+            'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
-            $this->setMensajes($procesoArchivo->getMensajes());
+        if(empty($archivoEjecutar)){
+            $this->setMensajes('No se ha definido ningun archivo');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
-        $procesoArchivo->setParametrosReader(null,null);
+
+        $procesoArchivo=$this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+            ->setArchivo()
+            ->setParametrosReader(null,null)
+        ;
         if(!$procesoArchivo->parseExcel()){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        $carga=$this->get('gopro_dbproceso_comun_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga=$this->get('gopro_dbproceso_cargador');
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
@@ -70,19 +73,19 @@ class CargaController extends BaseController
     public function arreglartcAction(Request $request,$archivoEjecutar)
     {
 
-        $operacion='carga_arreglartc';
-        $repositorio = $this->getDoctrine()->getRepository('GoproVipacDbprocesoBundle:Archivo');
+        $operacion='vipac_dbproceso_carga_arreglartc';
+        $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
         $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
-            'action' => $this->generateUrl('gopro_vipac_dbproceso_archivo_create'),
+            'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
-        $procesoArchivo=$this->get('gopro_dbproceso_comun_archivo');
-        if(!$procesoArchivo->setArchivoBase($repositorio,$archivoEjecutar,$operacion)){
-            $this->setMensajes($procesoArchivo->getMensajes());
+
+        if(empty($archivoEjecutar)){
+            $this->setMensajes('No se ha definido ningun archivo');
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
@@ -91,11 +94,16 @@ class CargaController extends BaseController
         $columnaDocCp[1]=array('nombre'=>'MONTO','llave'=>'no');
         $columnaDocCp[2]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no');
         $columnaDocCp[3]=array('nombre'=>'MONEDA','llave'=>'no');
-        $procesoArchivo->setParametrosReader($tablaDocCp,$columnaDocCp);
+
+        $procesoArchivo=$this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+            ->setArchivo()
+            ->setParametrosReader($tablaDocCp,$columnaDocCp)
+        ;
         $mensajes=$procesoArchivo->getMensajes();
         if($procesoArchivo->parseExcel()!==false){
-            $documentoCp=$this->get('gopro_dbproceso_comun_cargador');
-            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $documentoCp=$this->get('gopro_dbproceso_cargador');
+            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $documentoCp->ejecutar();
             $exiDocumentoCp=$documentoCp->getProceso()->getExistentesIndizados();
             if(empty($exiDocumentoCp)){
@@ -109,8 +117,8 @@ class CargaController extends BaseController
                 'columnasProceso'=>Array('ASIENTO','TOTAL_DEBITO_DOL','TOTAL_CREDITO_DOL','TOTAL_CONTROL_DOL','FECHA')
             );
             $columnaAsiDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
-            $asiDi=$this->get('gopro_dbproceso_comun_cargador');
-            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $asiDi=$this->get('gopro_dbproceso_cargador');
+            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $asiDi->prepararSelect();
             $asiDi->ejecutarSelectQuery();
             $exiAsiDi=$asiDi->getProceso()->getExistentesIndizados();
@@ -125,8 +133,8 @@ class CargaController extends BaseController
                 'columnasProceso'=>Array('ASIENTO','CONSECUTIVO','DEBITO_DOLAR','CREDITO_DOLAR')
             );
             $columnaDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
-            $di=$this->get('gopro_dbproceso_comun_cargador');
-            $di->setParametros($tablaDi,$columnaDi,$this->container->get('gopro_dbproceso_comun_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $di=$this->get('gopro_dbproceso_cargador');
+            $di->setParametros($tablaDi,$columnaDi,$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $di->prepararSelect();
             $di->ejecutarSelectQuery();
 
@@ -157,7 +165,7 @@ class CargaController extends BaseController
                 'columnasProceso'=>Array('FECHA','TIPO_CAMBIO','MONTO')
             );
             $columnaTc['FECHA']=array('nombre'=>'FECHA','llave'=>'si');
-            $tc=$this->get('gopro_dbproceso_comun_cargador');
+            $tc=$this->get('gopro_dbproceso_cargador');
             $tc->setParametros($tablaTc,$columnaTc,$fechaBuscar,$this->container->get('doctrine.dbal.vipac_connection'));
             $tc->prepararSelect();
             $tc->ejecutarSelectQuery();

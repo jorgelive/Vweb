@@ -4,7 +4,7 @@ namespace Gopro\InventarioBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class MantenimientoControllerTest extends WebTestCase
+class ServicioControllerTest extends WebTestCase
 {
     /*
     public function testCompleteScenario()
@@ -13,13 +13,13 @@ class MantenimientoControllerTest extends WebTestCase
         $client = static::createClient();
 
         // Create a new entry in the database
-        $crawler = $client->request('GET', '/mantenimiento/');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /mantenimiento/");
+        $crawler = $client->request('GET', '/servicio/');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), "Unexpected HTTP status code for GET /servicio/");
         $crawler = $client->click($crawler->selectLink('Create a new entry')->link());
 
         // Fill in the form and submit it
         $form = $crawler->selectButton('Create')->form(array(
-            'gopro_inventariobundle_mantenimientotype[field_name]'  => 'Test',
+            'gopro_inventariobundle_serviciotype[field_name]'  => 'Test',
             // ... other fields to fill
         ));
 
@@ -33,7 +33,7 @@ class MantenimientoControllerTest extends WebTestCase
         $crawler = $client->click($crawler->selectLink('Edit')->link());
 
         $form = $crawler->selectButton('Edit')->form(array(
-            'gopro_inventariobundle_mantenimientotype[field_name]'  => 'Foo',
+            'gopro_inventariobundle_serviciotype[field_name]'  => 'Foo',
             // ... other fields to fill
         ));
 

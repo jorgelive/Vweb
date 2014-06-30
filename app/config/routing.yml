@@ -9,7 +9,7 @@ gopro_vipac_reporte:
     prefix:   /reporte
 
 gopro_vipac_main:
-    resource: "@GoproVipacMainBundle/Controller/"
+    resource: "@GoproMainBundle/Controller/"
     type:     annotation
     prefix:   /
 
@@ -18,7 +18,7 @@ gopro_vipac_extra:
     type:     annotation
     prefix:   /extra
 
-gopro_vipac_cargador:
+gopro_vipac_dbproceso:
     resource: "@GoproVipacDbprocesoBundle/Controller/"
     type:     annotation
     prefix:   /dbproceso

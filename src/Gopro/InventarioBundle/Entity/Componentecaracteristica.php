@@ -50,11 +50,13 @@ class Componentecaracteristica
 
     /**
      * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecaracteristicas")
+     * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
      */
     private $componente;
 
     /**
      * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="componentecaracteristicas")
+     * @ORM\JoinColumn(name="caracteristica_id", referencedColumnName="id", nullable=false)
      */
     private $caracteristica;
 

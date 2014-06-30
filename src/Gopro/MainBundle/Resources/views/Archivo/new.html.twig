@@ -1,0 +1,13 @@
+{% extends 'GoproMainBundle::layout.html.twig' %}
+{% block title %}Carga de Archivos{% endblock title %}
+{% block titulo %}Carga de Archivos{% endblock titulo %}
+{% block content %}
+    {{ form(form) }}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_main_archivo') }}">
+                Vover a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

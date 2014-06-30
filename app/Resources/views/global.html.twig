@@ -4,14 +4,14 @@
     <title>{% block title %}Bienvenidos! - VWeb{% endblock title %}</title>
 
     {% block stylesheets %}
-        {% stylesheets filter='css_url_rewrite' '@GoproVipacMainBundle/Resources/public/css/*' '@GoproVipacMainBundle/Resources/public/css/jquery.ui.vipac/*' %}
+        {% stylesheets filter='css_url_rewrite' '@GoproMainBundle/Resources/public/css/*' '@GoproMainBundle/Resources/public/css/jquery.ui.vipac/*' %}
             <link rel="stylesheet" href="{{ asset_url }}" rel="stylesheet" media="screen"/>
         {% endstylesheets %}
 
     {% endblock stylesheets%}
 
     {% block javascripts %}
-        {% javascripts '@GoproVipacMainBundle/Resources/public/js/inicio/*' %}
+        {% javascripts '@GoproMainBundle/Resources/public/js/inicio/*' %}
             <script type="text/javascript" src="{{ asset_url }}"></script>
         {% endjavascripts %}
     {% endblock javascripts %}
@@ -46,13 +46,13 @@
     {% endfor %}
     </div>
     <div id='sidebar'>{% block sidebar %}
-            {{ render(controller('GoproVipacMainBundle:Default:sidebar')) }}
+            {{ render(controller('GoproMainBundle:Default:sidebar')) }}
     {% endblock sidebar %}</div>
 
     <div id="container">{% block container %}{% endblock container %}</div>
 {% endblock body %}
 {% block javascriptsfinal %}
-    {% javascripts '@GoproVipacMainBundle/Resources/public/js/fin/*'%}
+    {% javascripts '@GoproMainBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock javascriptsfinal %}

@@ -11,7 +11,7 @@
 
     <div id="archivos">
         <h1>Listado de Archivos</h1>
-        <table id="listaArchivos">
+        <table class="listaArchivos">
             <thead>
             <tr>
                 <th>Nombre</th>
@@ -27,7 +27,7 @@
                         <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
                         <td>
                             <a href="{{ path('gopro_vipac_dbproceso_carga_generico', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
-                            <a class="borrarFila" rel="{{ archivo.id }}" href="{{ path('gopro_vipac_dbproceso_archivo_delete',{'id':archivo.id})}}">Borrar</a>
+                            <a class="borrarFila" rel="{{ archivo.id }}" href="{{ path('gopro_main_archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -39,7 +39,7 @@
     {% if mensajes|default %}
         <div id="mensajes">
             <h1>Resultados del proceso</h1>
-            <ul>
+            <ul class="listaMensajes">
                 {% for mensaje in mensajes %}
                     <li>{{ mensaje }}</li>
                 {% endfor %}

@@ -6,12 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
+use GoPro\MainBundle\Service\Variable;
 
 /**
  * Item
  *
  * @ORM\Table(name="inv_item")
- * @ORM\Entity(repositoryClass="Gopro\InventarioBundle\Entity\ItemRepository")
+ * @ORM\Entity(repositoryClass="Gopro\InventarioBundle\Entity\Repository\ItemRepository")
  */
 class Item
 {
@@ -69,11 +70,13 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Dependencia")
+     * @ORM\JoinColumn(name="dependencia_id", referencedColumnName="id", nullable=false)
      */
     private $dependencia;
 
     /**
      * @ORM\ManyToOne(targetEntity="Itemtipo", inversedBy="items")
+     * @ORM\JoinColumn(name="itemtipo_id", referencedColumnName="id", nullable=false)
      */
     private $itemtipo;
 
@@ -85,15 +88,15 @@ class Item
     private $users;
 
     /**
-     * @ORM\OneToMany(targetEntity="Mantenimiento", mappedBy="item", cascade={"persist","remove"})
+     * @ORM\OneToMany(targetEntity="Servicio", mappedBy="item", cascade={"persist","remove"})
      */
-    private $mantenimientos;
+    private $servicios;
 
     public function __construct() {
         $this->componentes = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->areas = new ArrayCollection();
-        $this->mantenimientos = new ArrayCollection();
+        $this->servicios = new ArrayCollection();
     }
 
     /**
@@ -135,7 +138,12 @@ class Item
      */
     public function getCodigo()
     {
-        return $this->codigo;
+        if(!empty($this->codigo)){
+            return $this->codigo;
+        }else{
+            return (new Variable())->iniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
+        }
+
     }
 
     /**
@@ -353,35 +361,35 @@ class Item
     }
 
     /**
-     * Add mantenimientos
+     * Add servicios
      *
-     * @param \Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos
+     * @param \Gopro\InventarioBundle\Entity\Servicio $servicios
      * @return Item
      */
-    public function addMantenimiento(\Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos)
+    public function addServicio(\Gopro\InventarioBundle\Entity\Servicio $servicios)
     {
-        $this->mantenimientos[] = $mantenimientos;
+        $this->servicios[] = $servicios;
 
         return $this;
     }
 
     /**
-     * Remove mantenimientos
+     * Remove servicios
      *
-     * @param \Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos
+     * @param \Gopro\InventarioBundle\Entity\Servicio $servicios
      */
-    public function removeMantenimiento(\Gopro\InventarioBundle\Entity\Mantenimiento $mantenimientos)
+    public function removeServicio(\Gopro\InventarioBundle\Entity\Servicio $servicios)
     {
-        $this->mantenimientos->removeElement($mantenimientos);
+        $this->servicios->removeElement($servicios);
     }
 
     /**
-     * Get mantenimientos
+     * Get servicios
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getMantenimientos()
+    public function getServicios()
     {
-        return $this->mantenimientos;
+        return $this->servicios;
     }
 }

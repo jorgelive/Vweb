@@ -62,11 +62,13 @@ class Campo
 
     /**
      * @ORM\ManyToOne(targetEntity="Sentencia", inversedBy="campos")
+     * @ORM\JoinColumn(name="sentencia_id", referencedColumnName="id", nullable=false)
      */
     private $sentencia;
 
     /**
      * @ORM\ManyToOne(targetEntity="Tipo", inversedBy="campos")
+     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id", nullable=false)
      */
     private $tipo;
 

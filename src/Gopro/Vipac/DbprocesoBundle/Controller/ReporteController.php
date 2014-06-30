@@ -3,7 +3,7 @@
 namespace Gopro\Vipac\DbprocesoBundle\Controller;
 
 use Gopro\Vipac\DbprocesoBundle\Form\ParametrosType;
-use Gopro\Vipac\MainBundle\Controller\BaseController;
+use Gopro\MainBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -82,7 +82,7 @@ class ReporteController extends BaseController
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
 
-        $existentesRaw=$this->container->get('gopro_dbproceso_comun_variable')->utf($statement->fetchAll());
+        $existentesRaw=$this->container->get('gopro_main_variable')->utf($statement->fetchAll());
 
         if(empty($existentesRaw)){
             $this->setMensajes('No hay resultados');
@@ -118,10 +118,12 @@ class ReporteController extends BaseController
         $encabezado=array_keys($resultados[0]);
 
         if($destino='archivo'){
-            $archivoGenerado=$this->get('gopro_dbproceso_comun_archivo');
-            $archivoGenerado->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$resultados,$encabezado);
-            $archivoGenerado->setAnchoColumna(['A'=>12,'B'=>'auto','2:'=>12]);
-            return $archivoGenerado->getArchivo();
+            $archivoGenerado=$this->get('gopro_main_archivoexcel');
+            return $archivoGenerado
+                ->setArchivo()
+                ->setParametrosWriter('Reporte_'.$fechaInicio->format('Y-M-d').'_'.$fechaFin->format('Y-M-d'),$resultados,$encabezado)
+                ->setAnchoColumna(['A'=>12,'B'=>'auto','2:'=>12])
+                ->getArchivo();
         }
         return array('formulario' => $formulario->createView(), 'mensajes' => $this->getMensajes());
     }

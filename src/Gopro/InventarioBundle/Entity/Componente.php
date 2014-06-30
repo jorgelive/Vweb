@@ -68,11 +68,13 @@ class Componente
 
     /**
      * @ORM\ManyToOne(targetEntity="Componentetipo", inversedBy="componentes")
+     * @ORM\JoinColumn(name="componentetipo_id", referencedColumnName="id", nullable=false)
      */
     private $componentetipo;
 
     /**
      * @ORM\ManyToOne(targetEntity="Componenteestado", inversedBy="componentes")
+     * @ORM\JoinColumn(name="componenteestado_id", referencedColumnName="id", nullable=false)
      */
     private $componenteestado;
 
