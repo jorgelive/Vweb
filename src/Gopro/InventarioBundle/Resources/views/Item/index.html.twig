@@ -29,6 +29,9 @@
                     <li>
                         <a href="{{ path('gopro_inventario_item_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
+                    <li>
+                        <a href="{{ path('gopro_inventario_item_servicio', { 'id': entity.id }) }}">servicio</a>
+                    </li>
                 </ul>
                 </td>
             </tr>
@@ -40,6 +43,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_inventario_item_new') }}">
                 Agregar un item
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_item_servicio', { 'id' : 'todo' }) }}">
+                Generar mantenimientos
             </a>
         </li>
     </ul>

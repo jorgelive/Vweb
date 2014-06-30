@@ -154,7 +154,7 @@ class ItemController extends BaseController
     /**
      * Displays a form to edit an existing Item entity.
      *
-     * @Route("/{id}/servicio", name="gopro_inventario_item_edit")
+     * @Route("/{id}/servicio", name="gopro_inventario_item_servicio")
      * @Method("GET")
      * @Template()
      */
@@ -192,8 +192,6 @@ class ItemController extends BaseController
 
         $archivos=array();
         foreach($items as $item):
-            //echo $item->getNombre().'<br>';
-            //echo $item->getCodigo().'<br>';
             $componenteCadena='';
             if(!empty($item->getComponentes()[0])){
                 $componentePrincipal=$item->getComponentes()[0];
@@ -204,7 +202,6 @@ class ItemController extends BaseController
                 endforeach;
 
             }
-            //echo $componenteCadena.'<br>';
             $mantenimientos=array();
             foreach($item->getServicios() as $key => $servicio):
                 $mantenimientos[$key][]=$key+1;
@@ -225,6 +222,10 @@ class ItemController extends BaseController
                 ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
                 ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
                 ->setTabla($mantenimientos,'A9');
+
+            if($id!='todo'){
+                return $archivoGenerado->getArchivo();
+            }
 
             $archivos[]=[
                 'path'=>$archivoGenerado->getArchivo('archivo'),
