@@ -24,12 +24,6 @@
 {% endblock container %}
 
 {% block javascriptsfinal %}
-    <script id="plantillaHighlight" type="text/x-tmpl">
-        {{ source("GoproVipacDbprocesoBundle:Plantilla:highlight.js.twig") }}
-    </script>
-    <script id="archivoRow" type="text/x-tmpl">
-        {{ source("GoproVipacDbprocesoBundle:Plantilla:archivorow.js.twig") }}
-    </script>
     {% javascripts '@GoproVipacDbprocesoBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}

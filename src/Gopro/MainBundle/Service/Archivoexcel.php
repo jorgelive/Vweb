@@ -73,7 +73,8 @@ class Archivoexcel extends ContainerAware{
             return $this;
         }
         $fs = new Filesystem();
-        if(empty($this->getArchivoBase()->getAbsolutePath())||!$fs->exists($this->getArchivoBase()->getAbsolutePath())){
+
+        if(!$fs->exists($archivoAlmacenado->getAbsolutePath())){
             $this->setMensajes('El archivo no existe en la ruta');
             return $this;
         }
@@ -143,7 +144,7 @@ class Archivoexcel extends ContainerAware{
 
     public function parseExcel(){
 
-        if(empty($this->getArchivo)){
+        if(empty($this->getArchivoBase())){
             $this->setMensajes('El archivo no pudo ser puesto en memoria');
             return false;
         }
