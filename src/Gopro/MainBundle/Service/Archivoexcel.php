@@ -144,7 +144,7 @@ class Archivoexcel extends ContainerAware{
 
     public function parseExcel(){
 
-        if(empty($this->getArchivoBase())){
+        if(empty($this->archivo)){
             $this->setMensajes('El archivo no pudo ser puesto en memoria');
             return false;
         }
@@ -596,6 +596,9 @@ class Archivoexcel extends ContainerAware{
     }
 
     public function getArchivo($tipo='response'){
+        if(empty($this->getTipo())){
+            $this->setMensajes('Las celdas no tienen el formato correcto');
+        }
         $tipoWriter['xlsx']='Excel2007';
         $writer = $this->getProceso()->createWriter($this->archivo, $tipoWriter[$this->getTipo()]);
         if($tipo=='response'){

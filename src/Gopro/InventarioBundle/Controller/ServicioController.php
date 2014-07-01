@@ -102,6 +102,132 @@ class ServicioController extends BaseController
     }
 
     /**
+     * @Route("/lista", name="gopro_inventario_servicio_lista")
+     * @Method("GET")
+     * @Template()
+     */
+    public function listaservicioAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $servicios = $em->createQueryBuilder()
+            ->addSelect('s')
+            ->from('GoproInventarioBundle:Servicio', 's')
+            ->leftJoin('s.item', 'i')
+            ->addSelect('i')
+            ->leftJoin('i.dependencia', 'd')
+            ->addSelect('d')
+            ->leftJoin('i.users', 'u')
+            ->addSelect('u')
+            ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
+            ->addSelect('c')
+            ->leftJoin('c.componentecaracteristicas','cc')
+            ->addSelect('cc')
+            ->leftJoin('cc.caracteristica','ca')
+            ->addSelect('ca')
+            ->where($em->createQueryBuilder()->expr()->eq('s.serviciotipo', 1))
+            ->orderBy('i.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        if (empty($servicios)) {
+            throw $this->createNotFoundException('No se encontraton resultados.');
+        }
+
+        //print_r($servicios);
+
+        $itemsAnoDependencia=array();
+        foreach($servicios as $servicio):
+            $ano=$servicio->getFecha()->format('Y');
+            $dependencia=$servicio->getItem()->getDependencia()->getId();
+            $itemsAnoDependencia[$ano][$dependencia]['dependencia']=$servicio->getItem()->getDependencia();
+            $itemsAnoDependencia[$ano][$dependencia]['items'][$servicio->getItem()->getId()]['item']=$servicio->getItem();
+            $itemsAnoDependencia[$ano][$dependencia]['items'][$servicio->getItem()->getId()]['servicios'][]=$servicio;
+        endforeach;
+
+        foreach($itemsAnoDependencia as $ano=>$itemsDependencia):
+            echo $ano.'<br>';
+            foreach($itemsDependencia as $items):
+                echo $items['dependencia']->getNombre().'<br>';
+                foreach($items['items'] as $item):
+                    echo $item['item']->getCodigo().'<br>';
+                    $userList=array();
+                    foreach($item['item']->getUsers() as $user):
+                        $userList[]=$user->getFirstName().' '.$user->getLastName();
+                    endforeach;
+                    echo implode(' | ',$userList).'<br>';
+                    $areaList=array();
+                    foreach($item['item']->getAreas() as $area):
+                        $areaList[]=$area->getNombre();
+                    endforeach;
+                    echo implode(' | ',$areaList).'<br>';
+                    foreach($item['item']->getComponentes() as $componete):
+                        foreach($componete->getComponentecaracteristicas() as $componentecaracteristica):
+                            if(in_array($componentecaracteristica->getCaracteristica()->getId(),[1,2,3])){
+                                echo $componentecaracteristica->getContenido().'<br>';
+                            }
+                        endforeach;
+                    endforeach;
+                endforeach;
+            endforeach;
+
+        endforeach;
+
+            print_r($servicio->getFecha()->format('Y-m-d'));
+            foreach($item->getServicios() as $key => $servicio):
+                $mantenimientos[$key][]=$key+1;
+                $mantenimientos[$key][]=$servicio->getFecha()->format('Y-m-d');
+                $mantenimientos[$key][]=$servicio->getServiciotipo()->getNombre().': '.$servicio->getDescripcion();
+                if($servicio->getServiciotipo()->getId()==1){
+                    $mantenimientos[$key][]='';
+                    $mantenimientos[$key][]='X';
+                }else{
+                    $mantenimientos[$key][]='X';
+                    $mantenimientos[$key][]='';
+                }
+                $mantenimientos[$key][]= $servicio->getUser()->getNombre();
+            endforeach;
+            $componenteCadena='';
+            if(!empty($item->getComponentes()[0])){
+                $componentePrincipal=$item->getComponentes()[0];
+
+                foreach($componentePrincipal->getComponentecaracteristicas() as $componentecaracteristica):
+                    $componenteCadena .= $componentecaracteristica->getCaracteristica()->getNombre().': ';
+                    $componenteCadena .= $componentecaracteristica->getContenido().'. ';
+                endforeach;
+
+            }
+
+            $archivoGenerado=$this->get('gopro_main_archivoexcel')
+                ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
+                ->setArchivo()
+                ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
+                ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
+                ->setTabla($mantenimientos,'A9');
+
+            if($id!='todo'){
+                return $archivoGenerado->getArchivo();
+            }
+
+            $archivos[]=[
+                'path'=>$archivoGenerado->getArchivo('archivo'),
+                'nombre'=>$archivoGenerado->getNombre().'.'.$archivoGenerado->getTipo()
+            ];
+
+
+
+        if(empty($archivos)){
+            throw $this->createNotFoundException('No se pueden generar los archivos.');
+        }
+
+        return $this->get('gopro_main_archivozip')
+            ->setParametros($archivos,'mantenimientos_'.time())
+            ->setArchivo()
+            ->getArchivo();
+
+    }
+
+    /**
      * @Route("/generar/{ano}/{semestre}", name="gopro_inventario_servicio_generar")
      * @Method("GET")
      */

@@ -100,31 +100,6 @@ class ItemController extends BaseController
     }
 
     /**
-     * Finds and displays a Item entity.
-     *
-     * @Route("/{id}", name="gopro_inventario_item_show")
-     * @Method("GET")
-     * @Template()
-     */
-    public function showAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $em->getRepository('GoproInventarioBundle:Item')->find($id);
-
-        if (!$entity) {
-            throw $this->createNotFoundException('No se puede encontrar la entidad Item.');
-        }
-
-        $deleteForm = $this->createDeleteForm($id);
-
-        return array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),
-        );
-    }
-
-    /**
      * Displays a form to edit an existing Item entity.
      *
      * @Route("/{id}/edit", name="gopro_inventario_item_edit")
@@ -152,8 +127,6 @@ class ItemController extends BaseController
     }
 
     /**
-     * Displays a form to edit an existing Item entity.
-     *
      * @Route("/{id}/servicio", name="gopro_inventario_item_servicio")
      * @Method("GET")
      * @Template()
@@ -165,8 +138,8 @@ class ItemController extends BaseController
         $items = $em->createQueryBuilder()
             ->addSelect('i')
             ->from('GoproInventarioBundle:Item', 'i')
-            ->leftJoin('i.servicios', 'm')
-            ->addSelect('m')
+            ->leftJoin('i.servicios', 's')
+            ->addSelect('s')
             ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
             ->addSelect('c')
             ->leftJoin('c.componentecaracteristicas','cc')
@@ -218,6 +191,7 @@ class ItemController extends BaseController
             endforeach;
 
             $archivoGenerado=$this->get('gopro_main_archivoexcel')
+                ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
                 ->setArchivo()
                 ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
                 ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
@@ -243,6 +217,31 @@ class ItemController extends BaseController
             ->setArchivo()
             ->getArchivo();
 
+    }
+
+    /**
+     * Finds and displays a Item entity.
+     *
+     * @Route("/{id}", name="gopro_inventario_item_show")
+     * @Method("GET")
+     * @Template()
+     */
+    public function showAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('GoproInventarioBundle:Item')->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('No se puede encontrar la entidad Item.');
+        }
+
+        $deleteForm = $this->createDeleteForm($id);
+
+        return array(
+            'entity'      => $entity,
+            'delete_form' => $deleteForm->createView(),
+        );
     }
 
     /**
