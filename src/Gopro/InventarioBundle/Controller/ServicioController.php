@@ -146,82 +146,92 @@ class ServicioController extends BaseController
         endforeach;
 
         foreach($itemsAnoDependencia as $ano=>$itemsDependencia):
-            echo $ano.'<br>';
-            foreach($itemsDependencia as $items):
-                echo $items['dependencia']->getNombre().'<br>';
+            foreach($itemsDependencia as $dependencia=>$items):
+                $resultado=array();
+                $dependenciaNombre = $items['dependencia']->getNombre();
+                $iItems=0;
                 foreach($items['items'] as $item):
-                    echo $item['item']->getCodigo().'<br>';
+                    $resultado[$iItems][]=$iItems+1;
+                    $resultado[$iItems][]=$item['item']->getItemtipo()->getNombre();
                     $userList=array();
                     foreach($item['item']->getUsers() as $user):
                         $userList[]=$user->getFirstName().' '.$user->getLastName();
                     endforeach;
-                    echo implode(' | ',$userList).'<br>';
+                    $resultado[$iItems][]=implode(' | ',$userList);
+                    $resultado[$iItems][]=$item['item']->getCodigo();
                     $areaList=array();
                     foreach($item['item']->getAreas() as $area):
                         $areaList[]=$area->getNombre();
                     endforeach;
-                    echo implode(' | ',$areaList).'<br>';
+                    $resultado[$iItems][]=implode(' | ',$areaList);
+                    $itemList=array();
                     foreach($item['item']->getComponentes() as $componete):
                         foreach($componete->getComponentecaracteristicas() as $componentecaracteristica):
                             if(in_array($componentecaracteristica->getCaracteristica()->getId(),[1,2,3])){
-                                echo $componentecaracteristica->getContenido().'<br>';
+                                $itemList[$componentecaracteristica->getCaracteristica()->getId()]=$componentecaracteristica->getContenido();
                             }
                         endforeach;
+
                     endforeach;
+                    for($iCaracteristica=1;$iCaracteristica<=3;$iCaracteristica++):
+                        if(!empty($itemList[$iCaracteristica])){
+                            $resultado[$iItems][]=$itemList[$iCaracteristica];
+                        }else{
+                            $resultado[$iItems][]='';
+                        }
+                    endfor;
+                    if(!empty($item['item']->getServicios()[0])){
+                        $resultado[$iItems][]=$item['item']->getServicios()[0]->getUser()->getFirstName().' '.$item['item']->getServicios()[0]->getUser()->getLastName();
+                    }else{
+                        $resultado[$iItems][]='';
+                    }
+                    $serviciosList=array();
+                    foreach($item['item']->getServicios() as $servicio):
+                        if($servicio->getFecha()->format('d')>=15){
+                            $quincena=2;
+                        }else{
+                            $quincena=1;
+                        }
+                        if($servicio->getServicioestado()->getId()==1){
+                            $marca='P';
+                        }else{
+                            $marca='✓';
+                        }
+                        $serviciosList[(($servicio->getFecha()->format('m')-1)*2)+$quincena]=$marca;
+                    endforeach;
+                    for($iServicios=1;$iServicios<=24;$iServicios++):
+                        if(isset($serviciosList[$iServicios])){
+                            $resultado[$iItems][]=$serviciosList[$iServicios];
+                        }else{
+                            $resultado[$iItems][]='';
+                        }
+                    endfor;
+
+                    $iItems++;
                 endforeach;
-            endforeach;
 
-        endforeach;
-
-            print_r($servicio->getFecha()->format('Y-m-d'));
-            foreach($item->getServicios() as $key => $servicio):
-                $mantenimientos[$key][]=$key+1;
-                $mantenimientos[$key][]=$servicio->getFecha()->format('Y-m-d');
-                $mantenimientos[$key][]=$servicio->getServiciotipo()->getNombre().': '.$servicio->getDescripcion();
-                if($servicio->getServiciotipo()->getId()==1){
-                    $mantenimientos[$key][]='';
-                    $mantenimientos[$key][]='X';
-                }else{
-                    $mantenimientos[$key][]='X';
-                    $mantenimientos[$key][]='';
-                }
-                $mantenimientos[$key][]= $servicio->getUser()->getNombre();
-            endforeach;
-            $componenteCadena='';
-            if(!empty($item->getComponentes()[0])){
-                $componentePrincipal=$item->getComponentes()[0];
-
-                foreach($componentePrincipal->getComponentecaracteristicas() as $componentecaracteristica):
-                    $componenteCadena .= $componentecaracteristica->getCaracteristica()->getNombre().': ';
-                    $componenteCadena .= $componentecaracteristica->getContenido().'. ';
-                endforeach;
-
-            }
-
-            $archivoGenerado=$this->get('gopro_main_archivoexcel')
-                ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
-                ->setArchivo()
-                ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
-                ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
-                ->setTabla($mantenimientos,'A9');
-
-            if($id!='todo'){
+                //print_r($resultado);
+                $archivoGenerado=$this->get('gopro_main_archivoexcel')
+                    //->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
+                    ->setArchivo()
+                    ->setParametrosWriter('F-SIS-01-'.$ano.'_'.$dependenciaNombre)
+                    ->setCeldas(['texto'=>['C4'=>$ano,'C5'=>$dependenciaNombre]])
+                    ->setTabla($resultado,'A9');
                 return $archivoGenerado->getArchivo();
-            }
 
-            $archivos[]=[
-                'path'=>$archivoGenerado->getArchivo('archivo'),
-                'nombre'=>$archivoGenerado->getNombre().'.'.$archivoGenerado->getTipo()
-            ];
+                $archivos[]=[
+                    'path'=>$archivoGenerado->getArchivo('archivo'),
+                    'nombre'=>$archivoGenerado->getNombre().'.'.$archivoGenerado->getTipo()
+                ];
 
-
-
+            endforeach;
+        endforeach;
         if(empty($archivos)){
             throw $this->createNotFoundException('No se pueden generar los archivos.');
         }
 
         return $this->get('gopro_main_archivozip')
-            ->setParametros($archivos,'mantenimientos_'.time())
+            ->setParametros($archivos,'listamantenimientos_'.time())
             ->setArchivo()
             ->getArchivo();
 
