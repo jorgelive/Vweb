@@ -285,28 +285,33 @@ class Archivoexcel extends ContainerAware{
             return false;
         }
 
-        foreach ($existentesRaw as $nroLinea=>$valor):
-            $indice=array();
-            $llavesSave=array();
-            foreach($this->tablaSpecs['llaves'] as $llave):
-                $indice[]=$valor[$llave];
-                $llavesSave[$llave]=$valor[$llave];
-                unset($valor[$llave]);
-            endforeach;
-            $existentesIndizados[implode('|',$indice)]=$valor;
-            $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
-            $existentesIndizadosKp[implode('|',$indice)]=array_merge($llavesSave,$valor);
-            $existentesIndizadosMultiKp[implode('|',$indice)][]=array_merge($llavesSave,$valor);
-            if(!empty($this->getCamposCustom())){
-                $i=0;
-                foreach($this->getCamposCustom() as $llaveCustom):
-                    if(isset($valor[$llaveCustom])){
-                        $existentesCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
-                        $existentesCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
 
-                    }
-                    $i++;
+        foreach ($existentesRaw as $nroLinea=>$valor):
+            if(!empty($this->tablaSpecs['llaves'])){
+                $indice=array();
+                $llavesSave=array();
+                foreach($this->tablaSpecs['llaves'] as $llave):
+                    $indice[]=$valor[$llave];
+                    $llavesSave[$llave]=$valor[$llave];
+                    unset($valor[$llave]);
                 endforeach;
+                $existentesIndizados[implode('|',$indice)]=$valor;
+                $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
+                $existentesIndizadosKp[implode('|',$indice)]=array_merge($llavesSave,$valor);
+                $existentesIndizadosMultiKp[implode('|',$indice)][]=array_merge($llavesSave,$valor);
+                if(!empty($this->getCamposCustom())){
+                    $i=0;
+                    foreach($this->getCamposCustom() as $llaveCustom):
+                        if(isset($valor[$llaveCustom])){
+                            $existentesCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
+                            $existentesCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
+
+                        }
+                        $i++;
+                    endforeach;
+                }
+            }else{
+                $this->setMensajes('No se asigno ninguna llave, los agrupamientos no estan disponibles');
             }
             if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $llaveCustom):
@@ -318,7 +323,6 @@ class Archivoexcel extends ContainerAware{
         endforeach;
 
         $this->setExistentesRaw($existentesRaw);
-
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
         $this->setExistentesIndizadosKp($existentesIndizadosKp);

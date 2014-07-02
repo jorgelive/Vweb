@@ -949,7 +949,7 @@ class ProcesoController extends BaseController
         endforeach;
 
         $encabezados=array_keys($fusion[0]);
-        $archivoGenerado=$this->get('gopro_main_archivo');
+        $archivoGenerado=$this->get('gopro_main_archivo_excel');
         return $archivoGenerado
             ->setArchivo()
             ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)
