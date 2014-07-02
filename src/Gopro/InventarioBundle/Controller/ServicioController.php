@@ -134,8 +134,6 @@ class ServicioController extends BaseController
             throw $this->createNotFoundException('No se encontraton resultados.');
         }
 
-        //print_r($servicios);
-
         $itemsAnoDependencia=array();
         foreach($servicios as $servicio):
             $ano=$servicio->getFecha()->format('Y');
@@ -210,20 +208,17 @@ class ServicioController extends BaseController
                     $iItems++;
                 endforeach;
 
-                //print_r($resultado);
                 $archivoGenerado=$this->get('gopro_main_archivoexcel')
-                    //->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
+                    ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),2,'inventario_servicio_lista')
                     ->setArchivo()
                     ->setParametrosWriter('F-SIS-01-'.$ano.'_'.$dependenciaNombre)
-                    ->setCeldas(['texto'=>['C4'=>$ano,'C5'=>$dependenciaNombre]])
+                    ->setCeldas(['texto'=>['B5'=>'AÑO: '.$ano,'G5'=> ($ano-1).'-12-10']])
                     ->setTabla($resultado,'A9');
-                return $archivoGenerado->getArchivo();
 
                 $archivos[]=[
                     'path'=>$archivoGenerado->getArchivo('archivo'),
                     'nombre'=>$archivoGenerado->getNombre().'.'.$archivoGenerado->getTipo()
                 ];
-
             endforeach;
         endforeach;
         if(empty($archivos)){

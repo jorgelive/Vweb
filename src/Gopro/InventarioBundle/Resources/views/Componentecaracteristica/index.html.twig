@@ -6,6 +6,8 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Item</th>
+                <th>Tipo</th>
                 <th>Caracteristica</th>
                 <th>Contenido</th>
                 <th>Creado</th>
@@ -17,6 +19,8 @@
         {% for entity in entities %}
             <tr>
                 <td><a href="{{ path('gopro_inventario_componentecaracteristica_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.componente.item.nombre }}</td>
+                <td>{{ entity.componente.componentetipo.nombre }}</td>
                 <td>{{ entity.caracteristica.nombre }}</td>
                 <td>{{ entity.contenido }}</td>
                 <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>

@@ -33,7 +33,7 @@ table#listaArchivos tbody tr td a{ margin:0 5px; color:#444;}
 table#listaArchivos tbody tr td a:hover{ margin:0 5px; color:#444;}
 
 table.listaRegistros,
-table.registroPropiedades{border-collapse: collapse;}
+table.registroPropiedades{border-collapse: collapse; margin-bottom: 10px;}
 table.listaRegistros tr td,
 table.registroPropiedades tr td,
 table.listaRegistros tr th,

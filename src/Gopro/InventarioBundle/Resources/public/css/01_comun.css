@@ -1,17 +1,3 @@
-div#GoproInventarioBundle table.listaRegistros,
-div#GoproInventarioBundle table.registroPropiedades{border-collapse: collapse;}
-div#GoproInventarioBundle table.listaRegistros tr td,
-div#GoproInventarioBundle table.registroPropiedades tr td,
-div#GoproInventarioBundle table.listaRegistros tr th,
-div#GoproInventarioBundle table.registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
-div#GoproInventarioBundle table.listaRegistros tr td ul,
-div#GoproInventarioBundle table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
-
-div#GoproInventarioBundle ul.registroAcciones,
-div#GoproInventarioBundle ul.listaAcciones{list-style: none outside none; margin: 10px 0;}
-div#GoproInventarioBundle ul.registroAcciones li,
-div#GoproInventarioBundle ul.listaAcciones li{ display: inline-block;}
-
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componentecaracteristica div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div,

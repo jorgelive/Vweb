@@ -63,6 +63,7 @@ class Componente
 
     /**
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="componentes")
+     * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      */
     private $item;
 
@@ -92,7 +93,7 @@ class Componente
      */
     function __toString()
     {
-        return $this->getComponentetipo()->getNombre();
+        return $this->getItem()->getNombre().'-'.$this->getComponentetipo()->getNombre();
     }
 
     /**

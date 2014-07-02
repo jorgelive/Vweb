@@ -31,7 +31,6 @@
         <thead>
         <tr>
             <th>Id</th>
-            <th>Item</th>
             <th>Tipo de componente</th>
             <th>Fecha de compra</th>
             <th>Fin de garantía</th>
@@ -45,7 +44,6 @@
         {% for componente in entity.componentes %}
             <tr>
                 <td><a href="{{ path('gopro_inventario_componente_show', { 'id': componente.id }) }}">{{ componente.id }}</a></td>
-                <td>{% if componente.item %}{{ componente.item.nombre }}{% endif %}</td>
                 <td>{% if componente.componentetipo %}{{ componente.componentetipo.nombre }}{% endif %}</td>
                 <td>{% if componente.fechacompra %}{{ componente.fechacompra|date('Y-m-d') }}{% endif %}</td>
                 <td>{% if componente.fechafingarantia %}{{ componente.fechafingarantia|date('Y-m-d') }}{% endif %}</td>
