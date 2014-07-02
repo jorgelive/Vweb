@@ -82,7 +82,7 @@ class ReporteController extends BaseController
             return array('formulario' => $formulario->createView(),'mensajes' => $this->getMensajes());
         }
 
-        $existentesRaw=$this->container->get('gopro_main_variable')->utf($statement->fetchAll());
+        $existentesRaw=$this->container->get('gopro_main_variableproceso')->utf($statement->fetchAll());
 
         if(empty($existentesRaw)){
             $this->setMensajes('No hay resultados');

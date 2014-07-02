@@ -4,7 +4,7 @@ namespace Gopro\MainBundle\Service;
 use \Symfony\Component\DependencyInjection\ContainerAware;
 
 
-class Variables extends ContainerAware{
+class Variableproceso extends ContainerAware{
 
 
     public function sanitizeString($str, $what=NULL, $with='')

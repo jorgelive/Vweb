@@ -262,7 +262,7 @@ class Proceso extends ContainerAware{
             $this->setMensajes('No hay información para crear las condiciones de busqueda');
             return false;
         }
-        if(!$this->container->get('gopro_main_variable')->is_multi_array($phArray)){
+        if(!$this->container->get('gopro_main_variableproceso')->is_multi_array($phArray)){
             return implode(' AND ', $phArray);
         }
         $wherePH=array();
@@ -309,15 +309,15 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $subValor=$this->container->get('gopro_main_variable')->exceldate($subValor);
+                            $subValor=$this->container->get('gopro_main_variableproceso')->exceldate($subValor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }
                     }else{
                         $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                     }
-                    $procesoPh[$key][]=$modif[0].$subKey.$modif[1].' = '.$modif[2].':'.'v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeString($subKey.$subValor)),0,28).$modif[3];
-                    $procesoValor[$key]['v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
+                    $procesoPh[$key][]=$modif[0].$subKey.$modif[1].' = '.$modif[2].':'.'v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($subKey.$subValor)),0,28).$modif[3];
+                    $procesoValor[$key]['v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($subKey.$subValor)),0,28)]=$subValor;
                     $selectKeys[]=$subKey;
                 endforeach;
             }elseif(is_array($valor)&&($tipo=='valoresUpdate'||$tipo=='valoresInsert'||$tipo!='camposInsert'||$tipo=='camposselect')){
@@ -336,7 +336,7 @@ class Proceso extends ContainerAware{
                             $modif[1]=')';
                             $modif[2]='to_date(';
                             $modif[3]=",'yyyy-mm-dd')";
-                            $valor = $this->container->get('gopro_main_variable')->exceldate($valor);
+                            $valor = $this->container->get('gopro_main_variableproceso')->exceldate($valor);
                         }else{
                             $modif[0]=$modif[1]=$modif[2]=$modif[3]='';
                         }
@@ -349,8 +349,8 @@ class Proceso extends ContainerAware{
                     $procesoPh[]=':'.$key;
                     $procesoValor[$key]=$valor;
                 }else{ //todo utilizar esta condicion
-                    $procesoPh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeString($key.$valor)),0,28);
-                    $procesoValor['v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeString($key.$valor)),0,28)]=$valor;
+                    $procesoPh[]=$key.'= :'.'v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($key.$valor)),0,28);
+                    $procesoValor['v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($key.$valor)),0,28)]=$valor;
                     $selectKeys[]=$key;
                 }
             }

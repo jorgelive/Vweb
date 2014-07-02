@@ -35,8 +35,8 @@ class SentenciaController extends BaseController
      * @return string
      */
     private function setValoresBind($campo,$valor){
-        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
-        return ':v'.substr(sha1($this->container->get('gopro_main_variable')->sanitizeQuery($campo.$valor)),0,28);
+        $this->valoresBind[':v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeQuery($campo.$valor)),0,28)]=$valor;
+        return ':v'.substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeQuery($campo.$valor)),0,28);
     }
 
     /**
@@ -88,7 +88,7 @@ class SentenciaController extends BaseController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $entity->setContenido($this->container->get('gopro_main_variable')->sanitizeQuery($entity->getContenido()));
+            $entity->setContenido($this->container->get('gopro_main_variableproceso')->sanitizeQuery($entity->getContenido()));
             $em = $this->getDoctrine()->getManager();
             $campos = $this->getCampos($form->getData()->getContenido());
             foreach($campos as $campo){
@@ -351,7 +351,7 @@ class SentenciaController extends BaseController
                     'mensajes' => $this->getMensajes()
                 );
             }
-            $resultados=$this->container->get('gopro_main_variable')->utf($statement->fetchAll());
+            $resultados=$this->container->get('gopro_main_variableproceso')->utf($statement->fetchAll());
 
             if($destino=='archivo'){
                 $archivoGenerado=$this->get('gopro_main_archivoexcel');
@@ -482,7 +482,7 @@ class SentenciaController extends BaseController
         $editForm->handleRequest($request);
 
         if ($editForm->isValid()) {
-            $entity->setContenido($this->container->get('gopro_main_variable')->sanitizeQuery($entity->getContenido()));
+            $entity->setContenido($this->container->get('gopro_main_variableproceso')->sanitizeQuery($entity->getContenido()));
             $campos = $this->getCampos($editForm->getData()->getContenido());
             $camposExistentes=$em->getRepository('GoproVipacReporteBundle:Campo')->findBy(['sentencia'=>$entity->getId()]);
 

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
-use GoPro\MainBundle\Service\Variable;
+use GoPro\MainBundle\Service\Variableproceso;
 
 /**
  * Item
@@ -141,7 +141,7 @@ class Item
         if(!empty($this->codigo)){
             return $this->codigo;
         }else{
-            return (new Variable())->iniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
+            return (new Variableproceso())->iniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
         }
 
     }
