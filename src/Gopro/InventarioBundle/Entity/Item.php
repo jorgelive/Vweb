@@ -27,9 +27,7 @@ class Item
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="codigo", type="string", length=100)
-     * @Assert\NotBlank
+     * @ORM\Column(name="codigo", type="string", length=100, nullable=true)
      */
     private $codigo;
 
@@ -127,7 +125,7 @@ class Item
     public function setCodigo($codigo)
     {
         $this->codigo = $codigo;
-
+        return null;
         return $this;
     }
 
@@ -141,9 +139,21 @@ class Item
         if(!empty($this->codigo)){
             return $this->codigo;
         }else{
-            return (new Variableproceso())->iniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
+            return $this->getIniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
         }
 
+    }
+
+
+    public function getIniciales($string) {
+        $iniciales='';
+        $palabras = preg_split("/[\s,_-]+/", $string);
+        foreach ($palabras as $palabra) {
+            if(!empty($palabra[0])){
+                $iniciales .= strtoupper($palabra[0]);
+            }
+        }
+        return $iniciales;
     }
 
     /**

@@ -34,6 +34,9 @@ class DefaultController extends Controller
             array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
             array('nombre'=>'Vencimiento CP','route'=>'gopro_vipac_dbproceso_reporte_vencimientocp'),
             array('nombre'=>'Reportes','route'=>'gopro_vipac_reporte_sentencia'),
+            array('nombre'=>'Inventario Items','route'=>'gopro_inventario_item'),
+            array('nombre'=>'Inventario Componentes','route'=>'gopro_inventario_componente'),
+            array('nombre'=>'Inventario Caracteristicas','route'=>'gopro_inventario_componentecaracteristica'),
         );
         return array('items'=> $items);
     }

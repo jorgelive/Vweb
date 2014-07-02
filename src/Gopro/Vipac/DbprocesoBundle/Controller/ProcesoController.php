@@ -730,17 +730,18 @@ class ProcesoController extends BaseController
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
                 &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])
+
             ){
+
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]));
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
-                if($this->getCantidadTotal('montoTotal')==0){
-                    $coeficiente=0;
-                }else{
+                if($this->getCantidadTotal('montoTotal')!=0&&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
                     $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getCantidadTotal('montoTotal');
+                }else{
+                    $coeficiente=0;
                 }
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['coeficiente']=$coeficiente;
                 $this->resetCantidadTotal('montoTotal');

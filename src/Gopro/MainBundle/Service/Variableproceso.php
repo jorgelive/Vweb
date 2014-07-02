@@ -90,14 +90,5 @@ class Variableproceso extends ContainerAware{
         return (count($array) != count($array, 1));
     }
 
-    public function iniciales($string) {
-        $iniciales='';
-        $palabras = preg_split("/[\s,_-]+/", $string);
-        foreach ($palabras as $palabra) {
-            if(!empty($palabra[0])){
-                $iniciales .= strtoupper($palabra[0]);
-            }
-        }
-        return $iniciales;
-    }
+
 }
