@@ -729,8 +729,6 @@ class ProcesoController extends BaseController
         foreach($this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
-
             ){
 
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
