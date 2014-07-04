@@ -10,6 +10,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gopro\InventarioBundle\Entity\Item;
 use Gopro\InventarioBundle\Form\ItemType;
 
+use APY\DataGridBundle\Grid\Source\Entity;
+use APY\DataGridBundle\Grid\Column\TextColumn;
+use APY\DataGridBundle\Grid\Column\ActionsColumn;
+use APY\DataGridBundle\Grid\Action\MassAction;
+use APY\DataGridBundle\Grid\Action\DeleteMassAction;
+use APY\DataGridBundle\Grid\Action\RowAction;
+
 /**
  * Item controller.
  *
@@ -34,6 +41,26 @@ class ItemController extends BaseController
         return array(
             'entities' => $entities,
         );
+    }
+
+    /**
+     * Lists all Item entities.
+     *
+     * @Route("/grid", name="gopro_inventario_item_grid")
+     * @Template()
+     */
+    public function gridAction()
+    {
+
+        $source = new Entity('GoproInventarioBundle:Item');
+
+        $grid = $this->get('grid');
+
+
+        $grid->setSource($source);
+        $grid->hideColumns('codigo');
+
+        return $grid->getGridResponse('GoproInventarioBundle:item:grid.html.twig');
     }
     /**
      * Creates a new Item entity.
