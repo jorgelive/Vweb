@@ -53,7 +53,7 @@ class CargaController extends BaseController
 
         }
         $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'))){
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'))){
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
@@ -103,7 +103,7 @@ class CargaController extends BaseController
         $mensajes=$procesoArchivo->getMensajes();
         if($procesoArchivo->parseExcel()!==false){
             $documentoCp=$this->get('gopro_dbproceso_cargador');
-            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $documentoCp->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $documentoCp->ejecutar();
             $exiDocumentoCp=$documentoCp->getProceso()->getExistentesIndizados();
             if(empty($exiDocumentoCp)){
@@ -118,7 +118,7 @@ class CargaController extends BaseController
             );
             $columnaAsiDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
             $asiDi=$this->get('gopro_dbproceso_cargador');
-            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $asiDi->setParametros($tablaAsiDi,$columnaAsiDi,$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $asiDi->prepararSelect();
             $asiDi->ejecutarSelectQuery();
             $exiAsiDi=$asiDi->getProceso()->getExistentesIndizados();
@@ -134,7 +134,7 @@ class CargaController extends BaseController
             );
             $columnaDi['ASIENTO']=array('nombre'=>'ASIENTO','llave'=>'si');
             $di=$this->get('gopro_dbproceso_cargador');
-            $di->setParametros($tablaDi,$columnaDi,$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
+            $di->setParametros($tablaDi,$columnaDi,$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesRaw(),'from'),$this->container->get('doctrine.dbal.vipac_connection'));
             $di->prepararSelect();
             $di->ejecutarSelectQuery();
 

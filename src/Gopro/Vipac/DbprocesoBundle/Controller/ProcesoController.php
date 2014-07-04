@@ -71,7 +71,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variable')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -224,7 +224,7 @@ class ProcesoController extends BaseController
 
         foreach ($tcInfo->getExistentesIndizados() as $key => $value)
         {
-            $tcInfoFormateado[$this->get('gopro_main_variable')->exceldate($key,'to')] = $value;
+            $tcInfoFormateado[$this->get('gopro_main_variableproceso')->exceldate($key,'to')] = $value;
         }
 
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
@@ -267,7 +267,7 @@ class ProcesoController extends BaseController
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
                 $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
             }
-            $dataCP[$nroLinea]['CONDICION_PAGO']=$this->container->get('gopro_main_variable')->utf($datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO']);
+            $dataCP[$nroLinea]['CONDICION_PAGO']=$this->container->get('gopro_main_variableproceso')->utf($datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO']);
             if(isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])){
                 $dataCP[$nroLinea]['CONDICIONES']=$docCpTipos[$dataCP[$nroLinea]['TIPO']];
             }else{
@@ -376,7 +376,7 @@ class ProcesoController extends BaseController
                 $montoSoles=$tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']]['MONTO']*$dataCP[$nroLinea]['MONTO'];
             }elseif($dataCP[$nroLinea]['MONEDA']=='USD'){
                 $montoSoles=0;
-                $this->setMensajes('El tipo de cambio para la fecha contable '.$this->get('gopro_main_variable')->exceldate($dataCP[$nroLinea]['FECHA_DOCUMENTO'],'from').' de la linea: '.($nroLinea+1).', no existe');
+                $this->setMensajes('El tipo de cambio para la fecha contable '.$this->get('gopro_main_variableproceso')->exceldate($dataCP[$nroLinea]['FECHA_DOCUMENTO'],'from').' de la linea: '.($nroLinea+1).', no existe');
                 $generarExcel=false;
             }else{
                 $montoSoles=$dataCP[$nroLinea]['MONTO'];
@@ -726,21 +726,20 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        foreach($this->container->get('gopro_main_variable')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
+        foreach($this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
-                &&isset($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']])
-                &&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])
             ){
+
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$this->container->get('gopro_main_variable')->utf($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]));
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]));
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
-                if($this->getCantidadTotal('montoTotal')==0){
-                    $coeficiente=0;
-                }else{
+                if($this->getCantidadTotal('montoTotal')!=0&&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
                     $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getCantidadTotal('montoTotal');
+                }else{
+                    $coeficiente=0;
                 }
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['coeficiente']=$coeficiente;
                 $this->resetCantidadTotal('montoTotal');
@@ -858,7 +857,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variable')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -929,7 +928,7 @@ class ProcesoController extends BaseController
 
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variable')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
         if(empty($existente)){
             $this->setMensajes($procesoArchivo->getMensajes());
@@ -949,7 +948,7 @@ class ProcesoController extends BaseController
         endforeach;
 
         $encabezados=array_keys($fusion[0]);
-        $archivoGenerado=$this->get('gopro_main_archivo');
+        $archivoGenerado=$this->get('gopro_main_archivo_excel');
         return $archivoGenerado
             ->setArchivo()
             ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)

@@ -95,6 +95,17 @@ security:
         - { path: ^/reporte/tipo, role: ROLE_ADMIN }
         - { path: ^/reporte/operador, role: ROLE_ADMIN }
 
+        - { path: ^/inventario/caracteristica, role: ROLE_ADMIN }
+        - { path: ^/inventario/componentecaracteristica, role: ROLE_ADMIN }
+        - { path: ^/inventario/componente, role: ROLE_ADMIN }
+        - { path: ^/inventario/componenteestado, role: ROLE_ADMIN }
+        - { path: ^/inventario/componentetipo, role: ROLE_ADMIN }
+        - { path: ^/inventario/item, role: ROLE_ADMIN }
+        - { path: ^/inventario/itemtipo, role: ROLE_ADMIN }
+        - { path: ^/inventario/sevicio, role: ROLE_ADMIN }
+        - { path: ^/inventario/servicioestado, role: ROLE_ADMIN }
+        - { path: ^/inventario/serviciotipo, role: ROLE_ADMIN }
+
         - { path: ^/.*, role: IS_AUTHENTICATED_ANONYMOUSLY }
 
         

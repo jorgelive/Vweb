@@ -260,7 +260,7 @@ class Archivoexcel extends ContainerAware{
                         }
                         foreach($value as $key => $parteValor):
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='exceldate'){
-                                $parteValor = $this->container->get('gopro_main_variable')->exceldate($parteValor);
+                                $parteValor = $this->container->get('gopro_main_variableproceso')->exceldate($parteValor);
                             }
                             if(isset($this->columnaSpecs[$columnName[$key]]['tipo'])&&$this->columnaSpecs[$columnName[$key]]['tipo']=='file'&& $key==1){
                                 $parteValor = str_pad($parteValor,10, 0, STR_PAD_LEFT);
@@ -285,28 +285,33 @@ class Archivoexcel extends ContainerAware{
             return false;
         }
 
-        foreach ($existentesRaw as $nroLinea=>$valor):
-            $indice=array();
-            $llavesSave=array();
-            foreach($this->tablaSpecs['llaves'] as $llave):
-                $indice[]=$valor[$llave];
-                $llavesSave[$llave]=$valor[$llave];
-                unset($valor[$llave]);
-            endforeach;
-            $existentesIndizados[implode('|',$indice)]=$valor;
-            $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
-            $existentesIndizadosKp[implode('|',$indice)]=array_merge($llavesSave,$valor);
-            $existentesIndizadosMultiKp[implode('|',$indice)][]=array_merge($llavesSave,$valor);
-            if(!empty($this->getCamposCustom())){
-                $i=0;
-                foreach($this->getCamposCustom() as $llaveCustom):
-                    if(isset($valor[$llaveCustom])){
-                        $existentesCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
-                        $existentesCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
 
-                    }
-                    $i++;
+        foreach ($existentesRaw as $nroLinea=>$valor):
+            if(!empty($this->tablaSpecs['llaves'])){
+                $indice=array();
+                $llavesSave=array();
+                foreach($this->tablaSpecs['llaves'] as $llave):
+                    $indice[]=$valor[$llave];
+                    $llavesSave[$llave]=$valor[$llave];
+                    unset($valor[$llave]);
                 endforeach;
+                $existentesIndizados[implode('|',$indice)]=$valor;
+                $existentesIndizadosMulti[implode('|',$indice)][]=$valor;
+                $existentesIndizadosKp[implode('|',$indice)]=array_merge($llavesSave,$valor);
+                $existentesIndizadosMultiKp[implode('|',$indice)][]=array_merge($llavesSave,$valor);
+                if(!empty($this->getCamposCustom())){
+                    $i=0;
+                    foreach($this->getCamposCustom() as $llaveCustom):
+                        if(isset($valor[$llaveCustom])){
+                            $existentesCustomIndizadosMulti[implode('|',$indice)][$i][$llaveCustom]=$valor[$llaveCustom];
+                            $existentesCustomIndizados[implode('|',$indice)][$llaveCustom]=$valor[$llaveCustom];
+
+                        }
+                        $i++;
+                    endforeach;
+                }
+            }else{
+                $this->setMensajes('No se asigno ninguna llave, los agrupamientos no estan disponibles');
             }
             if(!empty($this->getCamposCustom())){
                 foreach($this->getCamposCustom() as $llaveCustom):
@@ -318,7 +323,6 @@ class Archivoexcel extends ContainerAware{
         endforeach;
 
         $this->setExistentesRaw($existentesRaw);
-
         $this->setExistentesIndizados($existentesIndizados);
         $this->setExistentesIndizadosMulti($existentesIndizadosMulti);
         $this->setExistentesIndizadosKp($existentesIndizadosKp);
@@ -462,7 +466,7 @@ class Archivoexcel extends ContainerAware{
     }
 
     public function setFila($fila,$posicion){
-        if(empty($this->getHoja())||empty($fila)||!is_array($fila)||$this->container->get('gopro_main_variable')->is_multi_array($fila)||empty($posicion)){
+        if(empty($this->getHoja())||empty($fila)||!is_array($fila)||$this->container->get('gopro_main_variableproceso')->is_multi_array($fila)||empty($posicion)){
             $this->setMensajes('El formato de fila no es correcto');
             return $this;
         }
@@ -482,7 +486,7 @@ class Archivoexcel extends ContainerAware{
     }
 
     public function setTabla($tabla,$posicion){
-        if(empty($this->getHoja())||empty($tabla)||!is_array($tabla)||!$this->container->get('gopro_main_variable')->is_multi_array($tabla)||empty($posicion)){
+        if(empty($this->getHoja())||empty($tabla)||!is_array($tabla)||!$this->container->get('gopro_main_variableproceso')->is_multi_array($tabla)||empty($posicion)){
             $this->setMensajes('El formato de tabla no es correcto');
             return $this;
         }
@@ -510,7 +514,7 @@ class Archivoexcel extends ContainerAware{
 
     public function setFormatoColumna($formatoColumna){
 
-        if(empty($this->getHoja())||empty($formatoColumna)||!$this->container->get('gopro_main_variable')->is_multi_array($formatoColumna)){
+        if(empty($this->getHoja())||empty($formatoColumna)||!$this->container->get('gopro_main_variableproceso')->is_multi_array($formatoColumna)){
             $this->setMensajes('El formato de columna no es correcto');
             return $this;
         }
@@ -582,7 +586,7 @@ class Archivoexcel extends ContainerAware{
     }
 
     public function setCeldas($celdas){
-        if(empty($this->getHoja())||empty($celdas)||!$this->container->get('gopro_main_variable')->is_multi_array($celdas)){
+        if(empty($this->getHoja())||empty($celdas)||!$this->container->get('gopro_main_variableproceso')->is_multi_array($celdas)){
             $this->setMensajes('Las celdas no tienen el formato correcto');
             return $this;
         }
@@ -604,12 +608,12 @@ class Archivoexcel extends ContainerAware{
         if($tipo=='response'){
             $response = $this->container->get('phpexcel')->createStreamedResponse($writer);
             $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
-            $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_main_variable')->sanitizeString($this->getNombre().'.'.$this->getTipo()));
+            $response->headers->set('Content-Disposition', 'attachment;filename='.$this->container->get('gopro_main_variableproceso')->sanitizeString($this->getNombre().'.'.$this->getTipo()));
             $response->headers->set('Pragma', 'public');
             $response->headers->set('Cache-Control', 'max-age=1');
             return $response;
         }elseif($tipo=='archivo'){
-            //$path=$this->container->getParameter('kernel.root_dir').'/../web/temp/'.$this->container->get('gopro_main_variable')->sanitizeString($this->getNombre().'.'.$this->getTipo());
+            //$path=$this->container->getParameter('kernel.root_dir').'/../web/temp/'.$this->container->get('gopro_main_variable_proceso')->sanitizeString($this->getNombre().'.'.$this->getTipo());
             $path=tempnam(sys_get_temp_dir(), $this->getTipo());
             $writer->save($path);
             return $path;

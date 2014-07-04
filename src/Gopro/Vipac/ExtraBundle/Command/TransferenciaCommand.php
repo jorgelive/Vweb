@@ -72,7 +72,7 @@ class TransferenciaCommand extends ContainerAwareCommand
             return false;
         }
 
-        $resultado = $this->getContainer()->get('gopro_main_variable')->utf($datosTransferencia->getExistentesRaw());
+        $resultado = $this->getContainer()->get('gopro_main_variableproceso')->utf($datosTransferencia->getExistentesRaw());
 
         foreach($resultado as $linea):
             if(!empty(trim($linea['E_MAIL']))){

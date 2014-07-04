@@ -195,7 +195,9 @@ class ServicioController extends BaseController
                         }else{
                             $marca='✓';
                         }
-                        $serviciosList[(($servicio->getFecha()->format('m')-1)*2)+$quincena]=$marca;
+                        if($servicio->getFecha()->format('Y')==$ano){
+                            $serviciosList[(($servicio->getFecha()->format('m')-1)*2)+$quincena]=$marca;
+                        }
                     endforeach;
                     for($iServicios=1;$iServicios<=24;$iServicios++):
                         if(isset($serviciosList[$iServicios])){
