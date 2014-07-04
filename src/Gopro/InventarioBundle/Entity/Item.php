@@ -28,8 +28,7 @@ class Item
     /**
      * @var string
      *
-     * @ORM\Column(name="codigo", type="string", length=100)
-     * @Assert\NotBlank
+     * @ORM\Column(name="codigo", type="string", length=100, nullable=true)
      */
     private $codigo;
 
