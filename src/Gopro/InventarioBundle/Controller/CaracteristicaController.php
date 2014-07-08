@@ -39,7 +39,7 @@ class CaracteristicaController extends BaseController
     /**
      * Creates a new Caracteristica entity.
      *
-     * @Route("/", name="gopro_inventario_caracteristica_create")
+     * @Route("/create", name="gopro_inventario_caracteristica_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Caracteristica:new.html.twig")
      */

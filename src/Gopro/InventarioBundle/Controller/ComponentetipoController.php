@@ -39,7 +39,7 @@ class ComponentetipoController extends BaseController
     /**
      * Creates a new Componentetipo entity.
      *
-     * @Route("/", name="gopro_inventario_componentetipo_create")
+     * @Route("/create", name="gopro_inventario_componentetipo_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Componentetipo:new.html.twig")
      */

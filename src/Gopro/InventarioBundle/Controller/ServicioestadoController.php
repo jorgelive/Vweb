@@ -39,7 +39,7 @@ class ServicioestadoController extends BaseController
     /**
      * Creates a new Servicioestado entity.
      *
-     * @Route("/", name="gopro_inventario_servicioestado_create")
+     * @Route("/create", name="gopro_inventario_servicioestado_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Servicioestado:new.html.twig")
      */

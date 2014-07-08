@@ -38,7 +38,7 @@ class TipoController extends Controller
     /**
      * Creates a new Tipo entity.
      *
-     * @Route("/", name="gopro_vipac_reporte_tipo_create")
+     * @Route("/create", name="gopro_vipac_reporte_tipo_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Tipo:new.html.twig")
      */

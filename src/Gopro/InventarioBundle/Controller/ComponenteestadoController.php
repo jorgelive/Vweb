@@ -39,7 +39,7 @@ class ComponenteestadoController extends BaseController
     /**
      * Creates a new Componenteestado entity.
      *
-     * @Route("/", name="gopro_inventario_componenteestado_create")
+     * @Route("/create", name="gopro_inventario_componenteestado_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Componenteestado:new.html.twig")
      */

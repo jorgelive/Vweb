@@ -41,7 +41,7 @@ class CampoController extends Controller
     /**
      * Creates a new Campo entity.
      *
-     * @Route("/", name="gopro_vipac_reporte_campo_create")
+     * @Route("/create", name="gopro_vipac_reporte_campo_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Campo:new.html.twig")
      */

@@ -32,7 +32,7 @@ class DoccptipoController extends Controller
         );
     }
     /**
-     * @Route("/", name="gopro_vipac_dbproceso_doccptipo_create")
+     * @Route("/create", name="gopro_vipac_dbproceso_doccptipo_create")
      * @Method("POST")
      * @Template("GoproVipacDbprocesoBundle:Doccptipo:new.html.twig")
      */

@@ -39,7 +39,7 @@ class ArchivoController extends BaseController
     /**
      * Creates a new Archivo entity.
      *
-     * @Route("/", name="gopro_main_archivo_create")
+     * @Route("/create", name="gopro_main_archivo_create")
      * @Method("POST")
      * @Template("GoproMainBundle:Archivo:new.html.twig")
      */

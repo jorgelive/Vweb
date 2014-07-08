@@ -11,6 +11,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gopro\InventarioBundle\Entity\Componente;
 use Gopro\InventarioBundle\Form\ComponenteType;
 
+use APY\DataGridBundle\Grid\Source\Entity;
+use APY\DataGridBundle\Grid\Column\TextColumn;
+use APY\DataGridBundle\Grid\Column\ActionsColumn;
+use APY\DataGridBundle\Grid\Action\MassAction;
+use APY\DataGridBundle\Grid\Action\DeleteMassAction;
+use APY\DataGridBundle\Grid\Action\RowAction;
+
 /**
  * Componente controller.
  *
@@ -23,23 +30,31 @@ class ComponenteController extends BaseController
      * Lists all Componente entities.
      *
      * @Route("/", name="gopro_inventario_componente")
-     * @Method("GET")
+     * @Method({"POST","GET"})
      * @Template()
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $source = new Entity('GoproInventarioBundle:Componente');
 
-        $entities = $em->getRepository('GoproInventarioBundle:Componente')->findAll();
+        $grid = $this->get('grid');
 
-        return array(
-            'entities' => $entities,
-        );
+        $mostrarAction = new RowAction('mostrar', 'gopro_inventario_componente_show');
+        $mostrarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($mostrarAction);
+
+        $editarAction = new RowAction('editar', 'gopro_inventario_componente_edit');
+        $editarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($editarAction);
+        $grid->setSource($source);
+
+        return $grid->getGridResponse();
+
     }
     /**
      * Creates a new Componente entity.
      *
-     * @Route("/", name="gopro_inventario_componente_create")
+     * @Route("/create", name="gopro_inventario_componente_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Componente:new.html.twig")
      */

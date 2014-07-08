@@ -28,44 +28,36 @@ class ItemController extends BaseController
     /**
      * Lists all Item entities.
      *
-     * @Route("/", name="gopro_inventario_item")
-     * @Method("GET")
+     * @Route("/index", name="gopro_inventario_item")
+     * @Method({"POST","GET"})
      * @Template()
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('GoproInventarioBundle:Item')->findAll();
-
-        return array(
-            'entities' => $entities,
-        );
-    }
-
-    /**
-     * Lists all Item entities.
-     *
-     * @Route("/grid", name="gopro_inventario_item_grid")
-     * @Template()
-     */
-    public function gridAction()
-    {
-
         $source = new Entity('GoproInventarioBundle:Item');
 
         $grid = $this->get('grid');
 
+        $mostrarAction = new RowAction('mostrar', 'gopro_inventario_item_show');
+        $mostrarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($mostrarAction);
+
+        $editarAction = new RowAction('editar', 'gopro_inventario_item_edit');
+        $editarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($editarAction);
+
+        $servicioAction = new RowAction('servicio', 'gopro_inventario_item_servicio');
+        $servicioAction->setRouteParameters(array('id'));
+        $grid->addRowAction($servicioAction);
 
         $grid->setSource($source);
-        $grid->hideColumns('codigo');
 
-        return $grid->getGridResponse('GoproInventarioBundle:item:grid.html.twig');
+        return $grid->getGridResponse();
     }
     /**
      * Creates a new Item entity.
      *
-     * @Route("/", name="gopro_inventario_item_create")
+     * @Route("/create", name="gopro_inventario_item_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Item:new.html.twig")
      */

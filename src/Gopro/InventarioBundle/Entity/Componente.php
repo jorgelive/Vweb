@@ -6,12 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
+use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Componente
  *
  * @ORM\Table(name="inv_componente")
  * @ORM\Entity
+ * @GRID\Source(columns="id, item.nombre, componentetipo.nombre, componenteestado.nombre")
  */
 class Componente
 {
@@ -64,18 +66,21 @@ class Componente
     /**
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="componentes")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(field="item.nombre", title="Item")
      */
     private $item;
 
     /**
      * @ORM\ManyToOne(targetEntity="Componentetipo", inversedBy="componentes")
      * @ORM\JoinColumn(name="componentetipo_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="componentetipo.nombre", title="Tipo")
      */
     private $componentetipo;
 
     /**
      * @ORM\ManyToOne(targetEntity="Componenteestado", inversedBy="componentes")
      * @ORM\JoinColumn(name="componenteestado_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="componenteestado.nombre", title="Estado")
      */
     private $componenteestado;
 

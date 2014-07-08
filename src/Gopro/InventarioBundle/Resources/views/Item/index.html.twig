@@ -2,42 +2,8 @@
 {% block title %}Lista de items{% endblock title %}
 {% block titulo %}Lista de items{% endblock titulo %}
 {% block content %}
-    <table class="listaRegistros">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Creado</th>
-                <th>Modificado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for entity in entities %}
-            <tr>
-                <td><a href="{{ path('gopro_inventario_item_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.codigo }}</td>
-                <td>{{ entity.nombre }}</td>
-                <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if entity.modificado %}{{ entity.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('gopro_inventario_item_show', { 'id': entity.id }) }}">mostrar</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('gopro_inventario_item_edit', { 'id': entity.id }) }}">editar</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('gopro_inventario_item_servicio', { 'id': entity.id }) }}">servicio</a>
-                    </li>
-                </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+    {{ grid(grid) }}
 
     <ul class="listaAcciones">
         <li>

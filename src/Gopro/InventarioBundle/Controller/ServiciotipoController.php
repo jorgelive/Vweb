@@ -39,7 +39,7 @@ class ServiciotipoController extends BaseController
     /**
      * Creates a new Serviciotipo entity.
      *
-     * @Route("/", name="gopro_inventario_serviciotipo_create")
+     * @Route("/create", name="gopro_inventario_serviciotipo_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Serviciotipo:new.html.twig")
      */

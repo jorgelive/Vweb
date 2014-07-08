@@ -1,3 +1,5 @@
+.grid {display: block; margin-bottom: 10px;}
+
 .grid table
 {
     border-collapse: collapse;
@@ -27,36 +29,20 @@
     font-weight: normal;
 }
 
-.grid tr.even
-{
-    background-color: #FCFDFE;
-}
+.grid tr.even {background-color: #FCFDFE;}
 
-.grid tr.odd {
-    background-color: #F7F9FC;
+.grid tr.odd {background-color: #F7F9FC;}
 
-}
+.grid_header,
+.grid_footer {margin: 5px 0 10px 0;}
 
-.grid_header, .grid_footer {
-    margin: 5px 0;
-}
+.grid_footer .pager {float:none !important;}
 
-/* Icons for order */
-/* You can find this icons in the images directory of the docuementation */
-th div {
-    height: 10px;
-    width: 20px;
-    float: right;
-    padding-top: 4px;
-}
+.grid th div {height: 10px; width: 20px; float: right; padding-top: 4px;}
 
-.grid th div.sort_up {
-    background: transparent url("data:image/gif;base64,R0lGODlhFwAKAIABAJCQkO/v7yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEALAAAAAAXAAoAAAIajI+py+0GwGsxTmVDvlqe/YCQ52wmyaXqUQAAOw==") no-repeat bottom left;
-}
+.grid th div.sort_up {background: transparent url("data:image/gif;base64,R0lGODlhFwAKAIABAJCQkO/v7yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEALAAAAAAXAAoAAAIajI+py+0GwGsxTmVDvlqe/YCQ52wmyaXqUQAAOw==") no-repeat bottom left;}
 
-.grid th div.sort_down {
-    background: transparent url("data:image/gif;base64,R0lGODlhFwAKAHAAACH5BAEAAAIALAAAAAAXAAoAgQAAAJCQkAAAAAAAAAIalI+py60RDpTRiZmwvdXozXkdKH6keKZqUwAAOw==") no-repeat bottom left;
-}
+.grid th div.sort_down {background: transparent url("data:image/gif;base64,R0lGODlhFwAKAHAAACH5BAEAAAIALAAAAAAXAAoAgQAAAJCQkAAAAAAAAAIalI+py60RDpTRiZmwvdXozXkdKH6keKZqUwAAOw==") no-repeat bottom left;}
 
 /* Boolean column */
 .grid .grid_boolean_true {
@@ -90,25 +76,26 @@ th div {
 
 /* Column filter */
 .grid .grid-filter-operator select{width: 80px; font-size: 8px;}
-.grid-filter-input-query{display: inline-block;}
+.grid .grid-filter-input-query{display: inline-block;}
 .grid .grid-filter-input-query input,
-.grid .grid-filter-select-query select{width: 80px; font-size: 8px;}
+.grid .grid-filter-select-query select{width: 115px; font-size: 8px;}
 
 .grid .grid-filter-input-query-to, .grid .grid-filter-select-query-to{display: block;}
 
 /* Grid Search */
 
-.grid-search {
+.grid .grid-search {
     border: 1px solid #D4E0EE;
     padding: 10px;
 }
 
-.grid-search label{
+.grid .grid-search label{
     width: 80px;
     display: inline-block;
     text-align: right;
 }
 
-.grid-search select, .grid-search .grid-filter-input-query input {
+.grid .grid-search select, .grid-search .grid-filter-input-query input {
     width: 150px;
 }
+.grid ul.grid-row-actions{list-style: none;}

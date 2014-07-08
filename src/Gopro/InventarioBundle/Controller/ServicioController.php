@@ -12,6 +12,13 @@ use Gopro\InventarioBundle\Entity\Servicio;
 use Gopro\InventarioBundle\Form\ServicioType;
 use Symfony\Component\Validator\Constraints\DateTime;
 
+use APY\DataGridBundle\Grid\Source\Entity;
+use APY\DataGridBundle\Grid\Column\TextColumn;
+use APY\DataGridBundle\Grid\Column\ActionsColumn;
+use APY\DataGridBundle\Grid\Action\MassAction;
+use APY\DataGridBundle\Grid\Action\DeleteMassAction;
+use APY\DataGridBundle\Grid\Action\RowAction;
+
 /**
  * Servicio controller.
  *
@@ -24,23 +31,31 @@ class ServicioController extends BaseController
      * Lists all Servicio entities.
      *
      * @Route("/", name="gopro_inventario_servicio")
-     * @Method("GET")
+     * @Method({"GET","POST"})
      * @Template()
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $source = new Entity('GoproInventarioBundle:Servicio');
 
-        $entities = $em->getRepository('GoproInventarioBundle:Servicio')->findAll();
+        $grid = $this->get('grid');
 
-        return array(
-            'entities' => $entities,
-        );
+        $mostrarAction = new RowAction('mostrar', 'gopro_inventario_servicio_show');
+        $mostrarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($mostrarAction);
+
+        $editarAction = new RowAction('editar', 'gopro_inventario_servicio_edit');
+        $editarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($editarAction);
+
+        $grid->setSource($source);
+
+        return $grid->getGridResponse();
     }
     /**
      * Creates a new Servicio entity.
      *
-     * @Route("/", name="gopro_inventario_servicio_create")
+     * @Route("/create", name="gopro_inventario_servicio_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Servicio:new.html.twig")
      */

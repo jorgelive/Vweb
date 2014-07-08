@@ -76,7 +76,7 @@ class SentenciaController extends BaseController
     /**
      * Creates a new Sentencia entity.
      *
-     * @Route("/", name="gopro_vipac_reporte_sentencia_create")
+     * @Route("/create", name="gopro_vipac_reporte_sentencia_create")
      * @Method("POST")
      * @Secure(roles="ROLE_ADMIN")
      * @Template("GoproVipacReporteBundle:Sentencia:new.html.twig")

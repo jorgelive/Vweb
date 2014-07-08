@@ -13,6 +13,7 @@ use APY\DataGridBundle\Grid\Mapping as GRID;
  *
  * @ORM\Table(name="inv_item")
  * @ORM\Entity(repositoryClass="Gopro\InventarioBundle\Entity\Repository\ItemRepository")
+ * @GRID\Source(columns="id, nombre, itemtipo.nombre, dependencia.nombre")
  */
 class Item
 {
@@ -69,12 +70,14 @@ class Item
     /**
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Dependencia")
      * @ORM\JoinColumn(name="dependencia_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="dependencia.nombre", title="Ubicacíón")
      */
     private $dependencia;
 
     /**
      * @ORM\ManyToOne(targetEntity="Itemtipo", inversedBy="items")
      * @ORM\JoinColumn(name="itemtipo_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="itemtipo.nombre", title="Tipo")
      */
     private $itemtipo;
 

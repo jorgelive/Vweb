@@ -39,7 +39,7 @@ class ItemtipoController extends BaseController
     /**
      * Creates a new Itemtipo entity.
      *
-     * @Route("/", name="gopro_inventario_itemtipo_create")
+     * @Route("/create", name="gopro_inventario_itemtipo_create")
      * @Method("POST")
      * @Template("GoproInventarioBundle:Itemtipo:new.html.twig")
      */

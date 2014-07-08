@@ -38,7 +38,7 @@ class OperadorController extends Controller
     /**
      * Creates a new Operador entity.
      *
-     * @Route("/", name="gopro_vipac_reporte_operador_create")
+     * @Route("/create", name="gopro_vipac_reporte_operador_create")
      * @Method("POST")
      * @Template("GoproVipacReporteBundle:Operador:new.html.twig")
      */
