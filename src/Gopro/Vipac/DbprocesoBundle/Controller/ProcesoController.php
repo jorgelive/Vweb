@@ -42,7 +42,8 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_PRINCIPAL_MERCADO');
+        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CHEQUE_FILE');
+        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CHEQUE_FILE');
         $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
         $columnaspecs[1]=null;
         $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
@@ -235,8 +236,8 @@ class ProcesoController extends BaseController
 
         $filesInfo=$this->container->get('gopro_dbproceso_proceso');
         $filesInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
-        $filesInfo->setTabla('VVW_FILE_MERCADO_SINGLEKEY');
-        $filesInfo->setSchema('RESERVAS');
+        $filesInfo->setTabla('DBP_PROCESO_CARGADORCP_FILE');
+        $filesInfo->setSchema('VWEB');
         $filesInfo->setCamposSelect([
             'NUM_FILE',
             'NOMBRE',
@@ -400,7 +401,12 @@ class ProcesoController extends BaseController
                 if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
                     $resultado[$nroLinea]['APLICACION']=$file['CENTRO_COSTO'].' '.$resultado[$nroLinea]['APLICACION'];
                 }
-                $resultado[$nroLinea]['FILE'.$i]=$nroFile;
+                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
+                    $resultado[$nroLinea]['FILE'.$i]=$file['CENTRO_COSTO'].' '.$dataCP[$nroLinea]['CONDICIONES']['subtotal'].' '.$nroFile;
+                }else{
+                    $resultado[$nroLinea]['FILE'.$i]=$nroFile;
+                }
+
                 if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
                     $file['CENTRO_COSTO']='0.00.00.00';
                 }
@@ -632,7 +638,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'VVW_DOCUMENTOS_CC','tipo'=>'S');
+        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALCC_DOCCC','tipo'=>'S');
         $columnaspecs[0]=array('nombre'=>'CUENTA_CONTABLE','llave'=>'no','proceso'=>'no');
         $columnaspecs[1]=array('nombre'=>'DESCRIPCION','llave'=>'no','proceso'=>'no');
         $columnaspecs[2]=array('nombre'=>'ASIENTO_ARCHIVO','llave'=>'no','proceso'=>'no');
@@ -692,8 +698,8 @@ class ProcesoController extends BaseController
 
         $serviciosHoteles=$this->container->get('gopro_dbproceso_proceso');
         $serviciosHoteles->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
-        $serviciosHoteles->setTabla('VVW_UNION_HOTEL_SERVICIO');
-        $serviciosHoteles->setSchema('RESERVAS');
+        $serviciosHoteles->setTabla('DBP_PROCESO_CALCC_UNION');
+        $serviciosHoteles->setSchema('VWEB');
         $serviciosHoteles->setCamposSelect([
             'ANO',
             'NUM_FILE_FISICO',
@@ -732,8 +738,8 @@ class ProcesoController extends BaseController
             ){
 
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$this->container->get('gopro_main_variableproceso')->utf($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]));
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']];
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$this->container->get('gopro_main_variableproceso')->utf($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]);
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
                 if($this->getCantidadTotal('montoTotal')!=0&&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
@@ -771,7 +777,11 @@ class ProcesoController extends BaseController
                 }
                 $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
-                $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
+                if(!empty($valor['CREDITO_DOLAR'])){
+                    $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
+                }else{
+                    $resultado[$i]['CREDITO_DOLAR']='';
+                }
                 if(!empty($valor['CREDITO_LOCAL'])){
                     $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
                 }else{
@@ -835,7 +845,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_PRINCIPAL_MERCADO');
+        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALXFILE_FILE');
 
         $procesoArchivo=$this->get('gopro_main_archivoexcel')
             ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
@@ -906,7 +916,7 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'RESERVAS',"nombre"=>'VVW_FILE_SERVICIOS_MERCADO');
+        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALXRESERVA_FILE');
         $procesoArchivo=$this->get('gopro_main_archivoexcel')
             ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
             ->setArchivo()
