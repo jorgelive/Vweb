@@ -1,5 +1,4 @@
 $.fn.filtro = function() {
-    //console.log(this);
     if(this.length==0){return false;}
     var formName='parametrosForm';
 
@@ -8,12 +7,19 @@ $.fn.filtro = function() {
         ||$(this).find('#'+formName+'_operadores').val()==''){
         return false;
     }
-    var row={
+    var filtroRow={
         id:1,
         formName:formName,
         campos: JSON.parse($(this).find('#'+formName+'_campos').val()),
         tipos: JSON.parse($(this).find('#'+formName+'_tipos').val()),
         operadores: JSON.parse($(this).find('#'+formName+'_operadores').val())
+    };
+
+    var ordenRow={
+        id:1,
+        formName:formName,
+        campos: JSON.parse($(this).find('#'+formName+'_campos').val()),
+        ordenes: JSON.parse($(this).find('#'+formName+'_ordenes').val())
     };
 
     var el = {
@@ -23,12 +29,25 @@ $.fn.filtro = function() {
             id: "filtroAdd",
             text: "Agregar Filtro",
             click: function(){
-                agregarFila();
+                agregarFiltro();
+            }
+        }),
+        ordenContent : $("<div>", {id: "ordenContent"}),
+        ordenTable : $("<table>", {id: "ordenTable"}),
+        ordenAdd : $("<a>", {
+            id: "ordenAdd",
+            text: "Agregar Orden",
+            click: function(){
+                agregarOrden();
             }
         })
     };
-    var filtroForm=$(this);
-    el.filtroContent.prependTo(filtroForm);
+
+    var parametrosform=$(this);
+    el.ordenContent.prependTo(parametrosform);
+    el.ordenTable.appendTo(el.ordenContent);
+    el.ordenAdd.appendTo(el.ordenContent);
+    el.filtroContent.prependTo(parametrosform);
     el.filtroTable.appendTo(el.filtroContent);
     el.filtroAdd.appendTo(el.filtroContent);
 
@@ -39,23 +58,71 @@ $.fn.filtro = function() {
         }
     );
 
+    el.ordenAdd.button({
+            icons: {
+                primary: 'ui-icon ui-icon-plus'
+            }
+        }
+    );
+
     $(document).ready(function() {
 
-        if(filtroForm.find('#'+formName+'_filtroaplicado').val()==''|| typeof filtroForm.find('#'+formName+'_filtroaplicado').val() === 'undefined'){
-            return false;
+        if(parametrosform.find('#'+formName+'_filtroaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_filtroaplicado').val() !== 'undefined'){
+            var filtroAplicado=JSON.parse(parametrosform.find('#'+formName+'_filtroaplicado').val());
+            for (var key in filtroAplicado)
+            {
+                agregarFiltro(filtroAplicado[key].campo,filtroAplicado[key].operador,filtroAplicado[key].valor);
+            }
         }
-
-        var filtroAplicado=JSON.parse(filtroForm.find('#'+formName+'_filtroaplicado').val());
-        for (var key in filtroAplicado)
-        {
-            agregarFila(filtroAplicado[key].campo,filtroAplicado[key].operador,filtroAplicado[key].valor);
+        if(parametrosform.find('#'+formName+'_ordenaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_ordenaplicado').val() !== 'undefined'){
+            var ordenAplicado=JSON.parse(parametrosform.find('#'+formName+'_ordenaplicado').val());
+            for (var key in ordenAplicado)
+            {
+                agregarOrden(ordenAplicado[key].campo,ordenAplicado[key].orden);
+            }
         }
     });
 
-    var agregarFila=function(currentCampo,currentOperador,currentValor){
+    var agregarOrden=function(currentCampo,currentOrden){
+        el.ordenTable.append(tmpl('plantillaOrdenRow',ordenRow));
+        var fila=el.ordenTable.find('tr[data-id='+ordenRow.id+']');
+        fila.find('a.borrarOrden').button().click(function() {
+            $(this).closest('tr').remove();
+        });
+        var selectCampos=fila.find('td.campo select');
+        var opcionesCampos=selectCampos.prop('options')
+        var selectOrdenes=fila.find('td.orden select');
+        var opcionesOrdenes=selectOrdenes.prop('options');
+        $.each(ordenRow.campos, function(id, contenido) {
+            opcionesCampos[opcionesCampos.length] = new Option(contenido.valor, contenido.key);
+        });
 
-        el.filtroTable.append(tmpl('plantillaFiltroRow',row));
-        var fila=el.filtroTable.find('tr[data-id='+row.id+']');
+        selectCampos.change(function(){
+            $('option', selectOrdenes).remove();
+            var selected=$(this).val();
+            if(typeof ordenRow.ordenes === 'undefined'){
+                return false;
+            }
+            $.each(ordenRow.ordenes, function(id, texto) {
+                opcionesOrdenes[opcionesOrdenes.length] = new Option(texto, id);
+            });
+            if(typeof currentOrden !== 'undefined'){
+                selectOrdenes.val(currentOrden);
+                currentOrden='';
+            }
+        });
+
+        ordenRow.id=ordenRow.id+1;
+        if(typeof currentCampo !== 'undefined'){
+            selectCampos.val(currentCampo);
+            selectCampos.trigger("change");
+        }
+    };
+
+    var agregarFiltro=function(currentCampo,currentOperador,currentValor){
+
+        el.filtroTable.append(tmpl('plantillaFiltroRow',filtroRow));
+        var fila=el.filtroTable.find('tr[data-id='+filtroRow.id+']');
         fila.find('a.borrarFiltro').button().click(function() {
             $(this).closest('tr').remove();
         });
@@ -65,7 +132,7 @@ $.fn.filtro = function() {
         var opcionesOperadores=selectOperadores.prop('options');
         var inputValor=fila.find('td.valor input')
 
-        $.each(row.campos, function(id, contenido) {
+        $.each(filtroRow.campos, function(id, contenido) {
             console.log(contenido);
             opcionesCampos[opcionesCampos.length] = new Option(contenido.valor, contenido.key);
         });
@@ -73,10 +140,10 @@ $.fn.filtro = function() {
         selectCampos.change(function(){
             $('option', selectOperadores).remove();
             var selected=$(this).val();
-            if(typeof row.operadores[selected] === 'undefined'){
+            if(typeof filtroRow.operadores[selected] === 'undefined'){
                 return false;
             }
-            $.each(row.operadores[selected], function(id, texto) {
+            $.each(filtroRow.operadores[selected], function(id, texto) {
                 opcionesOperadores[opcionesOperadores.length] = new Option(texto, id);
             });
             if(typeof currentOperador !== 'undefined'){
@@ -89,10 +156,10 @@ $.fn.filtro = function() {
                 currentValor='';
             }
 
-            if(typeof row.tipos[selected] === 'undefined'){
+            if(typeof filtroRow.tipos[selected] === 'undefined'){
                 return false;
             }
-            $.each(row.tipos[selected], function(id, texto) {
+            $.each(filtroRow.tipos[selected], function(id, texto) {
                 switch(id) {
                     case '3':
                         inputValor.prop("type", "date");
@@ -117,11 +184,10 @@ $.fn.filtro = function() {
                             inputValor.datepicker("destroy").removeClass("hasDatepicker").removeAttr('id');
                         }
                 }
-
             })
 
         });
-        row.id=row.id+1;
+        filtroRow.id=filtroRow.id+1;
         if(typeof currentCampo !== 'undefined'){
             selectCampos.val(currentCampo);
             selectCampos.trigger("change");

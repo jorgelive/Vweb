@@ -34,6 +34,8 @@ table#listaArchivos tbody tr td a:hover{ margin:0 5px; color:#444;}
 
 table.listaRegistros,
 table.registroPropiedades{border-collapse: collapse; margin-bottom: 10px;}
+table.listaRegistros thead tr th,
+table.registroPropiedades thead tr th {color: #0088cc; background: #eee;}
 table.listaRegistros tr td,
 table.registroPropiedades tr td,
 table.listaRegistros tr th,

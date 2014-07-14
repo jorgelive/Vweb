@@ -46,19 +46,23 @@
     {% if resultados|default and encabezados|default %}
         <div id="resultados">
             <h1>Resultado del proceso</h1>
-            <table border="1">
-                <tr>
-                    {% for encabezado in encabezados %}
-                        <th>{{ encabezado }}</th>
-                    {% endfor %}
-                </tr>
-                {% for fila in resultados %}
+            <table class="listaRegistros">
+                <thead>
                     <tr>
-                        {% for celda in fila %}
-                            <td>{{ celda }}</td>
+                        {% for encabezado in encabezados %}
+                            <th>{{ encabezado }}</th>
                         {% endfor %}
                     </tr>
-                {% endfor %}
+                </thead>
+                <tbody>
+                    {% for fila in resultados %}
+                        <tr>
+                            {% for celda in fila %}
+                                <td>{{ celda }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     {% endif %}

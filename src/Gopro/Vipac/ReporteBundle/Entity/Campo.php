@@ -68,7 +68,7 @@ class Campo
 
     /**
      * @ORM\ManyToOne(targetEntity="Tipo", inversedBy="campos")
-     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id", nullable=true)
      */
     private $tipo;
 

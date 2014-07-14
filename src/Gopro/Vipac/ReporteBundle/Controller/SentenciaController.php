@@ -44,16 +44,31 @@ class SentenciaController extends BaseController
      *
      * @return array
      */
-    private function getCampos($sql){
-        $campos=array();
+    private function getClauses($sql){
+        $clauses=array();
         if(strtoupper(substr($sql,0,6))!='SELECT'){
-            return $campos;
+            return $clauses;
         }
-        if (preg_match('/SELECT (.*?) FROM /i', $sql, $select)) {
+        if (preg_match('/SELECT (.*?) FROM/i', $sql, $select)) {
             $campos = explode(",",$select[1]);
             $campos = array_map('trim', $campos);
+            $clauses['campos']=array_unique($campos);
         }
-        return array_unique($campos);
+
+        if (preg_match('/FROM(.*?)$/i', $sql, $from)) {
+            $tabla = explode(' ',trim($from[1]));
+            $tabla = trim($tabla[0]);
+            $clauses['tabla']=$tabla;
+        }
+
+        if (preg_match('/WHERE(.*?)$/i', $sql, $where)) {
+            $condiciones = trim($where[0]);
+            $clauses['condiciones']=' '.$condiciones;
+        }else{
+            $clauses['condiciones']='';
+        }
+
+        return $clauses;
     }
 
     /**
@@ -90,7 +105,7 @@ class SentenciaController extends BaseController
         if ($form->isValid()) {
             $entity->setContenido($this->container->get('gopro_main_variableproceso')->sanitizeQuery($entity->getContenido()));
             $em = $this->getDoctrine()->getManager();
-            $campos = $this->getCampos($form->getData()->getContenido());
+            $campos = $this->getClauses($form->getData()->getContenido())['campos'];
             foreach($campos as $campo){
                 $campoEntity=new Campo();
                 $campoEntity->setNombre($campo);
@@ -169,7 +184,7 @@ class SentenciaController extends BaseController
         $camposDropdown=array();
         $tipos=array();
         $operadores=array();
-        $camposSQL=$this->getCampos($entity->getContenido());
+        $camposSQL=$this->getClauses($entity->getContenido())['campos'];
         if(!empty($entity->getCampos())){
             foreach ($entity->getCampos() as $campoEntity):
                 $camposPorNombre[$campoEntity->getNombre()]=$campoEntity->getNombremostrar();
@@ -183,8 +198,8 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
-        $encabezados=array();
 
+        $encabezados=array();
         foreach($camposSQL as $campoSQL):
             if(empty($camposPorNombre[$campoSQL])){
                 throw $this->createNotFoundException('No existe el encabezado: '.$campoSQL.'.');
@@ -205,11 +220,10 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),$destino,$limite);
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),$destino,$limite);
 
         if (
             $request->getMethod() == 'POST'
-            &&!empty($request->request->all()['parametrosForm']['filtro'])
             &&!empty($campos)
         ){
             $operadoresLista = [
@@ -223,120 +237,154 @@ class SentenciaController extends BaseController
                 8=>' <= '
 
             ];
-            $filtroSQL=array();
-            foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
-                if(
-                    empty($campos[$filtro['campo']])
-                    ||empty($operadores[$filtro['campo']][$filtro['operador']])
-                    ||empty($filtro['valor'])
-                ){
-                    $this->setMensajes('No pueden quedar campos vacios en los filtros o los filtros son inválidos.');
-                    return array(
-                        'entity' => $entity,
-                        'parametros_form'  => $parametrosForm->createView(),
-                        'delete_form' => $deleteForm->createView(),
-                        'mensajes' => $this->getMensajes()
-                    );
-                }
-                $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
-                $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
 
-                if(empty($operadores[$filtro['campo']][$filtro['operador']])){
-                    $this->setMensajes('No existe el operador');
-                    return array(
-                        'entity' => $entity,
-                        'parametros_form'  => $parametrosForm->createView(),
-                        'delete_form' => $deleteForm->createView(),
-                        'mensajes' => $this->getMensajes()
-                    );
-                }
-                $filtroSQLPart=array();
-                if(isset($tipos[$filtro['campo']][1])){
-                    $filtroSQLPart[0]='UPPER(';
-                    $filtroSQLPart[1]=$campos[$filtro['campo']];
-                    $filtroSQLPart[2]=')';
-                    $filtroSQLPart[3]=$operadoresLista[$filtro['operador']];
-                    if($filtro['operador']==3){
-                        $valores=explode('|',$filtro['valor']);
-                        $valoresIn=array();
-                        foreach ($valores as $valor):
-                            $valoresIn[]='UPPER('.$this->setValoresBind($campos[$filtro['campo']],$valor).')';
-                        endforeach;
-                        $filtroSQLPart[4]='(';
-                        $filtroSQLPart[5]=implode(',',$valoresIn);
-                        $filtroSQLPart[6]=')';
-                    }else{
-                        $filtroSQLPart[4]='UPPER(';
-                        if($filtro['operador']==4){
-                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor'].'%');
-                        }elseif($filtro['operador']==5){
-                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor'].'%');
-                        }elseif($filtro['operador']==6){
-                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor']);
+            $ordenesString = '';
+            $ordenesArray=array();
+            if(!empty($request->request->all()['parametrosForm']['orden'])){
+                foreach($request->request->all()['parametrosForm']['orden'] as $nroOrden => $orden):
+                    if(
+                        empty($campos[$orden['campo']])
+                        ||empty($orden['orden'])
+                    ){
+                        $this->setMensajes('Se ejecuta el proceso sin ordenamiento.');
+                        break;
+                    }
+                    $ordenAplicado[]=['campo'=>$orden['campo'],'orden'=>$orden['orden']];
+                    $parametrosForm->add('ordenaplicado', 'hidden', array('data' => json_encode($ordenAplicado)));
+                    $ordenesArrayPart=array();
+                    $ordenesArrayPart[0]=$campos[$orden['campo']];
+                    $ordenesArrayPart[1]=$orden['orden'];
+                    $ordenesArray[$nroOrden]=implode(' ',$ordenesArrayPart);
+                endforeach;
+            }
+
+            if(!empty($ordenesArray)){
+                $ordenesString = ' ORDER BY '.implode(', ',$ordenesArray);
+            }
+            
+            
+            $filtrosString = '';
+            $filtroArray=array();
+            if(!empty($request->request->all()['parametrosForm']['filtro'])){
+                foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
+                    if(
+                        empty($campos[$filtro['campo']])
+                        ||empty($operadores[$filtro['campo']][$filtro['operador']])
+                        ||empty($filtro['valor'])
+                    ){
+                        $this->setMensajes('Se ejecuta el proceso sin condiciones.');
+                        break;
+                    }
+                    $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
+                    $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
+
+                    if(empty($operadores[$filtro['campo']][$filtro['operador']])){
+                        $this->setMensajes('No existe el operador');
+                        return array(
+                            'entity' => $entity,
+                            'parametros_form'  => $parametrosForm->createView(),
+                            'delete_form' => $deleteForm->createView(),
+                            'mensajes' => $this->getMensajes()
+                        );
+                    }
+                    $filtroArrayPart=array();
+                    if(isset($tipos[$filtro['campo']][1])){
+                        $filtroArrayPart[0]='UPPER(';
+                        $filtroArrayPart[1]=$campos[$filtro['campo']];
+                        $filtroArrayPart[2]=')';
+                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                        if($filtro['operador']==3){
+                            $valores=explode('|',$filtro['valor']);
+                            $valoresIn=array();
+                            foreach ($valores as $valor):
+                                $valoresIn[]='UPPER('.$this->setValoresBind($campos[$filtro['campo']],$valor).')';
+                            endforeach;
+                            $filtroArrayPart[4]='(';
+                            $filtroArrayPart[5]=implode(',',$valoresIn);
+                            $filtroArrayPart[6]=')';
                         }else{
-                            $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                        }
+                            $filtroArrayPart[4]='UPPER(';
+                            if($filtro['operador']==4){
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor'].'%');
+                            }elseif($filtro['operador']==5){
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor'].'%');
+                            }elseif($filtro['operador']==6){
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor']);
+                            }else{
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                            }
 
-                        $filtroSQLPart[6]=')';
+                            $filtroArrayPart[6]=')';
+                        }
+                    }elseif(isset($tipos[$filtro['campo']][2])){
+                        $filtroArrayPart[0]='NVL(';
+                        $filtroArrayPart[1]=$campos[$filtro['campo']];
+                        $filtroArrayPart[2]=',0)';
+                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                        if($filtro['operador']==3){
+                            $valores=explode('|',$filtro['valor']);
+                            $valoresIn=array();
+                            foreach ($valores as $valor):
+                                $valoresIn[]=$this->setValoresBind($campos[$filtro['campo']],$valor);
+                            endforeach;
+                            $filtroArrayPart[4]='(';
+                            $filtroArrayPart[5]=implode(',',$valoresIn);
+                            $filtroArrayPart[6]=')';
+                        }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                            $this->setMensajes('El operador no es valido para numeros.');
+                            return array(
+                                'entity' => $entity,
+                                'parametros_form'  => $parametrosForm->createView(),
+                                'delete_form' => $deleteForm->createView(),
+                                'mensajes' => $this->getMensajes()
+                            );
+                        }else{
+                            $filtroArrayPart[4]='';
+                            $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                            $filtroArrayPart[6]='';
+                        }
+                    }elseif(isset($tipos[$filtro['campo']][3])){
+                        $filtroArrayPart[0]='TRUNC(';
+                        $filtroArrayPart[1]=$campos[$filtro['campo']];
+                        $filtroArrayPart[2]=')';
+                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                        if($filtro['operador']==3){
+                            $this->setMensajes('El operador no es valido para fechas.');
+                            return array(
+                                'entity' => $entity,
+                                'parametros_form'  => $parametrosForm->createView(),
+                                'delete_form' => $deleteForm->createView(),
+                                'mensajes' => $this->getMensajes()
+                            );
+                        }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                            $this->setMensajes('El operador no es valido para fechas.');
+                            return array(
+                                'entity' => $entity,
+                                'parametros_form'  => $parametrosForm->createView(),
+                                'delete_form' => $deleteForm->createView(),
+                                'mensajes' => $this->getMensajes()
+                            );
+                        }else{
+                            $filtroArrayPart[4]='TO_DATE(';
+                            $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                            $filtroArrayPart[6]=",'yyyy-mm-dd')";
+                        }
                     }
-                }elseif(isset($tipos[$filtro['campo']][2])){
-                    $filtroSQLPart[0]='NVL(';
-                    $filtroSQLPart[1]=$campos[$filtro['campo']];
-                    $filtroSQLPart[2]=',0)';
-                    $filtroSQLPart[3]=$operadoresLista[$filtro['operador']];
-                    if($filtro['operador']==3){
-                        $valores=explode('|',$filtro['valor']);
-                        $valoresIn=array();
-                        foreach ($valores as $valor):
-                            $valoresIn[]=$this->setValoresBind($campos[$filtro['campo']],$valor);
-                        endforeach;
-                        $filtroSQLPart[4]='(';
-                        $filtroSQLPart[5]=implode(',',$valoresIn);
-                        $filtroSQLPart[6]=')';
-                    }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
-                        $this->setMensajes('El operador no es valido para numeros.');
-                        return array(
-                            'entity' => $entity,
-                            'parametros_form'  => $parametrosForm->createView(),
-                            'delete_form' => $deleteForm->createView(),
-                            'mensajes' => $this->getMensajes()
-                        );
-                    }else{
-                        $filtroSQLPart[4]='';
-                        $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                        $filtroSQLPart[6]='';
-                    }
-                }elseif(isset($tipos[$filtro['campo']][3])){
-                    $filtroSQLPart[0]='TRUNC(';
-                    $filtroSQLPart[1]=$campos[$filtro['campo']];
-                    $filtroSQLPart[2]=')';
-                    $filtroSQLPart[3]=$operadoresLista[$filtro['operador']];
-                    if($filtro['operador']==3){
-                        $this->setMensajes('El operador no es valido para fechas.');
-                        return array(
-                            'entity' => $entity,
-                            'parametros_form'  => $parametrosForm->createView(),
-                            'delete_form' => $deleteForm->createView(),
-                            'mensajes' => $this->getMensajes()
-                        );
-                    }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
-                        $this->setMensajes('El operador no es valido para fechas.');
-                        return array(
-                            'entity' => $entity,
-                            'parametros_form'  => $parametrosForm->createView(),
-                            'delete_form' => $deleteForm->createView(),
-                            'mensajes' => $this->getMensajes()
-                        );
-                    }else{
-                        $filtroSQLPart[4]='TO_DATE(';
-                        $filtroSQLPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                        $filtroSQLPart[6]=",'yyyy-mm-dd')";
-                    }
+                    $filtroArray[$nroFiltro]=implode('',$filtroArrayPart);
+                endforeach;
+            }
+
+            if(!empty($filtroArray)){
+                if(empty($this->getClauses($entity->getContenido())['campos'])){
+                    $palabraWhere=' WHERE ';
+                }else{
+                    $palabraWhere=' AND ';
                 }
-                $filtroSQL[$nroFiltro]=implode('',$filtroSQLPart);
-            endforeach;
+                $filtrosString = $palabraWhere.implode(' AND ',$filtroArray);
+            }
+
             $limiteSQL=$this->setValoresBind('limite',$limite);
-            $selectQuery = 'select * from ( '.$entity->getContenido().' AND '.implode(' AND ',$filtroSQL).' ) WHERE ROWNUM <= '.$limiteSQL;
+            $selectQuery = 'select * from ( select '.implode(', ',$this->getClauses($entity->getContenido())['campos']).' FROM '.$this->getClauses($entity->getContenido())['tabla'].$this->getClauses($entity->getContenido())['condiciones'].$filtrosString.$ordenesString.' ) WHERE ROWNUM <= '.$limiteSQL;
             $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
 
             foreach($this->getValoresBind() as $campoBind => $valorBind ):
@@ -384,11 +432,12 @@ class SentenciaController extends BaseController
      * @param array $campos
      * @param array $tipos
      * @param array $operadores
+     * @param array $ordenes
      * @param string $destino
      * @param int $limite
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos,$tipos,$operadores,$destino=null,$limite=null)
+    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$destino=null,$limite=null)
     {
         $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
         $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
@@ -407,6 +456,7 @@ class SentenciaController extends BaseController
             ->add('campos', 'hidden', array('data' => $campos))
             ->add('tipos', 'hidden', array('data' => $tipos))
             ->add('operadores', 'hidden', array('data' => $operadores))
+            ->add('ordenes', 'hidden', array('data' => $ordenes))
             ->add('destino', 'choice', $destinoCh)
             ->add('limite', 'choice', $limiteCh)
             ->add('submit', 'submit', array('label' => 'Generar'))
@@ -483,7 +533,7 @@ class SentenciaController extends BaseController
 
         if ($editForm->isValid()) {
             $entity->setContenido($this->container->get('gopro_main_variableproceso')->sanitizeQuery($entity->getContenido()));
-            $campos = $this->getCampos($editForm->getData()->getContenido());
+            $campos = $this->getClauses($editForm->getData()->getContenido())['campos'];
             $camposExistentes=$em->getRepository('GoproVipacReporteBundle:Campo')->findBy(['sentencia'=>$entity->getId()]);
 
             foreach($camposExistentes as $campoExistente):
@@ -507,7 +557,7 @@ class SentenciaController extends BaseController
             }
             $em->flush();
 
-            return $this->redirect($this->generateUrl('sentencia_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_reporte_sentencia_edit', array('id' => $id)));
         }
         return array(
             'entity'      => $entity,

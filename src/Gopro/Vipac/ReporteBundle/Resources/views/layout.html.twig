@@ -24,11 +24,21 @@
 {% endblock container %}
 
 {% block javascriptsfinal %}
+    <script type="text/javascript">
+        $('#resultados').floatingScrollbar();
+    </script>
+    <script type="text/javascript">
+        $(".listaRegistros").floatThead({useAbsolutePositioning: true});
+    </script>
     <script id="plantillaFiltroRow" type="text/x-tmpl">
         {{ source("GoproVipacReporteBundle:Plantilla:filtrorow.js.twig") }}
+    </script>
+    <script id="plantillaOrdenRow" type="text/x-tmpl">
+        {{ source("GoproVipacReporteBundle:Plantilla:ordenrow.js.twig") }}
     </script>
     {% javascripts '@GoproVipacReporteBundle/Resources/public/js/fin/*'%}
         <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
     {{ parent() }}
+
 {% endblock javascriptsfinal %}

@@ -1,4 +1,8 @@
-div#GoproVipacReporteBundle form div#filtroContent{margin:5px 0;padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form div#filtroContent{width:500px; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form div#ordenContent{width:350px; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form div#parametrosForm{margin:5px 0;}
+
+div#GoproVipacReporteBundle div#resultados{width:100%; overflow-x: auto;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div,
