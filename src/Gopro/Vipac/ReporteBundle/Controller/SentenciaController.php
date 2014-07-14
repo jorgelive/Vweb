@@ -199,7 +199,6 @@ class SentenciaController extends BaseController
             endforeach;
         }
 
-        $encabezados=array();
         foreach($camposSQL as $campoSQL):
             if(empty($camposPorNombre[$campoSQL])){
                 throw $this->createNotFoundException('No existe el encabezado: '.$campoSQL.'.');
@@ -207,9 +206,18 @@ class SentenciaController extends BaseController
             $key=array_search($campoSQL,$campos);
             if(!empty($key)){
                 $camposDropdown[]=array('key'=>$key,'valor'=>$camposMostrar[$key]);
+                if(isset($tipos[$key][3])){
+                    $camposArray[]="to_char(".$campoSQL.",'yyyy-mm-dd')";
+                }else{
+                    $camposArray[]=$campoSQL;
+                }
+            }else{
+                $camposArray[]=$campoSQL;
             }
-            $encabezados[]=$camposPorNombre[$campoSQL];
         endforeach;
+
+        $encabezadoArray=$camposSQL;
+
         $limite=100;
         $destino=null;
         if(!empty($request->request->all()['parametrosForm']['limite'])){
@@ -220,162 +228,225 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),$destino,$limite);
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),$destino,$limite);
 
         if (
             $request->getMethod() == 'POST'
             &&!empty($campos)
         ){
-            $operadoresLista = [
-                1=>' = ',
-                2=>' != ',
-                3=>' IN ',
-                4=>' LIKE ',
-                5=>' LIKE ',
-                6=>' LIKE ',
-                7=>' >= ',
-                8=>' <= '
 
-            ];
+            $gruposGrupoString = '';
+            $gruposSelectArray=array();
+            $gruposGrupoArray=array();
+            $gruposEncabezado=array();
+            $existeAGR=false;
+            $existeCOL=false;
+            if(!empty($request->request->all()['parametrosForm']['grupo'])){
+                $i=1;
+                foreach($request->request->all()['parametrosForm']['grupo'] as $grupo):
+                    if(
+                        empty($campos[$grupo['campo']])
+                        ||empty($grupo['grupo'])
+                    ){
+                        $this->setMensajes('El agrupamiento de la fila '.$i.' no es válido.');
+                    }else{
+                        $grupoAplicado[]=['campo'=>$grupo['campo'],'grupo'=>$grupo['grupo']];
+                        $parametrosForm->add('grupoaplicado', 'hidden', array('data' => json_encode($grupoAplicado)));
+                        if($grupo['grupo']=='AGR'){
+                            if(isset($tipos[$grupo['campo']][3])){
+                                $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'yyyy-mm-dd'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
+                                $ordenGrupo[$grupo['campo']]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'yyyy-mm-dd'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ')";
+                            }elseif(isset($tipos[$grupo['campo']][2])){
+                                $gruposSelectArray[]='sum('.$campos[$grupo['campo']].')';
+                                $ordenGrupo[$grupo['campo']]='sum('.$campos[$grupo['campo']].')';
+                            }else{
+                                $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,".$campos[$grupo['campo']].",', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
+                                $ordenGrupo[$grupo['campo']]="rtrim(xmlagg(xmlelement(s,".$campos[$grupo['campo']].",', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ')";
+                            }
+                            $existeAGR=true;
+                        }else{
+                            $gruposSelectArray[]=$campos[$grupo['campo']];
+                            $gruposGrupoArray[]=$campos[$grupo['campo']];
+                            $existeCOL=true;
+                        }
+                        $gruposEncabezado[]=$campos[$grupo['campo']];
+                    }
+                    $i++;
+                endforeach;
+            }
+
+            if($existeAGR===true&&$existeCOL===true){
+                if(!empty($gruposGrupoArray)){
+                    $gruposGrupoString = ' GROUP BY '.implode(', ',$gruposGrupoArray);
+                }
+
+                if(!empty($gruposSelectArray)){
+                    $camposArray = $gruposSelectArray;
+                }
+                $encabezadoArray=$gruposEncabezado;
+            }elseif(!empty($request->request->all()['parametrosForm']['grupo'])){
+                $this->setMensajes('El agrupamiento no cumple los requisitos.');
+            }
 
             $ordenesString = '';
             $ordenesArray=array();
             if(!empty($request->request->all()['parametrosForm']['orden'])){
+                $i=1;
                 foreach($request->request->all()['parametrosForm']['orden'] as $nroOrden => $orden):
                     if(
                         empty($campos[$orden['campo']])
                         ||empty($orden['orden'])
                     ){
-                        $this->setMensajes('Se ejecuta el proceso sin ordenamiento.');
-                        break;
+                        $this->setMensajes('El orden de la fila '.$i.' no es válido.');
+                    }else{
+                        $ordenAplicado[]=['campo'=>$orden['campo'],'orden'=>$orden['orden']];
+                        $parametrosForm->add('ordenaplicado', 'hidden', array('data' => json_encode($ordenAplicado)));
+                        $ordenesArrayPart=array();
+                        if(!empty($ordenGrupo[$orden['campo']])){
+                            $ordenesArrayPart[0]=$ordenGrupo[$orden['campo']];
+                        }elseif(empty($gruposGrupoString)){
+                            $ordenesArrayPart[0]=$campos[$orden['campo']];
+                        }
+                        if(isset($ordenesArrayPart[0])){
+                            $ordenesArrayPart[1]=$orden['orden'];
+                            $ordenesArray[$nroOrden]=implode(' ',$ordenesArrayPart);
+                        }
                     }
-                    $ordenAplicado[]=['campo'=>$orden['campo'],'orden'=>$orden['orden']];
-                    $parametrosForm->add('ordenaplicado', 'hidden', array('data' => json_encode($ordenAplicado)));
-                    $ordenesArrayPart=array();
-                    $ordenesArrayPart[0]=$campos[$orden['campo']];
-                    $ordenesArrayPart[1]=$orden['orden'];
-                    $ordenesArray[$nroOrden]=implode(' ',$ordenesArrayPart);
+                    $i++;
                 endforeach;
             }
 
             if(!empty($ordenesArray)){
                 $ordenesString = ' ORDER BY '.implode(', ',$ordenesArray);
             }
-            
-            
+
             $filtrosString = '';
             $filtroArray=array();
+
             if(!empty($request->request->all()['parametrosForm']['filtro'])){
+                $operadoresLista = [
+                    1=>' = ',
+                    2=>' != ',
+                    3=>' IN ',
+                    4=>' LIKE ',
+                    5=>' LIKE ',
+                    6=>' LIKE ',
+                    7=>' >= ',
+                    8=>' <= '
+
+                ];
+                $i=1;
                 foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
                     if(
                         empty($campos[$filtro['campo']])
                         ||empty($operadores[$filtro['campo']][$filtro['operador']])
                         ||empty($filtro['valor'])
                     ){
-                        $this->setMensajes('Se ejecuta el proceso sin condiciones.');
-                        break;
-                    }
-                    $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
-                    $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
+                        $this->setMensajes('El filtro de la fila '.$i.' no es válido.');
+                    }else{
+                        $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
+                        $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
 
-                    if(empty($operadores[$filtro['campo']][$filtro['operador']])){
-                        $this->setMensajes('No existe el operador');
-                        return array(
-                            'entity' => $entity,
-                            'parametros_form'  => $parametrosForm->createView(),
-                            'delete_form' => $deleteForm->createView(),
-                            'mensajes' => $this->getMensajes()
-                        );
-                    }
-                    $filtroArrayPart=array();
-                    if(isset($tipos[$filtro['campo']][1])){
-                        $filtroArrayPart[0]='UPPER(';
-                        $filtroArrayPart[1]=$campos[$filtro['campo']];
-                        $filtroArrayPart[2]=')';
-                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
-                        if($filtro['operador']==3){
-                            $valores=explode('|',$filtro['valor']);
-                            $valoresIn=array();
-                            foreach ($valores as $valor):
-                                $valoresIn[]='UPPER('.$this->setValoresBind($campos[$filtro['campo']],$valor).')';
-                            endforeach;
-                            $filtroArrayPart[4]='(';
-                            $filtroArrayPart[5]=implode(',',$valoresIn);
-                            $filtroArrayPart[6]=')';
-                        }else{
-                            $filtroArrayPart[4]='UPPER(';
-                            if($filtro['operador']==4){
-                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor'].'%');
-                            }elseif($filtro['operador']==5){
-                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor'].'%');
-                            }elseif($filtro['operador']==6){
-                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor']);
+                        if(empty($operadores[$filtro['campo']][$filtro['operador']])){
+                            $this->setMensajes('No existe el operador');
+                            return array(
+                                'entity' => $entity,
+                                'parametros_form'  => $parametrosForm->createView(),
+                                'delete_form' => $deleteForm->createView(),
+                                'mensajes' => $this->getMensajes()
+                            );
+                        }
+                        $filtroArrayPart=array();
+                        if(isset($tipos[$filtro['campo']][1])){
+                            $filtroArrayPart[0]='UPPER(';
+                            $filtroArrayPart[1]=$campos[$filtro['campo']];
+                            $filtroArrayPart[2]=')';
+                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==3){
+                                $valores=explode('|',$filtro['valor']);
+                                $valoresIn=array();
+                                foreach ($valores as $valor):
+                                    $valoresIn[]='UPPER('.$this->setValoresBind($campos[$filtro['campo']],$valor).')';
+                                endforeach;
+                                $filtroArrayPart[4]='(';
+                                $filtroArrayPart[5]=implode(',',$valoresIn);
+                                $filtroArrayPart[6]=')';
                             }else{
-                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                            }
+                                $filtroArrayPart[4]='UPPER(';
+                                if($filtro['operador']==4){
+                                    $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor'].'%');
+                                }elseif($filtro['operador']==5){
+                                    $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor'].'%');
+                                }elseif($filtro['operador']==6){
+                                    $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],'%'.$filtro['valor']);
+                                }else{
+                                    $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                                }
 
-                            $filtroArrayPart[6]=')';
+                                $filtroArrayPart[6]=')';
+                            }
+                        }elseif(isset($tipos[$filtro['campo']][2])){
+                            $filtroArrayPart[0]='NVL(';
+                            $filtroArrayPart[1]=$campos[$filtro['campo']];
+                            $filtroArrayPart[2]=',0)';
+                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==3){
+                                $valores=explode('|',$filtro['valor']);
+                                $valoresIn=array();
+                                foreach ($valores as $valor):
+                                    $valoresIn[]=$this->setValoresBind($campos[$filtro['campo']],$valor);
+                                endforeach;
+                                $filtroArrayPart[4]='(';
+                                $filtroArrayPart[5]=implode(',',$valoresIn);
+                                $filtroArrayPart[6]=')';
+                            }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                                $this->setMensajes('El operador no es valido para numeros.');
+                                return array(
+                                    'entity' => $entity,
+                                    'parametros_form'  => $parametrosForm->createView(),
+                                    'delete_form' => $deleteForm->createView(),
+                                    'mensajes' => $this->getMensajes()
+                                );
+                            }else{
+                                $filtroArrayPart[4]='';
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                                $filtroArrayPart[6]='';
+                            }
+                        }elseif(isset($tipos[$filtro['campo']][3])){
+                            $filtroArrayPart[0]='TRUNC(';
+                            $filtroArrayPart[1]=$campos[$filtro['campo']];
+                            $filtroArrayPart[2]=')';
+                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==3){
+                                $this->setMensajes('El operador no es valido para fechas.');
+                                return array(
+                                    'entity' => $entity,
+                                    'parametros_form'  => $parametrosForm->createView(),
+                                    'delete_form' => $deleteForm->createView(),
+                                    'mensajes' => $this->getMensajes()
+                                );
+                            }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                                $this->setMensajes('El operador no es valido para fechas.');
+                                return array(
+                                    'entity' => $entity,
+                                    'parametros_form'  => $parametrosForm->createView(),
+                                    'delete_form' => $deleteForm->createView(),
+                                    'mensajes' => $this->getMensajes()
+                                );
+                            }else{
+                                $filtroArrayPart[4]='TO_DATE(';
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                                $filtroArrayPart[6]=",'yyyy-mm-dd')";
+                            }
                         }
-                    }elseif(isset($tipos[$filtro['campo']][2])){
-                        $filtroArrayPart[0]='NVL(';
-                        $filtroArrayPart[1]=$campos[$filtro['campo']];
-                        $filtroArrayPart[2]=',0)';
-                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
-                        if($filtro['operador']==3){
-                            $valores=explode('|',$filtro['valor']);
-                            $valoresIn=array();
-                            foreach ($valores as $valor):
-                                $valoresIn[]=$this->setValoresBind($campos[$filtro['campo']],$valor);
-                            endforeach;
-                            $filtroArrayPart[4]='(';
-                            $filtroArrayPart[5]=implode(',',$valoresIn);
-                            $filtroArrayPart[6]=')';
-                        }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
-                            $this->setMensajes('El operador no es valido para numeros.');
-                            return array(
-                                'entity' => $entity,
-                                'parametros_form'  => $parametrosForm->createView(),
-                                'delete_form' => $deleteForm->createView(),
-                                'mensajes' => $this->getMensajes()
-                            );
-                        }else{
-                            $filtroArrayPart[4]='';
-                            $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                            $filtroArrayPart[6]='';
-                        }
-                    }elseif(isset($tipos[$filtro['campo']][3])){
-                        $filtroArrayPart[0]='TRUNC(';
-                        $filtroArrayPart[1]=$campos[$filtro['campo']];
-                        $filtroArrayPart[2]=')';
-                        $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
-                        if($filtro['operador']==3){
-                            $this->setMensajes('El operador no es valido para fechas.');
-                            return array(
-                                'entity' => $entity,
-                                'parametros_form'  => $parametrosForm->createView(),
-                                'delete_form' => $deleteForm->createView(),
-                                'mensajes' => $this->getMensajes()
-                            );
-                        }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
-                            $this->setMensajes('El operador no es valido para fechas.');
-                            return array(
-                                'entity' => $entity,
-                                'parametros_form'  => $parametrosForm->createView(),
-                                'delete_form' => $deleteForm->createView(),
-                                'mensajes' => $this->getMensajes()
-                            );
-                        }else{
-                            $filtroArrayPart[4]='TO_DATE(';
-                            $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
-                            $filtroArrayPart[6]=",'yyyy-mm-dd')";
-                        }
+                        $filtroArray[$nroFiltro]=implode('',$filtroArrayPart);
                     }
-                    $filtroArray[$nroFiltro]=implode('',$filtroArrayPart);
+                    $i++;
                 endforeach;
             }
 
             if(!empty($filtroArray)){
-                if(empty($this->getClauses($entity->getContenido())['campos'])){
+                if(empty($this->getClauses($entity->getContenido())['condiciones'])){
                     $palabraWhere=' WHERE ';
                 }else{
                     $palabraWhere=' AND ';
@@ -384,7 +455,8 @@ class SentenciaController extends BaseController
             }
 
             $limiteSQL=$this->setValoresBind('limite',$limite);
-            $selectQuery = 'select * from ( select '.implode(', ',$this->getClauses($entity->getContenido())['campos']).' FROM '.$this->getClauses($entity->getContenido())['tabla'].$this->getClauses($entity->getContenido())['condiciones'].$filtrosString.$ordenesString.' ) WHERE ROWNUM <= '.$limiteSQL;
+
+            $selectQuery = 'select * from ( select '.implode(', ',$camposArray).' FROM '.$this->getClauses($entity->getContenido())['tabla'].$this->getClauses($entity->getContenido())['condiciones'].$filtrosString.$gruposGrupoString.$ordenesString.' ) WHERE ROWNUM <= '.$limiteSQL;
             $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
 
             foreach($this->getValoresBind() as $campoBind => $valorBind ):
@@ -400,6 +472,11 @@ class SentenciaController extends BaseController
                 );
             }
             $resultados=$this->container->get('gopro_main_variableproceso')->utf($statement->fetchAll());
+
+            $encabezados=array();
+            foreach($encabezadoArray as $campoEncabezado):
+                $encabezados[]=$camposPorNombre[$campoEncabezado];
+            endforeach;
 
             if($destino=='archivo'){
                 $archivoGenerado=$this->get('gopro_main_archivoexcel');
@@ -433,11 +510,12 @@ class SentenciaController extends BaseController
      * @param array $tipos
      * @param array $operadores
      * @param array $ordenes
+     * @param array $grupos
      * @param string $destino
      * @param int $limite
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$destino=null,$limite=null)
+    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$destino=null,$limite=null)
     {
         $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
         $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
@@ -457,6 +535,7 @@ class SentenciaController extends BaseController
             ->add('tipos', 'hidden', array('data' => $tipos))
             ->add('operadores', 'hidden', array('data' => $operadores))
             ->add('ordenes', 'hidden', array('data' => $ordenes))
+            ->add('grupos', 'hidden', array('data' => $grupos))
             ->add('destino', 'choice', $destinoCh)
             ->add('limite', 'choice', $limiteCh)
             ->add('submit', 'submit', array('label' => 'Generar'))
@@ -551,7 +630,7 @@ class SentenciaController extends BaseController
 
                 $campoEntity=new Campo();
                 $campoEntity->setNombre($campo);
-                $campoEntity->setNombremostrar($campo);
+                $campoEntity->setNombremostrar(ucwords(strtolower($campo)));
                 $campoEntity->setSentencia($entity);
                 $entity->getCampos()->add($campoEntity);
             }

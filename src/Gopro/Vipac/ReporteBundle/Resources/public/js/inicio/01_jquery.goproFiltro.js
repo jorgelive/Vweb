@@ -22,9 +22,17 @@ $.fn.filtro = function() {
         ordenes: JSON.parse($(this).find('#'+formName+'_ordenes').val())
     };
 
+    var grupoRow={
+        id:1,
+        formName:formName,
+        campos: JSON.parse($(this).find('#'+formName+'_campos').val()),
+        grupos: JSON.parse($(this).find('#'+formName+'_grupos').val())
+    };
+
     var el = {
         filtroContent : $("<div>", {id: "filtroContent"}),
         filtroTable : $("<table>", {id: "filtroTable"}),
+        filtroTableBody : $("<tbody>"),
         filtroAdd : $("<a>", {
             id: "filtroAdd",
             text: "Agregar Filtro",
@@ -34,21 +42,38 @@ $.fn.filtro = function() {
         }),
         ordenContent : $("<div>", {id: "ordenContent"}),
         ordenTable : $("<table>", {id: "ordenTable"}),
+        ordenTableBody : $("<tbody>"),
         ordenAdd : $("<a>", {
             id: "ordenAdd",
             text: "Agregar Orden",
             click: function(){
                 agregarOrden();
             }
+        }),
+        grupoContent : $("<div>", {id: "grupoContent"}),
+        grupoTable : $("<table>", {id: "grupoTable"}),
+        grupoTableBody : $("<tbody>"),
+        grupoAdd : $("<a>", {
+            id: "grupoAdd",
+            text: "Agregar Grupo",
+            click: function(){
+                agregarGrupo();
+            }
         })
     };
 
     var parametrosform=$(this);
+    el.grupoContent.prependTo(parametrosform);
+    el.grupoTable.appendTo(el.grupoContent);
+    el.grupoTableBody.appendTo(el.grupoTable);
+    el.grupoAdd.appendTo(el.grupoContent);
     el.ordenContent.prependTo(parametrosform);
     el.ordenTable.appendTo(el.ordenContent);
+    el.ordenTableBody.appendTo(el.ordenTable);
     el.ordenAdd.appendTo(el.ordenContent);
     el.filtroContent.prependTo(parametrosform);
     el.filtroTable.appendTo(el.filtroContent);
+    el.filtroTableBody.appendTo(el.filtroTable);
     el.filtroAdd.appendTo(el.filtroContent);
 
     el.filtroAdd.button({
@@ -65,8 +90,14 @@ $.fn.filtro = function() {
         }
     );
 
-    $(document).ready(function() {
+    el.grupoAdd.button({
+            icons: {
+                primary: 'ui-icon ui-icon-plus'
+            }
+        }
+    );
 
+    $(document).ready(function() {
         if(parametrosform.find('#'+formName+'_filtroaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_filtroaplicado').val() !== 'undefined'){
             var filtroAplicado=JSON.parse(parametrosform.find('#'+formName+'_filtroaplicado').val());
             for (var key in filtroAplicado)
@@ -81,11 +112,72 @@ $.fn.filtro = function() {
                 agregarOrden(ordenAplicado[key].campo,ordenAplicado[key].orden);
             }
         }
+        if(parametrosform.find('#'+formName+'_grupoaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_grupoaplicado').val() !== 'undefined'){
+            var grupoAplicado=JSON.parse(parametrosform.find('#'+formName+'_grupoaplicado').val());
+            for (var key in grupoAplicado)
+            {
+                agregarGrupo(grupoAplicado[key].campo,grupoAplicado[key].grupo);
+            }
+        }
+
+        var fixHelperModified = function(e, tr) {
+            var $originals = tr.children();
+            var $helper = tr.clone();
+            $helper.children().each(function(index) {
+                $(this).width($originals.eq(index).width())
+            });
+            return $helper;
+        };
+
+        $('#grupoContent tbody').sortable({
+            helper: fixHelperModified
+
+        });
+        $('#ordenContent tbody').sortable({
+            helper: fixHelperModified
+
+        });
     });
 
+    var agregarGrupo=function(currentCampo,currentGrupo){
+        el.grupoTableBody.append(tmpl('plantillaGrupoRow',grupoRow));
+        var fila=el.grupoTableBody.find('tr[data-id='+grupoRow.id+']');
+        fila.find('a.borrarGrupo').button().click(function() {
+            $(this).closest('tr').remove();
+        });
+        var selectCampos=fila.find('td.campo select');
+        var opcionesCampos=selectCampos.prop('options')
+        var selectGrupos=fila.find('td.grupo select');
+        var opcionesGrupos=selectGrupos.prop('options');
+        $.each(grupoRow.campos, function(id, contenido) {
+            opcionesCampos[opcionesCampos.length] = new Option(contenido.valor, contenido.key);
+        });
+
+        selectCampos.change(function(){
+            $('option', selectGrupos).remove();
+            var selected=$(this).val();
+            if(typeof grupoRow.grupos === 'undefined'){
+                return false;
+            }
+            $.each(grupoRow.grupos, function(id, texto) {
+                opcionesGrupos[opcionesGrupos.length] = new Option(texto, id);
+            });
+            if(typeof currentGrupo !== 'undefined'){
+                selectGrupos.val(currentGrupo);
+                currentGrupo='';
+            }
+        });
+
+        grupoRow.id=grupoRow.id+1;
+        if(typeof currentCampo !== 'undefined'){
+            selectCampos.val(currentCampo);
+            selectCampos.trigger("change");
+        }
+    };
+
     var agregarOrden=function(currentCampo,currentOrden){
-        el.ordenTable.append(tmpl('plantillaOrdenRow',ordenRow));
-        var fila=el.ordenTable.find('tr[data-id='+ordenRow.id+']');
+        el.ordenTableBody.append(tmpl('plantillaOrdenRow',ordenRow));
+        var fila=el.ordenTableBody.find('tr[data-id='+ordenRow.id+']');
         fila.find('a.borrarOrden').button().click(function() {
             $(this).closest('tr').remove();
         });
@@ -121,8 +213,8 @@ $.fn.filtro = function() {
 
     var agregarFiltro=function(currentCampo,currentOperador,currentValor){
 
-        el.filtroTable.append(tmpl('plantillaFiltroRow',filtroRow));
-        var fila=el.filtroTable.find('tr[data-id='+filtroRow.id+']');
+        el.filtroTableBody.append(tmpl('plantillaFiltroRow',filtroRow));
+        var fila=el.filtroTableBody.find('tr[data-id='+filtroRow.id+']');
         fila.find('a.borrarFiltro').button().click(function() {
             $(this).closest('tr').remove();
         });
