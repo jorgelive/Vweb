@@ -206,7 +206,9 @@ class SentenciaController extends BaseController
             $key=array_search($campoSQL,$campos);
             if(!empty($key)){
                 $camposDropdown[]=array('key'=>$key,'valor'=>$camposMostrar[$key]);
-                if(isset($tipos[$key][3])){
+                if(isset($tipos[$key][4])){
+                    $camposArray[]="to_char(".$campoSQL.",'hh24:mi')";
+                }elseif(isset($tipos[$key][3])){
                     $camposArray[]="to_char(".$campoSQL.",'yyyy-mm-dd')";
                 }else{
                     $camposArray[]=$campoSQL;
@@ -253,7 +255,10 @@ class SentenciaController extends BaseController
                         $grupoAplicado[]=['campo'=>$grupo['campo'],'grupo'=>$grupo['grupo']];
                         $parametrosForm->add('grupoaplicado', 'hidden', array('data' => json_encode($grupoAplicado)));
                         if($grupo['grupo']=='AGR'){
-                            if(isset($tipos[$grupo['campo']][3])){
+                            if(isset($tipos[$grupo['campo']][4])){
+                                $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'hh24:mi'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
+                                $ordenGrupo[$grupo['campo']]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'hh24:mi'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ')";
+                            }elseif(isset($tipos[$grupo['campo']][3])){
                                 $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'yyyy-mm-dd'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
                                 $ordenGrupo[$grupo['campo']]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'yyyy-mm-dd'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ')";
                             }elseif(isset($tipos[$grupo['campo']][2])){
@@ -265,7 +270,13 @@ class SentenciaController extends BaseController
                             }
                             $existeAGR=true;
                         }else{
-                            $gruposSelectArray[]=$campos[$grupo['campo']];
+                            if(isset($tipos[$grupo['campo']][4])){
+                                $gruposSelectArray[]="to_char(".$campos[$grupo['campo']].",'hh24:mi')";
+                            }elseif(isset($tipos[$grupo['campo']][3])){
+                                $gruposSelectArray[]="to_char(".$campos[$grupo['campo']].",'yyyy-mm-dd')";
+                            }else{
+                                $gruposSelectArray[]=$campos[$grupo['campo']];
+                            }
                             $gruposGrupoArray[]=$campos[$grupo['campo']];
                             $existeCOL=true;
                         }
@@ -417,15 +428,7 @@ class SentenciaController extends BaseController
                             $filtroArrayPart[1]=$campos[$filtro['campo']];
                             $filtroArrayPart[2]=')';
                             $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
-                            if($filtro['operador']==3){
-                                $this->setMensajes('El operador no es valido para fechas.');
-                                return array(
-                                    'entity' => $entity,
-                                    'parametros_form'  => $parametrosForm->createView(),
-                                    'delete_form' => $deleteForm->createView(),
-                                    'mensajes' => $this->getMensajes()
-                                );
-                            }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                            if($filtro['operador']==3||$filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
                                 $this->setMensajes('El operador no es valido para fechas.');
                                 return array(
                                     'entity' => $entity,
@@ -437,6 +440,27 @@ class SentenciaController extends BaseController
                                 $filtroArrayPart[4]='TO_DATE(';
                                 $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
                                 $filtroArrayPart[6]=",'yyyy-mm-dd')";
+                            }
+                        }elseif(isset($tipos[$filtro['campo']][4])){
+                            $filtroArrayPart[0]='to_char(';
+                            $filtroArrayPart[1]=$campos[$filtro['campo']];
+                            $filtroArrayPart[2]=",'hh24')";
+                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==2||$filtro['operador']==3||$filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
+                                $this->setMensajes('El operador no es valido para horas.');
+                                return array(
+                                    'entity' => $entity,
+                                    'parametros_form'  => $parametrosForm->createView(),
+                                    'delete_form' => $deleteForm->createView(),
+                                    'mensajes' => $this->getMensajes()
+                                );
+                            }else{
+                                if(strlen($filtro['valor'])==1){
+                                    $filtro['valor']='0'.$filtro['valor'];
+                                }
+                                $filtroArrayPart[4]='';
+                                $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
+                                $filtroArrayPart[6]='';
                             }
                         }
                         $filtroArray[$nroFiltro]=implode('',$filtroArrayPart);
