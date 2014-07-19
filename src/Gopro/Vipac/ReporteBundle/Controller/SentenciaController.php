@@ -180,6 +180,7 @@ class SentenciaController extends BaseController
         }
         $deleteForm = $this->createDeleteForm($id);
         $campos=array();
+        $camposPorNombre=array();
         $camposMostrar=array();
         $camposDropdown=array();
         $tipos=array();
@@ -198,6 +199,7 @@ class SentenciaController extends BaseController
                 };
             endforeach;
         }
+        $camposArray=array();
 
         foreach($camposSQL as $campoSQL):
             if(empty($camposPorNombre[$campoSQL])){
@@ -295,8 +297,11 @@ class SentenciaController extends BaseController
                     $camposArray = $gruposSelectArray;
                 }
                 $encabezadoArray=$gruposEncabezado;
-            }elseif(!empty($request->request->all()['parametrosForm']['grupo'])){
-                $this->setMensajes('El agrupamiento no cumple los requisitos.');
+            }elseif($existeAGR===true||$existeCOL===true){
+                if(!empty($gruposSelectArray)){
+                    $camposArray = $gruposSelectArray;
+                    $encabezadoArray=$gruposEncabezado;
+                }
             }
 
             $ordenesString = '';
@@ -509,6 +514,19 @@ class SentenciaController extends BaseController
                     ->setParametrosWriter('Reporte_'.(new \DateTime())->format('Y-m-d H:i:s'),$resultados,$encabezados)
                     ->getArchivo();
             }else{
+                if(!empty($filtroAplicado)){
+                    $parametrosAplicados['filtro']=$filtroAplicado;
+                }
+                if(!empty($ordenAplicado)){
+                    $parametrosAplicados['orden']=$ordenAplicado;
+                }
+                if(!empty($grupoAplicado)){
+                    $parametrosAplicados['grupo']=$grupoAplicado;
+                }
+                if(!empty($parametrosAplicados)){
+                    $parametrosForm->add('parametrosaplicados', 'hidden', array('data' => json_encode($parametrosAplicados)));
+                }
+
                 return array(
                     'entity' => $entity,
                     'parametros_form'  => $parametrosForm->createView(),

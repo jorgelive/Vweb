@@ -55,13 +55,22 @@ $.fn.filtro = function() {
         grupoTableBody : $("<tbody>"),
         grupoAdd : $("<a>", {
             id: "grupoAdd",
-            text: "Agregar Grupo",
+            text: "Agregar columna o grupo",
             click: function(){
                 agregarGrupo();
             }
+        }),
+        saveContent : $("<div>", {id: "saveContent", title:'Guardar parámetros'}),
+        saveForm : $("<form>", {id: "saveForm"}),
+        saveBoton : $("<a>", {
+            id: "filtroAdd",
+            text: "Guardar Parametros",
+            click: function(){
+                mostrarSave();
+            }
         })
     };
-
+    var mainContainer=$('#GoproVipacReporteBundle');
     var parametrosform=$(this);
     el.grupoContent.prependTo(parametrosform);
     el.grupoTable.appendTo(el.grupoContent);
@@ -75,6 +84,11 @@ $.fn.filtro = function() {
     el.filtroTable.appendTo(el.filtroContent);
     el.filtroTableBody.appendTo(el.filtroTable);
     el.filtroAdd.appendTo(el.filtroContent);
+    el.saveBoton.prependTo(parametrosform);
+    el.saveContent.appendTo(mainContainer);
+    el.saveContent.append(tmpl('saveForm',grupoRow));
+    el.saveContent.dialog().dialog("close");
+    el.saveContent.find(":submit").button();
 
     el.filtroAdd.button({
             icons: {
@@ -97,7 +111,15 @@ $.fn.filtro = function() {
         }
     );
 
+    el.saveBoton.button({
+            icons: {
+                primary: 'ui-icon ui-icon-disk'
+            }
+        }
+    );
+
     $(document).ready(function() {
+
         if(parametrosform.find('#'+formName+'_filtroaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_filtroaplicado').val() !== 'undefined'){
             var filtroAplicado=JSON.parse(parametrosform.find('#'+formName+'_filtroaplicado').val());
             for (var key in filtroAplicado)
@@ -138,6 +160,34 @@ $.fn.filtro = function() {
 
         });
     });
+
+    var savedParameter={};
+
+    var mostrarSave=function(currentCampo,currentGrupo){
+
+        $.each(parametrosform.serializeArray(), function( index, value ) {
+            if(typeof value.name != 'undefined' && typeof value.value != 'undefined' ){
+                if(/^[A-Za-z]/.test(value.name))
+                {
+                    var input = value.name.replace(/[\[\]]$/,"").replace(/[\]\[]+/g,"|");
+                    var keys = input.split("|");
+                    if(keys.length==4){
+                        if(typeof savedParameter[keys[1]] == 'undefined'){
+                            savedParameter[keys[1]]=[];
+                        }
+                        if(typeof savedParameter[keys[1]][(keys[2]-1)] == 'undefined'){
+                            savedParameter[keys[1]][(keys[2]-1)]={};
+                        }
+                        if(typeof keys[1] != 'undefined' && typeof keys[2] != 'undefined' && typeof keys[3] != 'undefined' && typeof value.value != 'undefined'){
+                            savedParameter[keys[1]][(keys[2]-1)][keys[3]]=value.value;
+                        }
+                    }
+                }
+            }
+        });
+        console.log(JSON.stringify(savedParameter));
+        el.saveContent.dialog( "open" )
+    }
 
     var agregarGrupo=function(currentCampo,currentGrupo){
         el.grupoTableBody.append(tmpl('plantillaGrupoRow',grupoRow));
@@ -225,7 +275,6 @@ $.fn.filtro = function() {
         var inputValor=fila.find('td.valor input')
 
         $.each(filtroRow.campos, function(id, contenido) {
-            console.log(contenido);
             opcionesCampos[opcionesCampos.length] = new Option(contenido.valor, contenido.key);
         });
 
