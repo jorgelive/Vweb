@@ -50,9 +50,8 @@ class ArchivoController extends BaseController
         $form->handleRequest($request);
 
         if ($form->isValid()||$request->isXMLHttpRequest()) {
-            $entity->setUsuario($this->getUserName());
+            $entity->setUser($this->getUser());
             $em = $this->getDoctrine()->getManager();
-
             $em->persist($entity);
             $em->flush();
             if ($request->isXMLHttpRequest()){
@@ -230,7 +229,7 @@ class ArchivoController extends BaseController
 
         if ($form->isValid()||$request->isXMLHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('GoproMainBundle:Archivo')->findOneBy(['id'=>$id,'usuario'=>$this->getUserName()]);
+            $entity = $em->getRepository('GoproMainBundle:Archivo')->findOneBy(['id'=>$id,'user'=>$this->getUser()]);
 
             if(!$entity&&$request->isXMLHttpRequest()){
                 return new JsonResponse(['mensaje'=>['exito'=>'no','titulo'=>'Fallo','texto'=>'No existe el archivo']]);

@@ -28,7 +28,7 @@ class ProcesoController extends BaseController
     {
         $operacion='vipac_dbproceso_proceso_cheque';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
@@ -116,7 +116,7 @@ class ProcesoController extends BaseController
 
         $operacion='vipac_dbproceso_proceso_cargadorcp';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
@@ -624,7 +624,7 @@ class ProcesoController extends BaseController
     {
         $operacion='vipac_dbproceso_proceso_calcc';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
@@ -831,7 +831,7 @@ class ProcesoController extends BaseController
 
         $operacion='vipac_dbproceso_proceso_calxfile';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
@@ -902,7 +902,7 @@ class ProcesoController extends BaseController
     {
         $operacion='vipac_dbproceso_proceso_calxreserva';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(

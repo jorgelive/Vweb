@@ -73,16 +73,21 @@ class Sentencia
      */
     private $campos;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Parametro", mappedBy="sentencia", cascade={"persist","remove"})
+     */
+    private $parametros;
+
     public function __construct() {
         $this->campos = new ArrayCollection();
         $this->areas = new ArrayCollection();
+        $this->parametros = new ArrayCollection();
     }
 
     public function __toString()
     {
         return $this->nombre;
     }
-
 
     /**
      * Get id
@@ -273,5 +278,38 @@ class Sentencia
     public function getCampos()
     {
         return $this->campos;
+    }
+
+    /**
+     * Add parametros
+     *
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros
+     * @return Sentencia
+     */
+    public function addParametro(\Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros)
+    {
+        $this->parametros[] = $parametros;
+
+        return $this;
+    }
+
+    /**
+     * Remove parametros
+     *
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros
+     */
+    public function removeParametro(\Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros)
+    {
+        $this->parametros->removeElement($parametros);
+    }
+
+    /**
+     * Get parametros
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getParametros()
+    {
+        return $this->parametros;
     }
 }

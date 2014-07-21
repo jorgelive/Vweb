@@ -1,4 +1,10 @@
 div#GoproVipacReporteBundle div#saveContent{position:absolute; top:0px; left:0px; display: none;}
+
+div#GoproVipacReporteBundle form#parametrosForm div#filtroContent table#filtroTable tbody tr td a.borrarFiltro,
+div#GoproVipacReporteBundle form#parametrosForm div#ordenContent table#ordenTable tbody tr td a.borrarOrden,
+div#GoproVipacReporteBundle form#parametrosForm div#grupoContent table#grupoTable tbody tr td a.borrarGrupo,
+div#GoproVipacReporteBundle form#parametrosForm div#guardadoContent table#guardadoTable tbody tr td a.borrarGuardado{font-size:8px; color:#cd0a0a;}
+
 div#GoproVipacReporteBundle form div#filtroContent{width:500px; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
 div#GoproVipacReporteBundle form div#ordenContent{width:350px; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
 div#GoproVipacReporteBundle form div#grupoContent{width:350px; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
@@ -10,36 +16,42 @@ div#GoproVipacReporteBundle div#resultados{width:100%; overflow-x: auto;}
 div#GoproVipacReporteBundle form div#parametrosForm div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div{margin-bottom: 7px;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div label,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div label{text-align:right; display: inline-block; margin-right: 5px; width: 90px; vertical-align: top;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div ul,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div ul,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div ul,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div ul,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div ul,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div ul{list-style: none;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div ul li,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div ul li,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div ul li,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div ul li,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div ul li,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div ul li{color:#cd0a0a; font-size: 9px;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div div,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div{margin-top: 5px; margin-left: 100px;}
 
 div#GoproVipacReporteBundle form div#parametrosForm div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div div label,
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div label{display: inline-block; margin-left: 5px; width: 70px; text-align: left;}
 

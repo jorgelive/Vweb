@@ -1,0 +1,13 @@
+{% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block title %}Creación de Parametros{% endblock title %}
+{% block titulo %}Creación de Parametros{% endblock titulo %}
+{% block content %}
+    {{ form(form) }}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_parametro') }}">
+                Volver a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

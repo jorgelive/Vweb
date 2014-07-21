@@ -33,11 +33,6 @@ class Archivo
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $usuario;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
     private $operacion;
 
     /**
@@ -57,9 +52,16 @@ class Archivo
     private $modificado;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     */
+    private $user;
+
+    /**
      * @Assert\File(maxSize="6000000")
      */
     private $archivo;
+
 
     /**
      * Sets archivo.
@@ -325,5 +327,26 @@ class Archivo
         return $this->modificado;
     }
 
+    /**
+     * Set user
+     *
+     * @param \Gopro\UserBundle\Entity\User $user
+     * @return Archivo
+     */
+    public function setUser(\Gopro\UserBundle\Entity\User $user)
+    {
+        $this->user = $user;
 
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Gopro\UserBundle\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 }

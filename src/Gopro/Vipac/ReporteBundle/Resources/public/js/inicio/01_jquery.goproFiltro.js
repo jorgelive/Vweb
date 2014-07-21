@@ -60,6 +60,9 @@ $.fn.filtro = function() {
                 agregarGrupo();
             }
         }),
+        guardadoContent : $("<div>", {id: "guardadoContent"}),
+        guardadoTable : $("<table>", {id: "guardadoTable"}),
+        guardadoTableBody : $("<tbody>"),
         saveContent : $("<div>", {id: "saveContent", title:'Guardar parámetros'}),
         saveForm : $("<form>", {id: "saveForm"}),
         saveBoton : $("<a>", {
@@ -84,6 +87,9 @@ $.fn.filtro = function() {
     el.filtroTable.appendTo(el.filtroContent);
     el.filtroTableBody.appendTo(el.filtroTable);
     el.filtroAdd.appendTo(el.filtroContent);
+    el.guardadoContent.prependTo(parametrosform);
+    el.guardadoTable.appendTo(el.guardadoContent);
+    el.guardadoTableBody.appendTo(el.guardadoTable);
     el.saveBoton.prependTo(parametrosform);
     el.saveContent.appendTo(mainContainer);
     el.saveContent.append(tmpl('saveForm',grupoRow));
@@ -118,28 +124,28 @@ $.fn.filtro = function() {
         }
     );
 
+    var parametrosGuardados={};
+
     $(document).ready(function() {
 
-        if(parametrosform.find('#'+formName+'_filtroaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_filtroaplicado').val() !== 'undefined'){
-            var filtroAplicado=JSON.parse(parametrosform.find('#'+formName+'_filtroaplicado').val());
-            for (var key in filtroAplicado)
-            {
-                agregarFiltro(filtroAplicado[key].campo,filtroAplicado[key].operador,filtroAplicado[key].valor);
-            }
+
+        if(parametrosform.find('#'+formName+'_parametrosaplicados').val()!='' && typeof parametrosform.find('#'+formName+'_parametrosaplicados').val() !== 'undefined'){
+            procesarParametros(JSON.parse(parametrosform.find('#'+formName+'_parametrosaplicados').val()));
         }
-        if(parametrosform.find('#'+formName+'_ordenaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_ordenaplicado').val() !== 'undefined'){
-            var ordenAplicado=JSON.parse(parametrosform.find('#'+formName+'_ordenaplicado').val());
-            for (var key in ordenAplicado)
-            {
-                agregarOrden(ordenAplicado[key].campo,ordenAplicado[key].orden);
-            }
-        }
-        if(parametrosform.find('#'+formName+'_grupoaplicado').val()!='' && typeof parametrosform.find('#'+formName+'_grupoaplicado').val() !== 'undefined'){
-            var grupoAplicado=JSON.parse(parametrosform.find('#'+formName+'_grupoaplicado').val());
-            for (var key in grupoAplicado)
-            {
-                agregarGrupo(grupoAplicado[key].campo,grupoAplicado[key].grupo);
-            }
+
+        if(parametrosform.find('#'+formName+'_parametrosguardados').val()!='' && typeof parametrosform.find('#'+formName+'_parametrosguardados').val() !== 'undefined'){
+
+            $.each(JSON.parse(parametrosform.find('#'+formName+'_parametrosguardados').val()), function( index, value ) {
+                if(typeof value.id == 'undefined' || typeof value.nombre == 'undefined' || typeof value.contenido == 'undefined' ){
+                    return false;
+                }
+                if(typeof parametrosGuardados[value.id] == 'undefined'){
+                    parametrosGuardados[value.id]={};
+                }
+                parametrosGuardados[value.id]['nombre']=value.nombre;
+                parametrosGuardados[value.id]['contenido']=value.contenido;
+                agregarGuardado(value);
+            });
         }
 
         var fixHelperModified = function(e, tr) {
@@ -153,11 +159,10 @@ $.fn.filtro = function() {
 
         $('#grupoContent tbody').sortable({
             helper: fixHelperModified
-
         });
+
         $('#ordenContent tbody').sortable({
             helper: fixHelperModified
-
         });
     });
 
@@ -185,8 +190,46 @@ $.fn.filtro = function() {
                 }
             }
         });
-        console.log(JSON.stringify(savedParameter));
+        //console.log(JSON.stringify(savedParameter));
         el.saveContent.dialog( "open" )
+    }
+
+    var procesarParametros = function (parametrosObjeto){
+        el.filtroTableBody.empty();
+        el.ordenTableBody.empty();
+        el.grupoTableBody.empty();
+        $.each(parametrosObjeto, function( index, value ) {
+            if(index=='filtro'){
+                for (var key in value)
+                {
+                    agregarFiltro(value[key].campo,value[key].operador,value[key].valor);
+                }
+            }
+            if(index=='orden'){
+                for (var key in value)
+                {
+                    agregarOrden(value[key].campo,value[key].orden);
+                }
+            }
+            if(index=='grupo'){
+                for (var key in value)
+                {
+                    agregarGrupo(value[key].campo,value[key].grupo);
+                }
+            }
+        })
+    };
+
+    var agregarGuardado=function(guardadoRow){
+        el.guardadoTableBody.append(tmpl('plantillaGuardadoRow',guardadoRow));
+        var fila=el.guardadoTableBody.find('tr[data-id='+guardadoRow.id+']');
+        fila.find('a.procesarGuardado').click(function() {
+            procesarParametros(JSON.parse(parametrosGuardados[$(this).closest('tr').data('id')]['contenido']));
+            console.log(parametrosGuardados[$(this).closest('tr').data('id')]['contenido'])
+        });
+        fila.find('a.borrarGuardado').button().click(function() {
+            //$(this).closest('tr').remove();
+        });
     }
 
     var agregarGrupo=function(currentCampo,currentGrupo){

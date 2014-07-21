@@ -178,6 +178,7 @@ class SentenciaController extends BaseController
         if (!$entity) {
             throw $this->createNotFoundException('No se puede encontrar la sentencia SQL.');
         }
+
         $deleteForm = $this->createDeleteForm($id);
         $campos=array();
         $camposPorNombre=array();
@@ -232,7 +233,18 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),$destino,$limite);
+        $parametrosGuardados = $em->createQueryBuilder()
+            ->addSelect('p.id, p.nombre, p.contenido')
+            ->from('GoproVipacReporteBundle:Parametro', 'p')
+            ->orderBy('p.id', 'ASC')
+            ->where($em->createQueryBuilder()->expr()->eq('p.user', ':user'))
+            ->andWhere($em->createQueryBuilder()->expr()->eq('p.sentencia', ':sentencia'))
+            ->setParameter('user', $this->getUser())
+            ->setParameter('sentencia', $entity)
+            ->getQuery()
+            ->getArrayResult();
+
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),$destino,$limite);
 
         if (
             $request->getMethod() == 'POST'
@@ -255,7 +267,6 @@ class SentenciaController extends BaseController
                         $this->setMensajes('El agrupamiento de la fila '.$i.' no es válido.');
                     }else{
                         $grupoAplicado[]=['campo'=>$grupo['campo'],'grupo'=>$grupo['grupo']];
-                        $parametrosForm->add('grupoaplicado', 'hidden', array('data' => json_encode($grupoAplicado)));
                         if($grupo['grupo']=='AGR'){
                             if(isset($tipos[$grupo['campo']][4])){
                                 $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'hh24:mi'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
@@ -316,7 +327,6 @@ class SentenciaController extends BaseController
                         $this->setMensajes('El orden de la fila '.$i.' no es válido.');
                     }else{
                         $ordenAplicado[]=['campo'=>$orden['campo'],'orden'=>$orden['orden']];
-                        $parametrosForm->add('ordenaplicado', 'hidden', array('data' => json_encode($ordenAplicado)));
                         $ordenesArrayPart=array();
                         if(!empty($ordenGrupo[$orden['campo']])){
                             $ordenesArrayPart[0]=$ordenGrupo[$orden['campo']];
@@ -361,8 +371,6 @@ class SentenciaController extends BaseController
                         $this->setMensajes('El filtro de la fila '.$i.' no es válido.');
                     }else{
                         $filtroAplicado[]=['campo'=>$filtro['campo'],'operador'=>$filtro['operador'],'valor'=>$filtro['valor']];
-                        $parametrosForm->add('filtroaplicado', 'hidden', array('data' => json_encode($filtroAplicado)));
-
                         if(empty($operadores[$filtro['campo']][$filtro['operador']])){
                             $this->setMensajes('No existe el operador');
                             return array(
@@ -548,16 +556,17 @@ class SentenciaController extends BaseController
 
     /**
      * @param mixed $id The entity id
-     * @param array $campos
-     * @param array $tipos
-     * @param array $operadores
-     * @param array $ordenes
-     * @param array $grupos
+     * @param string $campos
+     * @param string $tipos
+     * @param string $operadores
+     * @param string $ordenes
+     * @param string $grupos
+     * @param string $parametrosGuardados
      * @param string $destino
      * @param int $limite
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$destino=null,$limite=null)
+    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$parametrosGuardados,$destino=null,$limite=null)
     {
         $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
         $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
@@ -567,17 +576,17 @@ class SentenciaController extends BaseController
             'parametrosForm',
             'form',
             null,
-           [
+            [
                'action'=>$this->generateUrl('gopro_vipac_reporte_sentencia_show', ['id' => $id]),
                'method'=>'POST',
                'attr'=>['id'=>'parametrosForm']
-           ])
-            //$this->createFormBuilder(null,['attr'=>['name'=>'parametrosForm','id'=>'parametrosForm']])
+            ])
             ->add('campos', 'hidden', array('data' => $campos))
             ->add('tipos', 'hidden', array('data' => $tipos))
             ->add('operadores', 'hidden', array('data' => $operadores))
             ->add('ordenes', 'hidden', array('data' => $ordenes))
             ->add('grupos', 'hidden', array('data' => $grupos))
+            ->add('parametrosguardados', 'hidden', array('data' => $parametrosGuardados))
             ->add('destino', 'choice', $destinoCh)
             ->add('limite', 'choice', $limiteCh)
             ->add('submit', 'submit', array('label' => 'Generar'))

@@ -1,0 +1,48 @@
+{% extends 'GoproVipacReporteBundle::layout.html.twig' %}
+{% block title %}Lista de parametros{% endblock title %}
+{% block titulo %}Lista de parametros{% endblock titulo %}
+{% block content %}
+    <table class="listaRegistros">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Sentencia</th>
+                <th>Nombre</th>
+                <th>Contenido</th>
+                <th>Usuario</th>
+                <th>Público</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('gopro_vipac_reporte_parametro_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.sentencia.nombre }}</td>
+                <td>{{ entity.nombre }}</td>
+                <td>{{ entity.contenido }}</td>
+                <td>{{ entity.user.username }}</td>
+                <td>{{ entity.publico }}</td>
+                <td>
+                <ul>
+                    <li>
+                        <a href="{{ path('gopro_vipac_reporte_parametro_show', { 'id': entity.id }) }}">mostrar</a>
+                    </li>
+                    <li>
+                        <a href="{{ path('gopro_vipac_reporte_parametro_edit', { 'id': entity.id }) }}">editar</a>
+                    </li>
+                </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_parametro_new') }}">
+                Crear un nuevo registro
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

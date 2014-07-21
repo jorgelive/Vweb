@@ -27,7 +27,7 @@ class CargaController extends BaseController
 
         $operacion='vipac_dbproceso_carga_generico';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
@@ -75,7 +75,7 @@ class CargaController extends BaseController
 
         $operacion='vipac_dbproceso_carga_arreglartc';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('usuario' => $this->getUserName(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
 
         $opciones = array('operacion'=>$operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
