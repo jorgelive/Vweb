@@ -276,6 +276,14 @@ class Archivoexcel extends ContainerAware{
                     }
                 }
             }
+            if(!empty($this->tablaSpecs['llaves'])){
+                foreach($this->tablaSpecs['llaves'] as $llave):
+                    if(empty($existentesRaw[$fila][$llave])){
+                        unset($existentesRaw[$fila]);
+                        break;
+                    }
+                endforeach;
+            }
             $fila ++;
 
         }
@@ -284,7 +292,6 @@ class Archivoexcel extends ContainerAware{
             $this->setMensajes('No hay valores que procesar.');
             return false;
         }
-
 
         foreach ($existentesRaw as $nroLinea=>$valor):
             if(!empty($this->tablaSpecs['llaves'])){

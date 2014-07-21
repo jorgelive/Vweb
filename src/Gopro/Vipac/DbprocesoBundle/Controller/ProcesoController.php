@@ -43,7 +43,6 @@ class ProcesoController extends BaseController
         }
 
         $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CHEQUE_FILE');
-        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CHEQUE_FILE');
         $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
         $columnaspecs[1]=null;
         $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
