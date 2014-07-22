@@ -1,8 +1,8 @@
 $(function () {
-    $("#deleteForm").submit(function(e){
+    $("#deleteForm").submit(function(event){
         if (!confirm("Esta seguro que desea eliminar?"))
         {
-            e.preventDefault();
+            event.preventDefault();
             return;
         }
     });

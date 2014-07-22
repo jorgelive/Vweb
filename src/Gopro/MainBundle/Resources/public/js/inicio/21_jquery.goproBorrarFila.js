@@ -13,16 +13,15 @@ $.fn.borraFila = function() {
             }
         });
         deleting.done(function(data) {
-            if(!data.hasOwnProperty('mensaje')
-                ){
-                alert ('La respuesta no fue válida.')
+            if(!data.hasOwnProperty('mensaje')){
+                alert ('La respuesta no fue válida.');
                 return false;
             }
             if(data.mensaje.exito=='si'){
                 $("table#listaArchivos tr[data-id="+id+"]").remove();
                 $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
             }else{
-                //alert(data.mensaje);
+                $("#sessionFlash").empty().append(tmpl('plantillaError',data.mensaje));
             };
         });
     });

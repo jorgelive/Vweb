@@ -19,7 +19,7 @@ class ParametroType extends AbstractType
             ->add('nombre')
             ->add('contenido')
             ->add('user',null, array('label' => 'Usuario'))
-            ->add('publico',null, array('label' => 'Público'))
+            ->add('publico',null, array('label' => 'Público', 'required'=>false))
         ;
     }
     

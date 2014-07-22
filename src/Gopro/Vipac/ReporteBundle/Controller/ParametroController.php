@@ -4,6 +4,7 @@ namespace Gopro\Vipac\ReporteBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -51,11 +52,22 @@ class ParametroController extends Controller
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid()||$request->isXMLHttpRequest()) {
+            $entity->setUser($this->getUser());
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
-
+            if ($request->isXMLHttpRequest()){
+                return new JsonResponse([
+                    'mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'El parametro se ha agregado'],
+                    'parametro'=>[
+                        'id'=>$entity->getId(),
+                        'nombre'=>$entity->getNombre(),
+                        'contenido'=>$entity->getContenido(),
+                        'borrarRoute'=>$this->get('router')->generate('gopro_vipac_reporte_parametro_delete', array('id' => $entity->getId())),
+                    ]
+                ]);
+            }
             return $this->redirect($this->generateUrl('gopro_vipac_reporte_parametro_show', array('id' => $entity->getId())));
         }
 
@@ -217,16 +229,22 @@ class ParametroController extends Controller
         $form = $this->createDeleteForm($id);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid()||$request->isXMLHttpRequest()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('GoproVipacReporteBundle:Parametro')->find($id);
+            $entity = $em->getRepository('GoproVipacReporteBundle:Parametro')->findOneBy(['id'=>$id,'user'=>$this->getUser()]);
 
-            if (!$entity) {
-                throw $this->createNotFoundException('No se puede encontrar el parametro.');
+            if(!$entity&&$request->isXMLHttpRequest()){
+                return new JsonResponse(['mensaje'=>['exito'=>'no','titulo'=>'Fallo','texto'=>'El parametro no se pudo borrar']]);
+            }elseif (!$entity) {
+                throw $this->createNotFoundException('No se encuentra o no tiene permiso sobre el parametro guardado.');
             }
 
             $em->remove($entity);
             $em->flush();
+
+            if ($request->isXMLHttpRequest()){
+                return new JsonResponse(['mensaje'=>['exito'=>'si','titulo'=>'Exito','texto'=>'Se ha eliminado el parametro guardado']]);
+            }
         }
 
         return $this->redirect($this->generateUrl('gopro_vipac_reporte_parametro'));

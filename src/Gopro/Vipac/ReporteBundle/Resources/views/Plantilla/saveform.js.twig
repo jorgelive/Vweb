@@ -1,5 +1,22 @@
-<form action=index.php method=post>
-    <input type="text" name="content">
-    <input type="text" name="nombre">
-    <input id="bottonEnviar" type="submit" value="Guardar">
+<form action=index.php method=post name="gopro_vipac_reportebundle_parametro">
+    <div id="gopro_vipac_reportebundle_parametro">
+        <div>
+            <label class="required" for="gopro_vipac_reportebundle_parametro_nombre">Nombre</label>
+            <input id="gopro_vipac_reportebundle_parametro_nombre" type="text" required="required" name="gopro_vipac_reportebundle_parametro[nombre]">
+        </div>
+        <div>
+            <label for="gopro_vipac_reportebundle_parametro_publico">Público</label>
+            <input id="gopro_vipac_reportebundle_parametro_publico" type="checkbox" value="" name="gopro_vipac_reportebundle_parametro[publico]">
+        </div>
+        <div>
+            <input id="gopro_vipac_reportebundle_parametro_contenido" type="hidden" name="gopro_vipac_reportebundle_parametro[contenido]">
+        </div>
+        <div>
+            <input id="gopro_vipac_reportebundle_parametro_sentencia" type="hidden" name="gopro_vipac_reportebundle_parametro[sentencia]">
+        </div>
+        <div>
+        <div>
+            <input id="bottonEnviar" type="submit" value="Guardar">
+        </div>
+    </div>
 </form>

@@ -233,19 +233,25 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-        $parametrosGuardados = $em->createQueryBuilder()
-            ->addSelect('p.id, p.nombre, p.contenido')
+
+        $qb=$em->createQueryBuilder();
+        $condiciones[]=$qb->expr()->orx('p.user = :user');
+        $condiciones[]=$qb->expr()->orx('p.publico = :publico');
+        $parametrosGuardados = $qb->addSelect('p.id, p.nombre, p.contenido')
             ->from('GoproVipacReporteBundle:Parametro', 'p')
             ->orderBy('p.id', 'ASC')
-            ->where($em->createQueryBuilder()->expr()->eq('p.user', ':user'))
-            ->andWhere($em->createQueryBuilder()->expr()->eq('p.sentencia', ':sentencia'))
+            ->where(join(' OR ', $condiciones))
+            ->andWhere($qb->expr()->eq('p.sentencia', ':sentencia'))
             ->setParameter('user', $this->getUser())
+            ->setParameter('publico', 1)
             ->setParameter('sentencia', $entity)
             ->getQuery()
             ->getArrayResult();
-
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),$destino,$limite);
-
+        foreach($parametrosGuardados as $key => $parametroGuardado):
+            $parametrosGuardados[$key]['borrarRoute']=$this->generateUrl('gopro_vipac_reporte_parametro_delete',['id'=>$parametroGuardado['id']]);
+        endforeach;
+        $parametrosGuardadosOpciones=['sentenciaid'=>$id,'agregarurl'=>$this->generateUrl('gopro_vipac_reporte_parametro_create')];
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),json_encode($parametrosGuardadosOpciones),$destino,$limite);
         if (
             $request->getMethod() == 'POST'
             &&!empty($campos)
@@ -562,11 +568,12 @@ class SentenciaController extends BaseController
      * @param string $ordenes
      * @param string $grupos
      * @param string $parametrosGuardados
+     * @param string $parametrosGuardadosOpciones
      * @param string $destino
      * @param int $limite
      * @return \Symfony\Component\Form\Form The form
      */
-    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$parametrosGuardados,$destino=null,$limite=null)
+    private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$parametrosGuardados,$parametrosGuardadosOpciones,$destino=null,$limite=null)
     {
         $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
         $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
@@ -587,6 +594,7 @@ class SentenciaController extends BaseController
             ->add('ordenes', 'hidden', array('data' => $ordenes))
             ->add('grupos', 'hidden', array('data' => $grupos))
             ->add('parametrosguardados', 'hidden', array('data' => $parametrosGuardados))
+            ->add('parametrosguardadosopciones', 'hidden', array('data' => $parametrosGuardadosOpciones))
             ->add('destino', 'choice', $destinoCh)
             ->add('limite', 'choice', $limiteCh)
             ->add('submit', 'submit', array('label' => 'Generar'))

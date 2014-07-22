@@ -65,7 +65,7 @@ $.fn.filtro = function() {
         guardadoTableBody : $("<tbody>"),
         saveContent : $("<div>", {id: "saveContent", title:'Guardar parámetros'}),
         saveForm : $("<form>", {id: "saveForm"}),
-        saveBoton : $("<a>", {
+        guardadoAdd : $("<a>", {
             id: "filtroAdd",
             text: "Guardar Parametros",
             click: function(){
@@ -90,7 +90,7 @@ $.fn.filtro = function() {
     el.guardadoContent.prependTo(parametrosform);
     el.guardadoTable.appendTo(el.guardadoContent);
     el.guardadoTableBody.appendTo(el.guardadoTable);
-    el.saveBoton.prependTo(parametrosform);
+    el.guardadoAdd.appendTo(el.guardadoContent);
     el.saveContent.appendTo(mainContainer);
     el.saveContent.append(tmpl('saveForm',grupoRow));
     el.saveContent.dialog().dialog("close");
@@ -117,7 +117,7 @@ $.fn.filtro = function() {
         }
     );
 
-    el.saveBoton.button({
+    el.guardadoAdd.button({
             icons: {
                 primary: 'ui-icon ui-icon-disk'
             }
@@ -125,9 +125,46 @@ $.fn.filtro = function() {
     );
 
     var parametrosGuardados={};
+    var parametrosGuardadosOpciones={}
+    var saveForm={}
 
     $(document).ready(function() {
-
+        saveForm = el.saveContent.find('form[name=gopro_vipac_reportebundle_parametro]');
+        if(parametrosform.find('#'+formName+'_parametrosguardadosopciones').val()!='' && typeof parametrosform.find('#'+formName+'_parametrosguardadosopciones').val() !== 'undefined'){
+            parametrosGuardadosOpciones=JSON.parse(parametrosform.find('#'+formName+'_parametrosguardadosopciones').val());
+            saveForm.attr("action", parametrosGuardadosOpciones.agregarurl)
+            saveForm.submit(function(event)
+            {
+                event.preventDefault();
+                var agregando = $.ajax({
+                    url: $(this).attr("action"),
+                    type: 'POST',
+                    data : $(this).serializeArray(),
+                    statusCode: {
+                        500: function() {
+                            alert("500 Error Interno: No se ha agregado los parametros.");
+                        }
+                    }
+                });
+                agregando.done(function(data) {
+                    if(!data.hasOwnProperty('mensaje')){
+                        alert ('La respuesta no fue válida.');
+                        return false;
+                    }
+                    if(data.mensaje.exito=='si'){
+                        $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
+                        parametrosGuardados[data.parametro.id]={};
+                        parametrosGuardados[data.parametro.id]['nombre']=data.parametro.nombre;
+                        parametrosGuardados[data.parametro.id]['contenido']=data.parametro.contenido;
+                        parametrosGuardados[data.parametro.id]['borrarRoute']=data.parametro.borrarRoute;
+                        agregarGuardado(data.parametro)
+                        el.saveContent.dialog("close")
+                    }else{
+                        //alert(data.mensaje);
+                    }
+                });
+            });
+        }
 
         if(parametrosform.find('#'+formName+'_parametrosaplicados').val()!='' && typeof parametrosform.find('#'+formName+'_parametrosaplicados').val() !== 'undefined'){
             procesarParametros(JSON.parse(parametrosform.find('#'+formName+'_parametrosaplicados').val()));
@@ -144,6 +181,7 @@ $.fn.filtro = function() {
                 }
                 parametrosGuardados[value.id]['nombre']=value.nombre;
                 parametrosGuardados[value.id]['contenido']=value.contenido;
+                parametrosGuardados[value.id]['borrarRoute']=value.borrarRoute;
                 agregarGuardado(value);
             });
         }
@@ -169,7 +207,8 @@ $.fn.filtro = function() {
     var savedParameter={};
 
     var mostrarSave=function(currentCampo,currentGrupo){
-
+        savedParameter={};
+        var savedParameterIndex={};
         $.each(parametrosform.serializeArray(), function( index, value ) {
             if(typeof value.name != 'undefined' && typeof value.value != 'undefined' ){
                 if(/^[A-Za-z]/.test(value.name))
@@ -177,22 +216,40 @@ $.fn.filtro = function() {
                     var input = value.name.replace(/[\[\]]$/,"").replace(/[\]\[]+/g,"|");
                     var keys = input.split("|");
                     if(keys.length==4){
+                        if(typeof savedParameterIndex[keys[1]] == 'undefined'){
+                            savedParameterIndex[keys[1]]=[];
+                        }
                         if(typeof savedParameter[keys[1]] == 'undefined'){
                             savedParameter[keys[1]]=[];
                         }
-                        if(typeof savedParameter[keys[1]][(keys[2]-1)] == 'undefined'){
-                            savedParameter[keys[1]][(keys[2]-1)]={};
+                        if(savedParameterIndex[keys[1]].indexOf(keys[2])=='-1'){
+                            savedParameterIndex[keys[1]].push(keys[2]);
                         }
+                        if(typeof savedParameter[keys[1]][savedParameterIndex[keys[1]].indexOf(keys[2])] == 'undefined'){
+                            savedParameter[keys[1]][savedParameterIndex[keys[1]].indexOf(keys[2])]={};
+                        }
+
                         if(typeof keys[1] != 'undefined' && typeof keys[2] != 'undefined' && typeof keys[3] != 'undefined' && typeof value.value != 'undefined'){
-                            savedParameter[keys[1]][(keys[2]-1)][keys[3]]=value.value;
+                            savedParameter[keys[1]][savedParameterIndex[keys[1]].indexOf(keys[2])][keys[3]]=value.value;
                         }
                     }
                 }
             }
         });
-        //console.log(JSON.stringify(savedParameter));
-        el.saveContent.dialog( "open" )
-    }
+
+        if(JSON.stringify(savedParameter) =='{}'){
+            alert('No hay nada que guardar');
+        }else{
+            saveForm.find("#gopro_vipac_reportebundle_parametro_contenido").val(JSON.stringify(savedParameter));
+            if(typeof parametrosGuardadosOpciones.sentenciaid =='undefined'){
+                alert('Las opciones de guardado no estan disponibles')
+            }else{
+                saveForm.find("#gopro_vipac_reportebundle_parametro_sentencia").val(parametrosGuardadosOpciones.sentenciaid);
+                el.saveContent.dialog( "open" );
+            }
+        }
+
+    };
 
     var procesarParametros = function (parametrosObjeto){
         el.filtroTableBody.empty();
@@ -225,12 +282,37 @@ $.fn.filtro = function() {
         var fila=el.guardadoTableBody.find('tr[data-id='+guardadoRow.id+']');
         fila.find('a.procesarGuardado').click(function() {
             procesarParametros(JSON.parse(parametrosGuardados[$(this).closest('tr').data('id')]['contenido']));
-            console.log(parametrosGuardados[$(this).closest('tr').data('id')]['contenido'])
         });
-        fila.find('a.borrarGuardado').button().click(function() {
-            //$(this).closest('tr').remove();
+        fila.find('a.borrarGuardado').button().click(function(event) {
+            event.preventDefault();
+            if (!confirm("Esta seguro que desea el parametro guardado?"))
+            {
+                return;
+            }
+            var url = $(this).prop('href');
+            var deleting = $.ajax({
+                url: url,
+                type: 'DELETE',
+                statusCode: {
+                    500: function() {
+                        alert("500 Error Interno: No se ha eliminado la fila.");
+                    }
+                }
+            });
+            deleting.done(function(data) {
+                if(!data.hasOwnProperty('mensaje')){
+                    alert ('La respuesta no fue válida.');
+                    return false;
+                }
+                if(data.mensaje.exito=='si'){
+                    fila.remove();
+                    $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
+                }else{
+                    $("#sessionFlash").empty().append(tmpl('plantillaError',data.mensaje));
+                };
+            });
         });
-    }
+    };
 
     var agregarGrupo=function(currentCampo,currentGrupo){
         el.grupoTableBody.append(tmpl('plantillaGrupoRow',grupoRow));
