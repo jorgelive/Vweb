@@ -18,6 +18,7 @@ $.fn.borraFila = function() {
                 return false;
             }
             if(data.mensaje.exito=='si'){
+
                 $("table#listaArchivos tr[data-id="+id+"]").remove();
                 $("#sessionFlash").empty().append(tmpl('plantillaHighlight',data.mensaje));
             }else{

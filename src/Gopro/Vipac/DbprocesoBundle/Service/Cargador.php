@@ -165,7 +165,6 @@ class Cargador extends ContainerAware{
             if(!$this->getProceso()->setQueryVariables($insertArray,'valoresInsert')){
                 return false;
             }
-            print_r($this->getTipo());
             $this->dbRowProcess($rowNumber+1);
         endforeach;
         return true;
@@ -186,7 +185,7 @@ class Cargador extends ContainerAware{
             if($this->getProceso()->ejecutarUpdateQuery()){
                 $this->setMensajes('Actualizando para la linea: '.$rowNumber);
             }
-        }elseif(!empty($insertArray)){
+        }else{
             if ($this->getTipo()=='U'){
                 $this->setMensajes('La linea '.$rowNumber. ' no existe, estamos en modo solo actualizar');
                 return false;
@@ -205,9 +204,6 @@ class Cargador extends ContainerAware{
                 return false;
             }
             return true;
-        }else{
-            $this->setMensajes('No se actualizo nada, los parametros son errados');
-            return false;
         }
     }
 

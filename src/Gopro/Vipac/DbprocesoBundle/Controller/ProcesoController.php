@@ -822,6 +822,75 @@ class ProcesoController extends BaseController
     }
 
     /**
+     * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_generico", defaults={"archivoEjecutar" = null})
+     * @Template()
+     */
+    public function genericoAction(Request $request,$archivoEjecutar)
+    {
+        $operacion='vipac_dbproceso_proceso_generico';
+        $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
+        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+
+        $opciones = array('operacion'=>$operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('gopro_main_archivo_create'),
+        ));
+
+        $formulario->handleRequest($request);
+
+        if(empty($archivoEjecutar)){
+            $this->setMensajes('No se ha definido ningun archivo');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        $procesoArchivo=$this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+            ->setArchivo()
+            ->setParametrosReader(null,null)
+        ;
+
+        if(!$procesoArchivo->parseExcel()){
+            $this->setMensajes($procesoArchivo->getMensajes());
+            $this->setMensajes('El archivo no se puede procesar');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        $carga=$this->get('gopro_dbproceso_cargador');
+        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+            $this->setMensajes($procesoArchivo->getMensajes());
+            $this->setMensajes($carga->getMensajes());
+            $this->setMensajes('Los parametros de carga no son correctos');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+        $carga->ejecutar();
+        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
+
+        if(empty($existente)){
+            $this->setMensajes($procesoArchivo->getMensajes());
+            $this->setMensajes($carga->getMensajes());
+            $this->setMensajes('No existen datos para generar archivo');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+        }
+
+        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
+            if (!array_key_exists($key, $existente)) {
+                $existente[$key]['mensaje']='No se encuentra en la BD';
+            }
+            foreach($valores as $valor):
+                $fusion[]=array_replace_recursive($valor,$existente[$key]);
+            endforeach;
+        endforeach;
+
+        $encabezados=array_keys($fusion[0]);
+        $archivoGenerado=$this->get('gopro_main_archivoexcel');
+        return $archivoGenerado
+            ->setArchivo()
+            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)
+            ->getArchivo();
+    }
+
+    /**
      * @Route("/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
      * @Template()
      */

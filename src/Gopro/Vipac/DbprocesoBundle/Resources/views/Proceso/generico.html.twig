@@ -1,6 +1,6 @@
 {% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
-{% block title %}Cargador Genérico{% endblock title %}
-{% block titulo %}Cargador Genérico{% endblock titulo %}
+{% block title %}Calculadora Generica{% endblock title %}
+{% block titulo %}Calculadora Generica{% endblock titulo %}
 {% block content %}
     <div id="archivo">
         {{ form(formulario) }}
@@ -13,11 +13,11 @@
         <h1>Listado de Archivos</h1>
         <table id="listaArchivos">
             <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Fecha de creación</th>
-                <th>Acciones</th>
-            </tr>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha de creación</th>
+                    <th>Acciones</th>
+                </tr>
             </thead>
             <tbody>
             {% if archivosAlmacenados|default %}
@@ -26,7 +26,7 @@
                         <td class="nombre">{{ archivo.nombre }}</td>
                         <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
                         <td>
-                            <a href="{{ path('gopro_vipac_dbproceso_carga_generico', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a href="{{ path('gopro_vipac_dbproceso_proceso_generico', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
                             <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('gopro_main_archivo_delete',{'id':archivo.id})}}">Borrar</a>
                         </td>
                     </tr>
@@ -38,7 +38,7 @@
 
     {% if mensajes|default %}
         <div id="mensajes">
-            <h1>Resultados del proceso</h1>
+            <h1>Mensajes del proceso</h1>
             <ul class="listaMensajes">
                 {% for mensaje in mensajes %}
                     <li>{{ mensaje }}</li>
@@ -48,6 +48,7 @@
     {% endif %}
 
 {% endblock content %}
+
 
 
 
