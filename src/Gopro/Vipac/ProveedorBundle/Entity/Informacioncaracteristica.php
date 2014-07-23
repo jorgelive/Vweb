@@ -1,6 +1,6 @@
 <?php
 
-namespace Gopro\InventarioBundle\Entity;
+namespace Gopro\Vipac\ProveedorBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Componentecaracteristica
+ * Informacioncaracteristica
  *
- * @ORM\Table(name="inv_componentecaracteristica")
+ * @ORM\Table(name="pro_informacioncaracteristica")
  * @ORM\Entity
  */
-class Componentecaracteristica
+class Informacioncaracteristica
 {
     /**
      * @var integer
@@ -49,13 +49,13 @@ class Componentecaracteristica
     private $modificado;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecaracteristicas")
-     * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Informacion", inversedBy="informacioncaracteristicas")
+     * @ORM\JoinColumn(name="informacion_id", referencedColumnName="id", nullable=false)
      */
-    private $componente;
+    private $informacion;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="componentecaracteristicas")
+     * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="informacioncaracteristicas")
      * @ORM\JoinColumn(name="caracteristica_id", referencedColumnName="id", nullable=false)
      */
     private $caracteristica;
@@ -83,7 +83,7 @@ class Componentecaracteristica
      * Set contenido
      *
      * @param string $contenido
-     * @return Componentecaracteristica
+     * @return Informacioncaracteristica
      */
     public function setContenido($contenido)
     {
@@ -106,7 +106,7 @@ class Componentecaracteristica
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Componentecaracteristica
+     * @return Informacioncaracteristica
      */
     public function setCreado($creado)
     {
@@ -129,7 +129,7 @@ class Componentecaracteristica
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Componentecaracteristica
+     * @return Informacioncaracteristica
      */
     public function setModificado($modificado)
     {
@@ -149,35 +149,35 @@ class Componentecaracteristica
     }
 
     /**
-     * Set componente
+     * Set informacion
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componente
-     * @return Componentecaracteristica
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacion $informacion
+     * @return Informacioncaracteristica
      */
-    public function setComponente(\Gopro\InventarioBundle\Entity\Componente $componente = null)
+    public function setInformacion(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informacion = null)
     {
-        $this->componente = $componente;
+        $this->informacion = $informacion;
 
         return $this;
     }
 
     /**
-     * Get componente
+     * Get informacion
      *
-     * @return \Gopro\InventarioBundle\Entity\Componente 
+     * @return \Gopro\Vipac\ProveedorBundle\Entity\Informacion
      */
-    public function getComponente()
+    public function getInformacion()
     {
-        return $this->componente;
+        return $this->informacion;
     }
 
     /**
      * Set caracteristica
      *
-     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristica
-     * @return Componentecaracteristica
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristica
+     * @return Informacioncaracteristica
      */
-    public function setCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica = null)
+    public function setCaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristica = null)
     {
         $this->caracteristica = $caracteristica;
 
@@ -187,7 +187,7 @@ class Componentecaracteristica
     /**
      * Get caracteristica
      *
-     * @return \Gopro\InventarioBundle\Entity\Caracteristica 
+     * @return \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica
      */
     public function getCaracteristica()
     {

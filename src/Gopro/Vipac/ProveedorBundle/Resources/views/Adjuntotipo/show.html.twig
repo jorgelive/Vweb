@@ -1,0 +1,36 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Tipo de adjunto{% endblock title %}
+{% block titulo %}Tipo de adjunto{% endblock titulo %}
+{% block content %}
+    <table class="registroPropiedades">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombrer</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_adjuntotipo') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_adjuntotipo_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_adjuntotipo_new') }}">
+                Crear otro
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

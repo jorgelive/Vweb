@@ -1,0 +1,36 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Patrón de caracteristica{% endblock title %}
+{% block titulo %}Patrón de caracteristica{% endblock titulo %}
+{% block content %}
+    <table class="registroPropiedades">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombrer</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristica') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristica_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristica_new') }}">
+                Crear otro
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

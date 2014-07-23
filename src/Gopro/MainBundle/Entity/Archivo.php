@@ -62,6 +62,10 @@ class Archivo
      */
     private $archivo;
 
+    public function __toString()
+    {
+        return $this->nombre;
+    }
 
     /**
      * Sets archivo.
@@ -236,26 +240,26 @@ class Archivo
     }
 
     /**
-     * Set usuario
+     * Set user
      *
-     * @param string $usuario
+     * @param \Gopro\UserBundle\Entity\User $user
      * @return Archivo
      */
-    public function setUsuario($usuario)
+    public function setUser(\Gopro\UserBundle\Entity\User $user)
     {
-        $this->usuario = $usuario;
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get usuario
+     * Get user
      *
-     * @return string 
+     * @return \Gopro\UserBundle\Entity\User
      */
-    public function getUsuario()
+    public function getUser()
     {
-        return $this->usuario;
+        return $this->user;
     }
 
     /**
@@ -325,28 +329,5 @@ class Archivo
     public function getModificado()
     {
         return $this->modificado;
-    }
-
-    /**
-     * Set user
-     *
-     * @param \Gopro\UserBundle\Entity\User $user
-     * @return Archivo
-     */
-    public function setUser(\Gopro\UserBundle\Entity\User $user)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \Gopro\UserBundle\Entity\User
-     */
-    public function getUser()
-    {
-        return $this->user;
     }
 }

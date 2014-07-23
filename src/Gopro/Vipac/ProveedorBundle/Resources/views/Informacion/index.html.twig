@@ -1,13 +1,13 @@
-{% extends 'GoproVipacReporteBundle::layout.html.twig' %}
-{% block title %}Lista de sentencias SQL{% endblock title %}
-{% block titulo %}Lista de sentencias SQL{% endblock titulo %}
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Lista de informaciones{% endblock title %}
+{% block titulo %}Lista de informaciones{% endblock titulo %}
 {% block content %}
     <table class="listaRegistros">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
-                <th>Descripción</th>
+                <th>RUC</th>
                 <th>Contenido</th>
                 <th>Acciones</th>
             </tr>
@@ -15,17 +15,16 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('gopro_vipac_reporte_sentencia_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td><a href="{{ path('gopro_vipac_proveedor_informacion_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.nombre }}</td>
-                <td>{{ entity.descripcion }}</td>
-                <td>{{ entity.contenido }}</td>
+                <td>{{ entity.ruc }}</td>
                 <td>
                 <ul>
                     <li>
-                        <a href="{{ path('gopro_vipac_reporte_sentencia_show', { 'id': entity.id }) }}">mostrar</a>
+                        <a href="{{ path('gopro_vipac_proveedor_informacion_show', { 'id': entity.id }) }}">mostrar</a>
                     </li>
                     <li>
-                        <a href="{{ path('gopro_vipac_reporte_sentencia_edit', { 'id': entity.id }) }}">editar</a>
+                        <a href="{{ path('gopro_vipac_proveedor_informacion_edit', { 'id': entity.id }) }}">editar</a>
                     </li>
                 </ul>
                 </td>
@@ -36,7 +35,7 @@
 
     <ul class="listaAcciones">
         <li>
-            <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia_new') }}">
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion_new') }}">
                 Crear un nuevo registro
             </a>
         </li>

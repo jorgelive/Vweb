@@ -1,0 +1,53 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Información{% endblock title %}
+{% block titulo %}Información{% endblock titulo %}
+{% block content %}
+    <table class="registroPropiedades">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+            <tr>
+                <th>RUC</th>
+                <td>{{ entity.ruc }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{ form(parametros_form) }}
+
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion_new') }}">
+                Crear otro
+            </a>
+        </li>
+    </ul>
+
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Resultados de la consulta</h1>
+            <ul>
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+{% endblock content %}

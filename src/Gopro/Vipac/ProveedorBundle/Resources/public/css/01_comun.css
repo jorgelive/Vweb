@@ -1,0 +1,23 @@
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div{margin-bottom: 7px;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div label,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div label{text-align:right; display: inline-block; margin-right: 5px; width: 90px; vertical-align: top;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div ul,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div ul{list-style: none;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div ul li,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div ul li{color:#cd0a0a; font-size: 9px;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div div{margin-top: 5px; margin-left: 100px;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div label,
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacionadjunto div div label{display: inline-block; margin-left: 5px; width: 70px; text-align: left;}
+
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div#gopro_vipac_proveedorbundle_informacion_informacionadjuntos{margin:0;}
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div#gopro_vipac_proveedorbundle_informacion_informacionadjuntos div {display:inline-block;}
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div#gopro_vipac_proveedorbundle_informacion_informacionadjuntos div div{margin:5px;padding: 5px; border: 1px solid #a6c9e2;}
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div#gopro_vipac_proveedorbundle_informacion_informacionadjuntos div div div {display:block; margin:0; padding: 0; border: none;}
+div#GoproVipacProveedorBundle form div#gopro_vipac_proveedorbundle_informacion div div#gopro_vipac_proveedorbundle_informacion_informacionadjuntos div div div label{width: 140px; }

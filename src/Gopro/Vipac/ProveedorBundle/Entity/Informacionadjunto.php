@@ -1,5 +1,5 @@
 <?php
-namespace Gopro\Vipac\DbprocesoBundle\Entity;
+namespace Gopro\Vipac\ProveedorBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -7,11 +7,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="dbp_archivo")
+ * @ORM\Entity(repositoryClass="Gopro\Vipac\ProveedorBundle\Entity\Repository\InformacionadjuntoRepository")
+ * @ORM\Table(name="pro_informacionadjunto")
  * @ORM\HasLifecycleCallbacks
  */
-class Archivo
+class Informacionadjunto
 {
     /**
      * @ORM\Id
@@ -21,25 +21,9 @@ class Archivo
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank
-     */
-    private $nombre;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $extension;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $usuario;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $operacion;
 
     /**
      * @var datetime $creado
@@ -58,35 +42,51 @@ class Archivo
     private $modificado;
 
     /**
-     * @Assert\File(maxSize="6000000")
+     * @ORM\ManyToOne(targetEntity="Adjuntotipo")
+     * @ORM\JoinColumn(name="adjuntotipo_id", referencedColumnName="id", nullable=false)
      */
-    private $file;
+    private $adjuntotipo;
 
     /**
-     * Sets file.
-     *
-     * @param UploadedFile $file
+     * @ORM\ManyToOne(targetEntity="Informacion")
+     * @ORM\JoinColumn(name="informacion_id", referencedColumnName="id", nullable=false)
      */
-    public function setFile(UploadedFile $file = null)
+    private $informacion;
+
+    /**
+     * @Assert\File(maxSize="6000000")
+     */
+    private $archivo;
+
+    public function __toString()
     {
-        $this->file = $file;
-        // check if we have an old image path
+        return $this->getAdjuntotipo()->getNombre();
+    }
+
+
+    /**
+     * Sets archivo.
+     *
+     * @param UploadedFile $archivo
+     */
+    public function setArchivo(UploadedFile $archivo = null)
+    {
+        $this->archivo = $archivo;
         if (is_file($this->getAbsolutePath())) {
-            // store the old name to delete after the update
             $this->temp = $this->getAbsolutePath();
         } else {
-            $this->extension = 'initial';
+             $this->extension = 'initial';
         }
     }
 
     /**
-     * Get file.
+     * Get archivo.
      *
      * @return UploadedFile
      */
-    public function getFile()
+    public function getArchivo()
     {
-        return $this->file;
+        return $this->archivo;
     }
 
     private $temp;
@@ -97,8 +97,9 @@ class Archivo
      */
     public function preUpload()
     {
-        if (null !== $this->getFile()) {
-            $this->extension = $this->getFile()->guessExtension();
+        if (null !== $this->getArchivo()) {
+            $this->extension = $this->getArchivo()->guessExtension();
+            $this->nombre = preg_replace('/\.[^.]*$/', '', $this->getArchivo()->getClientOriginalName());
         }
     }
 
@@ -108,24 +109,20 @@ class Archivo
      */
     public function upload()
     {
-        if (null === $this->getFile()) {
+        if (null === $this->getArchivo()) {
             return;
         }
         if (isset($this->temp)) {
-            // delete the old image
             unlink($this->temp);
             $this->temp = null;
         }
 
-        // you must throw an exception here if the file cannot be moved
-        // so that the entity is not persisted to the database
-        // which the UploadedFile move() method does
-        $this->getFile()->move(
+        $this->getArchivo()->move(
             $this->getUploadRootDir(),
-            $this->id.'.'.$this->getFile()->guessExtension()
+            $this->id.'.'.$this->getArchivo()->guessExtension()
         );
 
-        $this->setFile(null);
+        $this->setArchivo(null);
     }
 
     /**
@@ -180,7 +177,7 @@ class Archivo
 
     protected function getUploadDir()
     {
-        return 'carga/archivos';
+        return 'carga/informacionadjunto';
     }
 
     /**
@@ -191,29 +188,6 @@ class Archivo
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set nombre
-     *
-     * @param string $nombre
-     * @return Archivo
-     */
-    public function setNombre($nombre)
-    {
-        $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    /**
-     * Get nombre
-     *
-     * @return string 
-     */
-    public function getNombre()
-    {
-        return $this->nombre;
     }
 
     /**
@@ -232,58 +206,59 @@ class Archivo
     /**
      * Get extension
      *
-     * @return string 
+     * @return string
      */
-    public function getextension()
+    public function getExtension()
     {
         return $this->extension;
     }
 
     /**
-     * Set usuario
+     * Set adjuntotipo
      *
-     * @param string $usuario
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Adjuntotipo $adjuntotipo
      * @return Archivo
      */
-    public function setUsuario($usuario)
+    public function setAdjuntotipo(\Gopro\Vipac\ProveedorBundle\Entity\Adjuntotipo $adjuntotipo)
     {
-        $this->usuario = $usuario;
+        $this->adjuntotipo = $adjuntotipo;
 
         return $this;
     }
 
     /**
-     * Get usuario
+     * Get adjuntotipo
      *
-     * @return string 
+     * @return \Gopro\Vipac\ProveedorBundle\Entity\Adjuntotipo
      */
-    public function getUsuario()
+    public function getAdjuntotipo()
     {
-        return $this->usuario;
+        return $this->adjuntotipo;
     }
 
     /**
-     * Set operacion
+     * Set informacion
      *
-     * @param string $operacion
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacion $informacion
      * @return Archivo
      */
-    public function setOperacion($operacion)
+    public function setInformacion(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informacion)
     {
-        $this->operacion = $operacion;
+        $this->informacion = $informacion;
 
         return $this;
     }
 
     /**
-     * Get operacion
+     * Get informacion
      *
-     * @return string 
+     * @return \Gopro\Vipac\ProveedorBundle\Entity\Informacion
      */
-    public function getOperacion()
+    public function getInformacion()
     {
-        return $this->operacion;
+        return $this->informacion;
     }
+
 
     /**
      * Set creado
@@ -330,4 +305,5 @@ class Archivo
     {
         return $this->modificado;
     }
+
 }
