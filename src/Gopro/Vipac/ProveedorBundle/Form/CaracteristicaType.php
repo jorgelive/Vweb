@@ -17,6 +17,12 @@ class CaracteristicaType extends AbstractType
     {
         $builder
             ->add('nombre')
+            ->add('valor')
+            ->add('opcional',null,array(
+                'required' => false,
+            ))
+            ->add('prioridad')
+            ->add('caracteristicatipo',null, array('label' => 'Tipo de característica'))
             ->add('informaciontipos',null, array('label' => 'Tipo de proveedor'))
         ;
     }

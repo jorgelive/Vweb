@@ -17,7 +17,13 @@ class InformacioncaracteristicaType extends AbstractType
     {
         $builder
             ->add('caracteristica')
-            ->add('contenido')
+            ->add('texto')
+            ->add('numero')
+            ->add('fecha')
+            ->add('booleano')
+            ->add('archivocargado',null,array(
+                'required' => true,
+            ))
             ->addEventSubscriber(new AgregarInformacioncaracteristicaInformacionSubscriber());
         ;
     }

@@ -33,6 +33,29 @@ class Caracteristica
     private $nombre;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="valor", type="text", nullable=true)
+     */
+    private $valor;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="opcional", type="boolean")
+     */
+    private $opcional;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="prioridad", type="integer")
+     * @Assert\NotBlank
+     */
+    private $prioridad;
+
+
+    /**
      * @var datetime $creado
      *
      * @Gedmo\Timestampable(on="create")
@@ -49,6 +72,12 @@ class Caracteristica
     private $modificado;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Caracteristicatipo", inversedBy="caracteristicas" )
+     * @ORM\JoinColumn(name="caracteristicatipo_id", referencedColumnName="id", nullable=false)
+     */
+    private $caracteristicatipo;
+
+    /**
      * @ORM\OneToMany(targetEntity="Informacioncaracteristica", mappedBy="caracteristica", cascade={"persist"})
      */
     private $informacioncaracteristicas;
@@ -62,6 +91,14 @@ class Caracteristica
     public function __construct() {
         $this->informacioncaracteristicas = new ArrayCollection();
         $this->informaciontipos = new ArrayCollection();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getNombre();
     }
 
 
@@ -97,6 +134,85 @@ class Caracteristica
     public function getNombre()
     {
         return $this->nombre;
+    }
+
+    /**
+     * Set valor
+     *
+     * @param string $valor
+     * @return Caracteristica
+     */
+    public function setValor($valor)
+    {
+        $this->valor = $valor;
+
+        return $this;
+    }
+
+    /**
+     * Get valor
+     *
+     * @return string
+     */
+    public function getValor()
+    {
+        return $this->valor;
+    }
+
+    /**
+     * Get valores
+     *
+     * @return array
+     */
+    public function getValores()
+    {
+        return explode('|',$this->valor);
+    }
+
+    /**
+     * Set opcional
+     *
+     * @param boolean $opcional
+     * @return Caracteristica
+     */
+    public function setOpcional($opcional)
+    {
+        $this->opcional = $opcional;
+
+        return $this;
+    }
+
+    /**
+     * Get opcional
+     *
+     * @return boolean 
+     */
+    public function getOpcional()
+    {
+        return $this->opcional;
+    }
+
+    /**
+     * Set prioridad
+     *
+     * @param integer $prioridad
+     * @return Caracteristica
+     */
+    public function setPrioridad($prioridad)
+    {
+        $this->prioridad = $prioridad;
+
+        return $this;
+    }
+
+    /**
+     * Get prioridad
+     *
+     * @return string
+     */
+    public function getPrioridad()
+    {
+        return $this->prioridad;
     }
 
     /**
@@ -143,6 +259,29 @@ class Caracteristica
     public function getModificado()
     {
         return $this->modificado;
+    }
+
+    /**
+     * Set caracteristicatipo
+     *
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristicatipo $caracteristicatipo
+     * @return Caracteristica
+     */
+    public function setCaracteristicatipo(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristicatipo $caracteristicatipo)
+    {
+        $this->caracteristicatipo = $caracteristicatipo;
+
+        return $this;
+    }
+
+    /**
+     * Get caracteristicatipo
+     *
+     * @return \Gopro\Vipac\ProveedorBundle\Entity\Caracteristicatipo 
+     */
+    public function getCaracteristicatipo()
+    {
+        return $this->caracteristicatipo;
     }
 
     /**

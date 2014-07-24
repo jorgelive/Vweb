@@ -7,21 +7,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Gopro\Vipac\ProveedorBundle\Entity\Adjuntotipo;
-use Gopro\Vipac\ProveedorBundle\Form\AdjuntotipoType;
+use Gopro\Vipac\ProveedorBundle\Entity\Caracteristicatipo;
+use Gopro\Vipac\ProveedorBundle\Form\CaracteristicatipoType;
 
 /**
- * Adjuntotipo controller.
+ * Caracteristicatipo controller.
  *
- * @Route("/adjuntotipo")
+ * @Route("/caracteristicatipo")
  */
-class AdjuntotipoController extends Controller
+class CaracteristicatipoController extends Controller
 {
 
     /**
-     * Lists all Adjuntotipo entities.
+     * Lists all Caracteristicatipo entities.
      *
-     * @Route("/", name="gopro_vipac_proveedor_adjuntotipo")
+     * @Route("/", name="gopro_vipac_proveedor_caracteristicatipo")
      * @Method("GET")
      * @Template()
      */
@@ -29,7 +29,7 @@ class AdjuntotipoController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('GoproVipacProveedorBundle:Adjuntotipo')->findAll();
+        $entities = $em->getRepository('GoproVipacProveedorBundle:Caracteristicatipo')->findAll();
 
         return array(
             'entities' => $entities,
@@ -38,15 +38,15 @@ class AdjuntotipoController extends Controller
 
 
     /**
-     * Creates a new Adjuntotipo entity.
+     * Creates a new Caracteristicatipo entity.
      *
-     * @Route("/create", name="gopro_vipac_proveedor_adjuntotipo_create")
+     * @Route("/create", name="gopro_vipac_proveedor_caracteristicatipo_create")
      * @Method("POST")
-     * @Template("GoproVipacProveedorBundle:Adjuntotipo:new.html.twig")
+     * @Template("GoproVipacProveedorBundle:Caracteristicatipo:new.html.twig")
      */
     public function createAction(Request $request)
     {
-        $entity = new Adjuntotipo();
+        $entity = new Caracteristicatipo();
         $form = $this->createCreateForm($entity);
         $form->handleRequest($request);
 
@@ -55,7 +55,7 @@ class AdjuntotipoController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('gopro_vipac_proveedor_adjuntotipo_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('gopro_vipac_proveedor_caracteristicatipo_show', array('id' => $entity->getId())));
         }
 
         return array(
@@ -65,16 +65,16 @@ class AdjuntotipoController extends Controller
     }
 
     /**
-    * Creates a form to create a Adjuntotipo entity.
+    * Creates a form to create a Caracteristicatipo entity.
     *
-    * @param Adjuntotipo $entity The entity
+    * @param Caracteristicatipo $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createCreateForm(Adjuntotipo $entity)
+    private function createCreateForm(Caracteristicatipo $entity)
     {
-        $form = $this->createForm(new AdjuntotipoType(), $entity, array(
-            'action' => $this->generateUrl('gopro_vipac_proveedor_adjuntotipo_create'),
+        $form = $this->createForm(new CaracteristicatipoType(), $entity, array(
+            'action' => $this->generateUrl('gopro_vipac_proveedor_caracteristicatipo_create'),
             'method' => 'POST',
         ));
 
@@ -84,15 +84,15 @@ class AdjuntotipoController extends Controller
     }
 
     /**
-     * Displays a form to create a new Adjuntotipo entity.
+     * Displays a form to create a new Caracteristicatipo entity.
      *
-     * @Route("/new", name="gopro_vipac_proveedor_adjuntotipo_new")
+     * @Route("/new", name="gopro_vipac_proveedor_caracteristicatipo_new")
      * @Method("GET")
      * @Template()
      */
     public function newAction()
     {
-        $entity = new Adjuntotipo();
+        $entity = new Caracteristicatipo();
         $form   = $this->createCreateForm($entity);
 
         return array(
@@ -103,9 +103,9 @@ class AdjuntotipoController extends Controller
 
 
     /**
-     * Finds and displays a Adjuntotipo entity.
+     * Finds and displays a Caracteristicatipo entity.
      *
-     * @Route("/{id}", name="gopro_vipac_proveedor_adjuntotipo_show")
+     * @Route("/{id}", name="gopro_vipac_proveedor_caracteristicatipo_show")
      * @Method("GET")
      * @Template()
      */
@@ -113,10 +113,10 @@ class AdjuntotipoController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GoproVipacProveedorBundle:Adjuntotipo')->find($id);
+        $entity = $em->getRepository('GoproVipacProveedorBundle:Caracteristicatipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('No se puede encontrar el adjuntotipo.');
+            throw $this->createNotFoundException('No se puede encontrar el caracteristicatipo.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -128,9 +128,9 @@ class AdjuntotipoController extends Controller
     }
 
     /**
-     * Displays a form to edit an existing Adjuntotipo entity.
+     * Displays a form to edit an existing Caracteristicatipo entity.
      *
-     * @Route("/{id}/edit", name="gopro_vipac_proveedor_adjuntotipo_edit")
+     * @Route("/{id}/edit", name="gopro_vipac_proveedor_caracteristicatipo_edit")
      * @Method("GET")
      * @Template()
      */
@@ -138,10 +138,10 @@ class AdjuntotipoController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GoproVipacProveedorBundle:Adjuntotipo')->find($id);
+        $entity = $em->getRepository('GoproVipacProveedorBundle:Caracteristicatipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('No se puede encontrar el adjuntotipo.');
+            throw $this->createNotFoundException('No se puede encontrar el caracteristicatipo.');
         }
 
         $editForm = $this->createEditForm($entity);
@@ -155,16 +155,16 @@ class AdjuntotipoController extends Controller
     }
 
     /**
-    * Creates a form to edit a Adjuntotipo entity.
+    * Creates a form to edit a Caracteristicatipo entity.
     *
-    * @param Adjuntotipo $entity The entity
+    * @param Caracteristicatipo $entity The entity
     *
     * @return \Symfony\Component\Form\Form The form
     */
-    private function createEditForm(Adjuntotipo $entity)
+    private function createEditForm(Caracteristicatipo $entity)
     {
-        $form = $this->createForm(new AdjuntotipoType(), $entity, array(
-            'action' => $this->generateUrl('gopro_vipac_proveedor_adjuntotipo_update', array('id' => $entity->getId())),
+        $form = $this->createForm(new CaracteristicatipoType(), $entity, array(
+            'action' => $this->generateUrl('gopro_vipac_proveedor_caracteristicatipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
 
@@ -173,20 +173,20 @@ class AdjuntotipoController extends Controller
         return $form;
     }
     /**
-     * Edits an existing Adjuntotipo entity.
+     * Edits an existing Caracteristicatipo entity.
      *
-     * @Route("/{id}", name="gopro_vipac_proveedor_adjuntotipo_update")
+     * @Route("/{id}", name="gopro_vipac_proveedor_caracteristicatipo_update")
      * @Method("PUT")
-     * @Template("GoproVipacProveedorBundle:Adjuntotipo:edit.html.twig")
+     * @Template("GoproVipacProveedorBundle:Caracteristicatipo:edit.html.twig")
      */
     public function updateAction(Request $request, $id)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('GoproVipacProveedorBundle:Adjuntotipo')->find($id);
+        $entity = $em->getRepository('GoproVipacProveedorBundle:Caracteristicatipo')->find($id);
 
         if (!$entity) {
-            throw $this->createNotFoundException('No se puede encontrar el adjuntotipo.');
+            throw $this->createNotFoundException('No se puede encontrar el caracteristicatipo.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
@@ -196,7 +196,7 @@ class AdjuntotipoController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('gopro_vipac_proveedor_adjuntotipo_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('gopro_vipac_proveedor_caracteristicatipo_edit', array('id' => $id)));
         }
 
         return array(
@@ -206,9 +206,9 @@ class AdjuntotipoController extends Controller
         );
     }
     /**
-     * Deletes a Adjuntotipo entity.
+     * Deletes a Caracteristicatipo entity.
      *
-     * @Route("/{id}", name="gopro_vipac_proveedor_adjuntotipo_delete")
+     * @Route("/{id}", name="gopro_vipac_proveedor_caracteristicatipo_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
@@ -218,21 +218,21 @@ class AdjuntotipoController extends Controller
 
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('GoproVipacProveedorBundle:Adjuntotipo')->find($id);
+            $entity = $em->getRepository('GoproVipacProveedorBundle:Caracteristicatipo')->find($id);
 
             if (!$entity) {
-                throw $this->createNotFoundException('No se puede encontrar el adjuntotipo.');
+                throw $this->createNotFoundException('No se puede encontrar el caracteristicatipo.');
             }
 
             $em->remove($entity);
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('gopro_vipac_proveedor_adjuntotipo'));
+        return $this->redirect($this->generateUrl('gopro_vipac_proveedor_caracteristicatipo'));
     }
 
     /**
-     * Creates a form to delete a Adjuntotipo entity by id.
+     * Creates a form to delete a Caracteristicatipo entity by id.
      *
      * @param mixed $id The entity id
      *
@@ -245,7 +245,7 @@ class AdjuntotipoController extends Controller
             'form',
             null,
             [
-                'action'=>$this->generateUrl('gopro_vipac_proveedor_adjuntotipo_delete', ['id' => $id]),
+                'action'=>$this->generateUrl('gopro_vipac_proveedor_caracteristicatipo_delete', ['id' => $id]),
                 'method'=>'DELETE',
                 'attr'=>['id'=>'deleteForm']
             ])

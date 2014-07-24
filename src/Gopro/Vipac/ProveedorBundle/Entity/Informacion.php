@@ -55,15 +55,10 @@ class Informacion
     private $modificado;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Informaciontipo")
+     * @ORM\ManyToOne(targetEntity="Informaciontipo", inversedBy="informaciones" )
      * @ORM\JoinColumn(name="informaciontipo_id", referencedColumnName="id", nullable=false)
      */
     private $informaciontipo;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Informacionadjunto", mappedBy="informacion", cascade={"persist","remove"})
-     */
-    private $informacionadjuntos;
 
     /**
      * @ORM\OneToMany(targetEntity="Informacioncaracteristica", mappedBy="informacion", cascade={"persist","remove"})
@@ -71,7 +66,6 @@ class Informacion
     private $informacioncaracteristicas;
 
     public function __construct() {
-        $this->informacionadjuntos = new ArrayCollection();
         $this->informacioncaracteristicas = new ArrayCollection();
     }
 
@@ -79,6 +73,8 @@ class Informacion
     {
         return $this->nombre;
     }
+
+ 
 
     /**
      * Get id
@@ -206,45 +202,12 @@ class Informacion
     }
 
     /**
-     * Add informacionadjuntos
-     *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos
-     * @return Informacion
-     */
-    public function addInformacionadjunto(\Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos)
-    {
-        $this->informacionadjuntos[] = $informacionadjuntos;
-
-        return $this;
-    }
-
-    /**
-     * Remove informacionadjuntos
-     *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos
-     */
-    public function removeInformacionadjunto(\Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos)
-    {
-        $this->informacionadjuntos->removeElement($informacionadjuntos);
-    }
-
-    /**
-     * Get informacionadjuntos
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getInformacionadjuntos()
-    {
-        return $this->informacionadjuntos;
-    }
-
-    /**
      * Add informacioncaracteristicas
      *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristicas $informacioncaracteristicas
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristica $informacioncaracteristicas
      * @return Informacion
      */
-    public function addInformacioncaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristicas $informacioncaracteristicas)
+    public function addInformacioncaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristica $informacioncaracteristicas)
     {
         $this->informacioncaracteristicas[] = $informacioncaracteristicas;
 
@@ -254,9 +217,9 @@ class Informacion
     /**
      * Remove informacioncaracteristicas
      *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristicas $informacioncaracteristicas
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristica $informacioncaracteristicas
      */
-    public function removeInformacioncaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristicas $informacioncaracteristicas)
+    public function removeInformacioncaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristica $informacioncaracteristicas)
     {
         $this->informacioncaracteristicas->removeElement($informacioncaracteristicas);
     }

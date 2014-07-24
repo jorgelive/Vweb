@@ -1,6 +1,6 @@
 {% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
-{% block title %}Adjunto{% endblock title %}
-{% block titulo %}Adjunto{% endblock titulo %}
+{% block title %}Tipo de caracteristica{% endblock title %}
+{% block titulo %}Tipo de caracteristica{% endblock titulo %}
 {% block content %}
     <table class="registroPropiedades">
         <tbody>
@@ -9,29 +9,29 @@
                 <td>{{ entity.id }}</td>
             </tr>
             <tr>
-                <th>Proveedor</th>
-                <td>{{ entity.informacion.nombre }}</td>
+                <th>Nombre</th>
+                <td>{{ entity.nombre }}</td>
             </tr>
             <tr>
                 <th>Tipo</th>
-                <td>{{ entity.adjuntotipo.nombre }}</td>
+                <td>{{ entity.tipo }}</td>
             </tr>
         </tbody>
     </table>
 
     <ul class="registroAcciones">
         <li>
-            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacionadjunto') }}">
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristicatipo') }}">
                 Volver a la lista
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacionadjunto_edit', { 'id': entity.id }) }}">
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristicatipo_edit', { 'id': entity.id }) }}">
                 Editar
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('gopro_vipac_proveedor_informacionadjunto_new') }}">
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_caracteristicatipo_new') }}">
                 Crear otro
             </a>
         </li>

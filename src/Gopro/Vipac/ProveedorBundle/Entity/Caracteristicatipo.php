@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Adjuntotipo
- *
- * @ORM\Table(name="pro_adjuntotipo")
+ * Caracteristicatipo
+ * @ORM\Entity(repositoryClass="Gopro\Vipac\ProveedorBundle\Entity\Repository\CaracteristicatipoRepository")
+ * @ORM\Table(name="pro_caracteristicatipo")
  * @ORM\Entity
  */
-class Adjuntotipo
+class Caracteristicatipo
 {
     /**
      * @var integer
@@ -33,6 +33,14 @@ class Adjuntotipo
     private $nombre;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="tipo", type="string", length=100)
+     * @Assert\NotBlank
+     */
+    private $tipo;
+
+    /**
      * @var datetime $creado
      *
      * @Gedmo\Timestampable(on="create")
@@ -49,28 +57,24 @@ class Adjuntotipo
     private $modificado;
 
     /**
-     * @ORM\OneToMany(targetEntity="Informacionadjunto", mappedBy="adjuntotipo", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Caracteristica", mappedBy="caracteristicatipo", cascade={"persist"})
      */
-    private $informacionadjuntos;
+    private $caracteristicas;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Informaciontipo")
-     * @ORM\JoinTable(name="pro_informacionadjuntos_informaciontipos")
-     */
-    private $informaciontipos;
 
     public function __construct() {
-        $this->informacionadjuntos = new ArrayCollection();
-        $this->informaciontipos = new ArrayCollection();
+        $this->caracteristicas = new ArrayCollection();
     }
 
     /**
      * @return string
      */
-    function __toString()
+    public function __toString()
     {
         return $this->getNombre();
     }
+
+
 
     /**
      * Get id
@@ -86,7 +90,7 @@ class Adjuntotipo
      * Set nombre
      *
      * @param string $nombre
-     * @return Adjuntotipo
+     * @return Caracteristicatipo
      */
     public function setNombre($nombre)
     {
@@ -106,10 +110,33 @@ class Adjuntotipo
     }
 
     /**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return Caracteristicatipo
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+
+    /**
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Adjuntotipo
+     * @return Caracteristicatipo
      */
     public function setCreado($creado)
     {
@@ -132,7 +159,7 @@ class Adjuntotipo
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Adjuntotipo
+     * @return Caracteristicatipo
      */
     public function setModificado($modificado)
     {
@@ -152,68 +179,35 @@ class Adjuntotipo
     }
 
     /**
-     * Add informacionadjuntos
+     * Add caracteristicas
      *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos
-     * @return Adjuntotipo
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas
+     * @return Caracteristicatipo
      */
-    public function addInformacionadjunto(\Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos)
+    public function addCaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas)
     {
-        $this->informacionadjuntos[] = $informacionadjuntos;
+        $this->caracteristicas[] = $caracteristicas;
 
         return $this;
     }
 
     /**
-     * Remove informacionadjuntos
+     * Remove caracteristicas
      *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas
      */
-    public function removeInformacionadjunto(\Gopro\Vipac\ProveedorBundle\Entity\Informacionadjunto $informacionadjuntos)
+    public function removeCaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas)
     {
-        $this->informacionadjuntos->removeElement($informacionadjuntos);
+        $this->caracteristicas->removeElement($caracteristicas);
     }
 
     /**
-     * Get informacionadjuntos
+     * Get caracteristicas
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getInformacionadjuntos()
+    public function getCaracteristicas()
     {
-        return $this->informacionadjuntos;
-    }
-
-    /**
-     * Add informaciontipos
-     *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informaciontipo $informaciontipos
-     * @return Adjuntotipo
-     */
-    public function addInformaciontipo(\Gopro\Vipac\ProveedorBundle\Entity\Informaciontipo $informaciontipos)
-    {
-        $this->informaciontipos[] = $informaciontipos;
-
-        return $this;
-    }
-
-    /**
-     * Remove informaciontipos
-     *
-     * @param \Gopro\Vipac\ProveedorBundle\Entity\Informaciontipo $informaciontipos
-     */
-    public function removeInformaciontipo(\Gopro\Vipac\ProveedorBundle\Entity\Informaciontipo $informaciontipos)
-    {
-        $this->informaciontipos->removeElement($informaciontipos);
-    }
-
-    /**
-     * Get informaciontipos
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getInformaciontipos()
-    {
-        return $this->informaciontipos;
+        return $this->caracteristicas;
     }
 }
