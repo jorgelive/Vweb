@@ -19,7 +19,11 @@ class InformacioncaracteristicaType extends AbstractType
             ->add('caracteristica')
             ->add('texto')
             ->add('numero')
-            ->add('fecha')
+            ->add('fecha','date',array(
+                'input'  => 'datetime',
+                'widget' => 'single_text',
+                'attr' => array('class' => 'datePicker')
+            ))
             ->add('booleano')
             ->add('archivocargado',null,array(
                 'required' => true,
@@ -43,6 +47,6 @@ class InformacioncaracteristicaType extends AbstractType
      */
     public function getName()
     {
-        return 'gopro_vipac_proveedorbundle_informacionadjunto';
+        return 'gopro_vipac_proveedorbundle_informacioncaracteristica';
     }
 }

@@ -21,12 +21,10 @@ class InformacionType extends AbstractType
             ->add('informacioncaracteristicas', 'collection', array(
                 'label'=>false,
                 'type' => new InformacioncaracteristicaType(),
-                'options' => array('label' => false)
-            ))
-            ->add('informacionadjuntos', 'collection', array(
-                'label'=>'Datos adjuntos',
-                'type' => new InformacionadjuntoType(),
-                'options' => array('label' => false)
+                'options' => array('label' => false),
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false
             ))
         ;
     }

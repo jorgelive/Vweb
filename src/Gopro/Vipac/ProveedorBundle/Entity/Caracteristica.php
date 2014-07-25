@@ -83,7 +83,7 @@ class Caracteristica
     private $informacioncaracteristicas;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Informaciontipo")
+     * @ORM\ManyToMany(targetEntity="Informaciontipo", inversedBy="caracteristicas")
      * @ORM\JoinTable(name="pro_caracteristicas_informaciontipos")
      */
     private $informaciontipos;

@@ -3,6 +3,7 @@
 namespace Gopro\Vipac\ProveedorBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Gopro\MainBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -38,11 +39,31 @@ class InformacionController extends BaseController
         );
     }
     /**
+     *
+     * @param string $parametros
+     * @param string $campos
+     * @param string $valores
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function valoresForm($parametros,$campos,$valores)
+    {
+        return $this->get('form.factory')->createNamedBuilder(
+            'valoresForm',
+            'form',
+            null
+            )
+            ->add('parametros', 'hidden', array('data' => $parametros))
+            ->add('campos', 'hidden', array('data' => $campos))
+            ->add('valores', 'hidden', array('data' => $valores))
+            ->getForm();
+    }
+
+    /**
      * Creates a new Informacion entity.
      *
      * @Route("/create", name="gopro_vipac_proveedor_informacion_create")
      * @Method("POST")
-     * @Secure(roles="ROLE_ADMIN")
+     * @Secure(roles="IS_AUTHENTICATED_ANONYMOUSLY")
      * @Template("GoproVipacProveedorBundle:Informacion:new.html.twig")
      */
     public function createAction(Request $request)
@@ -52,24 +73,55 @@ class InformacionController extends BaseController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $entity->setContenido($this->container->get('gopro_main_variableproceso')->sanitizeQuery($entity->getContenido()));
             $em = $this->getDoctrine()->getManager();
-            $informacionadjuntos = $this->getClauses($form->getData()->getContenido())['informacionadjuntos'];
-            foreach($informacionadjuntos as $informacionadjunto){
-                $informacionadjuntoEntity=new Informacionadjunto();
-                $informacionadjuntoEntity->setNombre($informacionadjunto);
-                $informacionadjuntoEntity->setNombremostrar($informacionadjunto);
-                $informacionadjuntoEntity->setInformacion($entity);
-                $entity->getInformacionadjuntos()->add($informacionadjuntoEntity);
-            }
             $em->persist($entity);
             $em->flush();
-
+            if(!is_object($this->getUser())){
+                return new Response('Gracias por completar el formulario');
+            }
             return $this->redirect($this->generateUrl('gopro_vipac_proveedor_informacion_show', array('id' => $entity->getId())));
         }
 
+        $em = $this->getDoctrine()->getManager();
+        $qb=$em->createQueryBuilder();
+        $caracteristicasTipo = $qb->addSelect('i')
+            ->from('GoproVipacProveedorBundle:Informaciontipo', 'i')
+            ->leftJoin('i.caracteristicas', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.caracteristicatipo', 't')
+            ->addSelect('t')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach($caracteristicasTipo as $tipo):
+            $i=0;
+            foreach ($tipo['caracteristicas'] as $caracteristica):
+                $campos[$tipo['id']][$i]['nombreTipo']=$caracteristica['nombre'];
+                $campos[$tipo['id']][$i]['valorTipo']=$caracteristica['id'];
+                if($caracteristica['opcional']==1){
+                    $caracteristica['opcional']=true;
+                }else{
+                    $caracteristica['opcional']=false;
+                }
+                $campos[$tipo['id']][$i]['opcional']=$caracteristica['opcional'];
+                $campos[$tipo['id']][$i]['tipo']=$caracteristica['caracteristicatipo']['tipo'];
+                $opciones=explode('|',$caracteristica['valor']);
+                if(empty($opciones[0])){
+                    $opciones=null;
+                }
+                $campos[$tipo['id']][$i]['opciones']=$opciones;
+                $i++;
+            endforeach;
+        endforeach;
+
+        $parametros=['entidadAnidada'=>'informacioncaracteristicas','campoCaracteristica'=>'caracteristica'];
+
+        $valores='';
+        $valoresForm = $this->valoresForm(json_encode($parametros),json_encode($campos),json_encode($valores));
+
         return array(
             'entity' => $entity,
+            'valoresForm' => $valoresForm->createView(),
             'form'   => $form->createView(),
         );
     }
@@ -98,7 +150,7 @@ class InformacionController extends BaseController
      *
      * @Route("/new", name="gopro_vipac_proveedor_informacion_new")
      * @Method("GET")
-     * @Secure(roles="ROLE_ADMIN")
+     * @Secure(roles="IS_AUTHENTICATED_ANONYMOUSLY")
      * @Template()
      */
     public function newAction()
@@ -106,8 +158,46 @@ class InformacionController extends BaseController
         $entity = new Informacion();
         $form   = $this->createCreateForm($entity);
 
+        $em = $this->getDoctrine()->getManager();
+        $qb=$em->createQueryBuilder();
+        $caracteristicasTipo = $qb->addSelect('i')
+            ->from('GoproVipacProveedorBundle:Informaciontipo', 'i')
+            ->leftJoin('i.caracteristicas', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.caracteristicatipo', 't')
+            ->addSelect('t')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach($caracteristicasTipo as $tipo):
+            $i=0;
+            foreach ($tipo['caracteristicas'] as $caracteristica):
+                $campos[$tipo['id']][$i]['nombreTipo']=$caracteristica['nombre'];
+                $campos[$tipo['id']][$i]['valorTipo']=$caracteristica['id'];
+                if($caracteristica['opcional']==1){
+                    $caracteristica['opcional']=true;
+                }else{
+                    $caracteristica['opcional']=false;
+                }
+                $campos[$tipo['id']][$i]['opcional']=$caracteristica['opcional'];
+                $campos[$tipo['id']][$i]['tipo']=$caracteristica['caracteristicatipo']['tipo'];
+                $opciones=explode('|',$caracteristica['valor']);
+                if(empty($opciones[0])){
+                    $opciones=null;
+                }
+                $campos[$tipo['id']][$i]['opciones']=$opciones;
+                $i++;
+            endforeach;
+        endforeach;
+
+        $parametros=['entidadAnidada'=>'informacioncaracteristicas','campoCaracteristica'=>'caracteristica'];
+
+        $valores='';
+        $valoresForm = $this->valoresForm(json_encode($parametros),json_encode($campos),json_encode($valores));
+
         return array(
             'entity' => $entity,
+            'valoresForm' => $valoresForm->createView(),
             'form'   => $form->createView(),
         );
     }
@@ -137,7 +227,6 @@ class InformacionController extends BaseController
             'delete_form' => $deleteForm->createView(),
         );
     }
-
 
     /**
      * Displays a form to edit an existing Informacion entity.

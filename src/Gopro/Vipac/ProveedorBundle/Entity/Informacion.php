@@ -210,7 +210,7 @@ class Informacion
     public function addInformacioncaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Informacioncaracteristica $informacioncaracteristicas)
     {
         $this->informacioncaracteristicas[] = $informacioncaracteristicas;
-
+        $informacioncaracteristicas->setInformacion($this);
         return $this;
     }
 

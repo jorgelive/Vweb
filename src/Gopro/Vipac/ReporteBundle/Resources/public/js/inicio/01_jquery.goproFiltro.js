@@ -172,7 +172,7 @@ $.fn.filtro = function() {
 
         if(parametrosform.find('#'+formName+'_parametrosguardados').val()!='' && typeof parametrosform.find('#'+formName+'_parametrosguardados').val() !== 'undefined'){
 
-            $.each(JSON.parse(parametrosform.find('#'+formName+'_parametrosguardados').val()), function( index, value ) {
+            $.each(JSON.parse(parametrosform.find('#'+formName+'_parametrosguardados').val()),function(index,value){
                 if(typeof value.id == 'undefined' || typeof value.nombre == 'undefined' || typeof value.contenido == 'undefined' ){
                     return false;
                 }

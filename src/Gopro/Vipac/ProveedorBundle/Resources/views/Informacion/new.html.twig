@@ -3,6 +3,7 @@
 {% block titulo %}Creación de información{% endblock titulo %}
 {% block content %}
     {{ form(form) }}
+    {{ form(valoresForm) }}
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion') }}">

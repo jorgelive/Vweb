@@ -53,8 +53,14 @@ class Informaciontipo
      */
     private $informaciones;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Caracteristica", mappedBy="informaciontipos")
+     */
+    private $caracteristicas;
+
     public function __construct() {
         $this->informaciones = new ArrayCollection();
+        $this->caracteristicas = new ArrayCollection();
     }
 
     /**
@@ -64,6 +70,7 @@ class Informaciontipo
     {
         return $this->getNombre();
     }
+
 
     /**
      * Get id
@@ -150,7 +157,7 @@ class Informaciontipo
      * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones
      * @return Informaciontipo
      */
-    public function addInformacione(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones)
+    public function addInformacion(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones)
     {
         $this->informaciones[] = $informaciones;
 
@@ -162,7 +169,7 @@ class Informaciontipo
      *
      * @param \Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones
      */
-    public function removeInformacione(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones)
+    public function removeInformacion(\Gopro\Vipac\ProveedorBundle\Entity\Informacion $informaciones)
     {
         $this->informaciones->removeElement($informaciones);
     }
@@ -175,5 +182,38 @@ class Informaciontipo
     public function getInformaciones()
     {
         return $this->informaciones;
+    }
+
+    /**
+     * Add caracteristicas
+     *
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas
+     * @return Informaciontipo
+     */
+    public function addCaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas)
+    {
+        $this->caracteristicas[] = $caracteristicas;
+
+        return $this;
+    }
+
+    /**
+     * Remove caracteristicas
+     *
+     * @param \Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas
+     */
+    public function removeCaracteristica(\Gopro\Vipac\ProveedorBundle\Entity\Caracteristica $caracteristicas)
+    {
+        $this->caracteristicas->removeElement($caracteristicas);
+    }
+
+    /**
+     * Get caracteristicas
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCaracteristicas()
+    {
+        return $this->caracteristicas;
     }
 }
