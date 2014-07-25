@@ -2,12 +2,16 @@
     <div id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}">
         <div>
             <label {% if (o.opcional==false) { %}class="required" {% } %}for="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_nombremostrar">{%=o.nombreTipo%}</label>
-            {% if (o.tipo=='texto') { %}
+            {% if (o.opciones!=null) { %}
+                <select id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]"></select>
+            {% } else if (o.tipo=='texto') { %}
                 <input id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" type="text" value="{%=o.valor%}" maxlength="255" {% if (o.opcional==false) { %}required="required" {% } %}name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]">
             {% } else if(o.tipo=='numero') { %}
                 <input id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" type="number" value="{%=o.valor%}" maxlength="12" {% if (o.opcional==false) { %}required="required" {% } %}name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]">
             {% } else if(o.tipo=='fecha') { %}
                 <input id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" class="datePicker" type="date" value="{%=o.valor%}" maxlength="12" {% if (o.opcional==false) { %}required="required" {% } %}name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]">
+            {% } else if(o.tipo=='booleano') { %}
+                <input id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" class="datePicker" type="checkbox" value="1" name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]">
             {% } else if(o.tipo=='archivocargado') { %}
                 <input id="{%=o.formularioNombre%}_{%=o.entidadAnidada%}_{%=o.id%}_{%=o.tipo%}" type="file" {% if (o.opcional==false) { %}required="required" {% } %}name="{%=o.formularioNombre%}[{%=o.entidadAnidada%}][{%=o.id%}][{%=o.tipo%}]">
             {% } %}

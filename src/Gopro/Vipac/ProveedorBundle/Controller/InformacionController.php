@@ -90,6 +90,7 @@ class InformacionController extends BaseController
             ->addSelect('c')
             ->leftJoin('c.caracteristicatipo', 't')
             ->addSelect('t')
+            ->add('orderBy', 'c.prioridad ASC')
             ->getQuery()
             ->getArrayResult();
 
@@ -166,6 +167,7 @@ class InformacionController extends BaseController
             ->addSelect('c')
             ->leftJoin('c.caracteristicatipo', 't')
             ->addSelect('t')
+            ->add('orderBy', 'c.prioridad ASC')
             ->getQuery()
             ->getArrayResult();
 

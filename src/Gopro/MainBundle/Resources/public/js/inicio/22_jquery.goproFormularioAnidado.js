@@ -26,7 +26,6 @@ $.fn.formularioAnidado = function(datosForm,disparador) {
         formularioDiv: formulario.find('#'+formularioNombre),
         anidadoContainer : $("<div>"),
         anidadoContent : $("<div>", {id: formularioNombre+'_'+parametros['entidadAnidada']})
-
     };
 
     el.anidadoContent.appendTo(el.anidadoContainer);
@@ -40,11 +39,23 @@ $.fn.formularioAnidado = function(datosForm,disparador) {
             value['campoCaracteristica']=parametros['campoCaracteristica'];
             value['id']=index;
             el.anidadoContent.append(tmpl('formularioanidadoRow',value));
+            currentRow=$('#'+formularioNombre+'_'+parametros['entidadAnidada']+'_'+index);
+            console.log(currentRow);
+
+            if(value.opciones!=null){
+                var rowSelect=currentRow.find('select');
+                //console.log(rowSelect);
+                var rowSelectOpciones=rowSelect.prop('options');
+                //console.log(rowSelectOpciones);
+                if(value.opcional==true){
+                    rowSelectOpciones[rowSelectOpciones.length] = new Option('','');
+                }
+                $.each(value.opciones, function(id, contenido) {
+                    rowSelectOpciones[rowSelectOpciones.length] = new Option(contenido, contenido);
+                });
+            }
             //console.log (value);
         });
     };
-
     crearCampos(1);
-
-
 };
