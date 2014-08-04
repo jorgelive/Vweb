@@ -170,6 +170,7 @@ class ProcesoController extends BaseController
             ->setParametrosReader($tablaSpecs,$columnaspecs)
             ->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20'])
             ->setDescartarBlanco(true)
+            ->setTrimEspacios(true)
         ;
 
         if(!$archivoInfo->parseExcel()){
