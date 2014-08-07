@@ -275,7 +275,7 @@ class Archivoexcel extends ContainerAware{
                         endforeach;
                     }else{
                         if(trim($value)!=''||empty($this->getDescartarBlanco())){
-                            if(!empty($this->trimEspacios())){
+                            if(!empty($this->getTrimEspacios())){
                                 $value=trim($value);
                             }
                             $existentesDescartados[$fila][]=$value;

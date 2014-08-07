@@ -2,7 +2,7 @@
 h1{font-size: 150%}
 h2{font-size: 130%}
 h3{font-size: 110%}
-h1,h2,h3{margin-bottom: 5px;}
+h1,h2,h3{margin: 7px 0 5px 0;}
 a{text-decoration: none;}
 a:hover{text-decoration: underline;}
 label.required:after {content: " *";}
@@ -24,6 +24,11 @@ div#sidebar ul li{width: 100%;line-height: 30px;}
 div#sidebar ul li a{margin-bottom: 3px; width: 100%;}
 
 div#container{padding:10px; width:75%; display: inline-block; vertical-align: top;}
+
+table#listaResultados {margin:10px 0; border-collapse: collapse;}
+table#listaResultados thead tr th{font-size: 95%;}
+table#listaResultados thead tr th,
+table#listaResultados tbody tr td{min-width:170px; border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
 
 table#listaArchivos {margin:10px 0; border-collapse: collapse;}
 table#listaArchivos thead tr th{font-size: 95%;}

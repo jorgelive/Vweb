@@ -48,7 +48,7 @@ class ProcesoController extends BaseController
         $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
         $columnaspecs[3]=null;
         $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO','llave'=>'no');
+        $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO_PAIS','llave'=>'no');
 
         $procesoArchivo=$this->get('gopro_main_archivoexcel')
             ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
@@ -95,10 +95,10 @@ class ProcesoController extends BaseController
 
         $resultados=array();
         foreach($fusion as $fusionPart):
-            if(!isset($resultados[$fusionPart['CENTRO_COSTO']])){
-                $resultados[$fusionPart['CENTRO_COSTO']]=0;
+            if(!isset($resultados[$fusionPart['CENTRO_COSTO_PAIS']])){
+                $resultados[$fusionPart['CENTRO_COSTO_PAIS']]=0;
             }
-            $resultados[$fusionPart['CENTRO_COSTO']]=$resultados[$fusionPart['CENTRO_COSTO']]+$fusionPart['MONTO'];
+            $resultados[$fusionPart['CENTRO_COSTO_PAIS']]=$resultados[$fusionPart['CENTRO_COSTO_PAIS']]+$fusionPart['MONTO'];
         endforeach;
 
         $this->setMensajes($procesoArchivo->getMensajes());

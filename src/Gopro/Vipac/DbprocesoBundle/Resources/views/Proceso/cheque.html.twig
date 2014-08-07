@@ -2,6 +2,24 @@
 {% block title %}Calculo para cheques{% endblock title %}
 {% block titulo %}Calculo para cheques{% endblock titulo %}
 {% block content %}
+    {% if resultados|default %}
+        <div id="resultados">
+            <h1>Resultado del proceso</h1>
+            <table id="listaResultados">
+                <tr>
+                    <th>Centro de Costo</th>
+                    <th>Monto</th>
+                </tr>
+                {% for centro,monto in resultados %}
+                    <tr>
+                        <td>{{ centro }}</td>
+                        <td>{{ monto }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+
     <div id="archivo">
         {{ form(formulario) }}
         <h1>Agregar archivo</h1>
@@ -34,24 +52,6 @@
             </tbody>
         </table>
     </div>
-
-    {% if resultados|default %}
-        <div id="resultados">
-            <h1>Resultado del proceso</h1>
-            <table border="1">
-                <tr>
-                    <th>Centro de Costo</th>
-                    <th>Monto</th>
-                </tr>
-                {% for centro,monto in resultados %}
-                    <tr>
-                        <td>{{ centro }}</td>
-                        <td>{{ monto }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    {% endif %}
     {% if mensajes|default %}
         <div id="mensajes">
             <h1>Mensajes del proceso</h1>
