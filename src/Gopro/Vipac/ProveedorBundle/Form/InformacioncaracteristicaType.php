@@ -22,7 +22,7 @@ class InformacioncaracteristicaType extends AbstractType
             ->add('fecha','date',array(
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
             ->add('booleano')
             ->add('archivocargado',null,array(

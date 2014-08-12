@@ -18,6 +18,42 @@
             </tr>
         </tbody>
     </table>
+    <h2>Detalle</h2>
+    <table class="listaRegistros">
+        <thead>
+        <tr>
+            <th>Caracteristica</th>
+            <th>Texto</th>
+            <th>Número</th>
+            <th>Fecha</th>
+            <th>Booleano</th>
+            <th>Archivo</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for caracteristica in entity.informacioncaracteristicas %}
+            <tr>
+                <td>{{ caracteristica.caracteristica.nombre }}</td>
+                <td>{{ caracteristica.texto }}</td>
+                <td>{{ caracteristica.numero }}</td>
+                <td>{{ caracteristica.fecha is empty ? "" : caracteristica.fecha|date("Y-m-d") }}</td>
+                <td>{{ caracteristica.booleano }}</td>
+                <td>{{ caracteristica.archivo }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('gopro_vipac_proveedor_informacioncaracteristica_show', { 'id': caracteristica.id }) }}">mostrar</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('gopro_vipac_proveedor_informacioncaracteristica_edit', { 'id': caracteristica.id }) }}">editar</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     <ul class="registroAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_vipac_proveedor_informacion') }}">

@@ -23,13 +23,13 @@ class ComponenteType extends AbstractType
                 'label' => 'Compra',
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
             ->add('fechafingarantia',null, array(
                 'label' => 'Fin de garantía',
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
 
             ->addEventSubscriber(new AgregarCampoFechabajaSubscriber());

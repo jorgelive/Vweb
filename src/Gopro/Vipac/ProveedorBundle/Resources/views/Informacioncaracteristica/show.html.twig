@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <th>Fecha</th>
-                <td>{{ entity.fecha }}</td>
+                <td>{{ entity.fecha is empty ? "" : entity.fecha|date("Y-m-d") }}</td>
             </tr>
             <tr>
                 <th>Booleano</th>

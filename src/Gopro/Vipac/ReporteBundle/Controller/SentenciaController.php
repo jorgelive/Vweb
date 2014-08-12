@@ -251,7 +251,7 @@ class SentenciaController extends BaseController
             $parametrosGuardados[$key]['borrarRoute']=$this->generateUrl('gopro_vipac_reporte_parametro_delete',['id'=>$parametroGuardado['id']]);
         endforeach;
         $parametrosGuardadosOpciones=['sentenciaid'=>$id,'agregarurl'=>$this->generateUrl('gopro_vipac_reporte_parametro_create')];
-        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),json_encode($parametrosGuardadosOpciones),$destino,$limite);
+        $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','CON'=>'Conteo','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),json_encode($parametrosGuardadosOpciones),$destino,$limite);
         if (
             $request->getMethod() == 'POST'
             &&!empty($campos)
@@ -273,8 +273,11 @@ class SentenciaController extends BaseController
                         $this->setMensajes('El agrupamiento de la fila '.$i.' no es válido.');
                     }else{
                         $grupoAplicado[]=['campo'=>$grupo['campo'],'grupo'=>$grupo['grupo']];
-                        if($grupo['grupo']=='AGR'){
-                            if(isset($tipos[$grupo['campo']][4])){
+                        if($grupo['grupo']=='AGR'||$grupo['grupo']=='CON'){
+                            if($grupo['grupo']=='CON'){
+                                $gruposSelectArray[]='count('.$campos[$grupo['campo']].')';
+                                $ordenGrupo[$grupo['campo']]='count('.$campos[$grupo['campo']].')';
+                            }elseif(isset($tipos[$grupo['campo']][4])){
                                 $gruposSelectArray[]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'hh24:mi'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ') C_".$campos[$grupo['campo']];
                                 $ordenGrupo[$grupo['campo']]="rtrim(xmlagg(xmlelement(s,to_char(".$campos[$grupo['campo']].",'hh24:mi'),', ').extract('//text()') order by ".$campos[$grupo['campo']].").getClobVal(),', ')";
                             }elseif(isset($tipos[$grupo['campo']][3])){
@@ -364,15 +367,17 @@ class SentenciaController extends BaseController
                     5=>' LIKE ',
                     6=>' LIKE ',
                     7=>' >= ',
-                    8=>' <= '
-
+                    8=>' <= ',
+                    9=>' != '
                 ];
                 $i=1;
                 foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
                     if(
-                        empty($campos[$filtro['campo']])
-                        ||empty($operadores[$filtro['campo']][$filtro['operador']])
-                        ||empty($filtro['valor'])
+                        (
+                            empty($campos[$filtro['campo']])
+                            || empty($operadores[$filtro['campo']][$filtro['operador']])
+                            || empty($filtro['valor'])
+                        ) && $filtro['operador'] != 9
                     ){
                         $this->setMensajes('El filtro de la fila '.$i.' no es válido.');
                     }else{
@@ -388,9 +393,15 @@ class SentenciaController extends BaseController
                         }
                         $filtroArrayPart=array();
                         if(isset($tipos[$filtro['campo']][1])){
-                            $filtroArrayPart[0]='UPPER(';
-                            $filtroArrayPart[1]=$campos[$filtro['campo']];
-                            $filtroArrayPart[2]=')';
+                            if($filtro['operador']==9){
+                                $filtroArrayPart[0]='NVL(';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]=",' ')";
+                            }else{
+                                $filtroArrayPart[0]='UPPER(';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]=')';
+                            }
                             $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
                             if($filtro['operador']==3){
                                 $valores=explode('|',$filtro['valor']);
@@ -401,6 +412,10 @@ class SentenciaController extends BaseController
                                 $filtroArrayPart[4]='(';
                                 $filtroArrayPart[5]=implode(',',$valoresIn);
                                 $filtroArrayPart[6]=')';
+                            }elseif($filtro['operador']==9){
+                                $filtroArrayPart[4]='';
+                                $filtroArrayPart[5]="' '";
+                                $filtroArrayPart[6]='';
                             }else{
                                 $filtroArrayPart[4]='UPPER(';
                                 if($filtro['operador']==4){
@@ -412,14 +427,20 @@ class SentenciaController extends BaseController
                                 }else{
                                     $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
                                 }
-
                                 $filtroArrayPart[6]=')';
                             }
                         }elseif(isset($tipos[$filtro['campo']][2])){
-                            $filtroArrayPart[0]='NVL(';
-                            $filtroArrayPart[1]=$campos[$filtro['campo']];
-                            $filtroArrayPart[2]=',0)';
-                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==9){
+                                $filtroArrayPart[0]='';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]='';
+                                $filtroArrayPart[3]='';
+                            }else{
+                                $filtroArrayPart[0]='NVL(';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]=',0)';
+                                $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            }
                             if($filtro['operador']==3){
                                 $valores=explode('|',$filtro['valor']);
                                 $valoresIn=array();
@@ -429,6 +450,10 @@ class SentenciaController extends BaseController
                                 $filtroArrayPart[4]='(';
                                 $filtroArrayPart[5]=implode(',',$valoresIn);
                                 $filtroArrayPart[6]=')';
+                            }elseif($filtro['operador']==9){
+                                $filtroArrayPart[4]=' ';
+                                $filtroArrayPart[5]='IS NOT NULL';
+                                $filtroArrayPart[6]='';
                             }elseif($filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
                                 $this->setMensajes('El operador no es valido para numeros.');
                                 return array(
@@ -443,10 +468,17 @@ class SentenciaController extends BaseController
                                 $filtroArrayPart[6]='';
                             }
                         }elseif(isset($tipos[$filtro['campo']][3])){
-                            $filtroArrayPart[0]='TRUNC(';
-                            $filtroArrayPart[1]=$campos[$filtro['campo']];
-                            $filtroArrayPart[2]=')';
-                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==9){
+                                $filtroArrayPart[0]='';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]='';
+                                $filtroArrayPart[3]='';
+                            }else{
+                                $filtroArrayPart[0]='TRUNC(';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]=')';
+                                $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            }
                             if($filtro['operador']==3||$filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
                                 $this->setMensajes('El operador no es valido para fechas.');
                                 return array(
@@ -455,16 +487,27 @@ class SentenciaController extends BaseController
                                     'delete_form' => $deleteForm->createView(),
                                     'mensajes' => $this->getMensajes()
                                 );
+                            }elseif($filtro['operador']==9){
+                                $filtroArrayPart[4]=' ';
+                                $filtroArrayPart[5]='IS NOT NULL';
+                                $filtroArrayPart[6]='';
                             }else{
                                 $filtroArrayPart[4]='TO_DATE(';
                                 $filtroArrayPart[5]=$this->setValoresBind($campos[$filtro['campo']],$filtro['valor']);
                                 $filtroArrayPart[6]=",'yyyy-mm-dd')";
                             }
                         }elseif(isset($tipos[$filtro['campo']][4])){
-                            $filtroArrayPart[0]='to_char(';
-                            $filtroArrayPart[1]=$campos[$filtro['campo']];
-                            $filtroArrayPart[2]=",'hh24')";
-                            $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            if($filtro['operador']==9){
+                                $filtroArrayPart[0]='';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]='';
+                                $filtroArrayPart[3]='';
+                            }else{
+                                $filtroArrayPart[0]='to_char(';
+                                $filtroArrayPart[1]=$campos[$filtro['campo']];
+                                $filtroArrayPart[2]=",'hh24')";
+                                $filtroArrayPart[3]=$operadoresLista[$filtro['operador']];
+                            }
                             if($filtro['operador']==2||$filtro['operador']==3||$filtro['operador']==4||$filtro['operador']==5||$filtro['operador']==6){
                                 $this->setMensajes('El operador no es valido para horas.');
                                 return array(
@@ -473,6 +516,10 @@ class SentenciaController extends BaseController
                                     'delete_form' => $deleteForm->createView(),
                                     'mensajes' => $this->getMensajes()
                                 );
+                            }elseif($filtro['operador']==9){
+                                $filtroArrayPart[4]=' ';
+                                $filtroArrayPart[5]='IS NOT NULL';
+                                $filtroArrayPart[6]='';
                             }else{
                                 if(strlen($filtro['valor'])==1){
                                     $filtro['valor']='0'.$filtro['valor'];

@@ -16,7 +16,8 @@ div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros di
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_doccptipo div div label,
 div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div div label {display: inline-block; margin-left: 5px; width: 70px;}
 
-div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker{width: 120px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker-0--1{width: 120px;}
+div#GoproVipacDbprocesoBundle form div#gopro_vipac_dbprocesobundle_parametros div input.datePicker-80-18{width: 120px;}
 
 div#GoproVipacDbprocesoBundle div#mensajes{margin-top: 10px;}
 div#GoproVipacDbprocesoBundle div#archivos{margin-top: 10px;}

@@ -24,12 +24,12 @@ class ParametrosType extends AbstractType
             ->add('fechaInicio','date',array(
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
             ->add('fechaFin','date',array(
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
             ->add('destino', 'choice', $destinoCh)
             ->add('tipo', 'choice', $tipoCh)

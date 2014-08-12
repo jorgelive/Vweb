@@ -434,7 +434,7 @@ $.fn.filtro = function() {
                                 changeMonth: true,
                                 changeYear: true,
                                 dateFormat: 'yy-mm-dd ',
-                                yearRange: "-0:+1"
+                                yearRange: "-5:+5"
                             });
                         }
                         break;

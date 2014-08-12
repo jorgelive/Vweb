@@ -19,7 +19,7 @@ class ServicioType extends AbstractType
             ->add('fecha',null,array(
                 'input'  => 'datetime',
                 'widget' => 'single_text',
-                'attr' => array('class' => 'datePicker')
+                'attr' => array('class' => 'datePicker-0--1')
             ))
             ->add('item')
             ->add('serviciotipo',null, array('label' => 'Tipo'))

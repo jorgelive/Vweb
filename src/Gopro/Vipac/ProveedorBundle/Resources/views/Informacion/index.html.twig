@@ -2,36 +2,8 @@
 {% block title %}Lista de informaciones{% endblock title %}
 {% block titulo %}Lista de informaciones{% endblock titulo %}
 {% block content %}
-    <table class="listaRegistros">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>RUC</th>
-                <th>Contenido</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for entity in entities %}
-            <tr>
-                <td><a href="{{ path('gopro_vipac_proveedor_informacion_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
-                <td>{{ entity.nombre }}</td>
-                <td>{{ entity.ruc }}</td>
-                <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('gopro_vipac_proveedor_informacion_show', { 'id': entity.id }) }}">mostrar</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('gopro_vipac_proveedor_informacion_edit', { 'id': entity.id }) }}">editar</a>
-                    </li>
-                </ul>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+
+    {{ grid(grid) }}
 
     <ul class="listaAcciones">
         <li>
@@ -41,3 +13,4 @@
         </li>
     </ul>
 {% endblock content %}
+

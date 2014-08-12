@@ -8,9 +8,9 @@ div#GoproVipacReporteBundle form#parametrosForm div#guardadoContent table#guarda
 
 
 div#GoproVipacReporteBundle form#parametrosForm div#guardadoContent{width:180px; display:block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#filtroContent{width:420px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#ordenContent{width:270px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#grupoContent{width:270px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#filtroContent{width:470px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#ordenContent{width:320px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#grupoContent{width:320px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
 
 div#GoproVipacReporteBundle form#parametrosForm div#parametrosForm{margin:5px 0;}
 

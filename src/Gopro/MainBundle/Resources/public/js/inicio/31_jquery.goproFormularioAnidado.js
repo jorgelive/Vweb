@@ -40,8 +40,6 @@ $.fn.formularioAnidado = function(datosForm,disparador) {
             value['id']=index;
             el.anidadoContent.append(tmpl('formularioanidadoRow',value));
             currentRow=$('#'+formularioNombre+'_'+parametros['entidadAnidada']+'_'+index);
-            console.log(currentRow);
-
             if(value.opciones!=null){
                 var rowSelect=currentRow.find('select');
                 //console.log(rowSelect);
@@ -54,8 +52,10 @@ $.fn.formularioAnidado = function(datosForm,disparador) {
                     rowSelectOpciones[rowSelectOpciones.length] = new Option(contenido, contenido);
                 });
             }
-            //console.log (value);
         });
+        if (!Modernizr.input.required) {
+            formulario.html5form({async : false});
+        }
     };
     crearCampos(1);
 };

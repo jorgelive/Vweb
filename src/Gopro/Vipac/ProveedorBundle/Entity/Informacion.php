@@ -6,12 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Informacion
  *
  * @ORM\Table(name="pro_informacion")
  * @ORM\Entity
+ * @GRID\Source(columns="id, nombre, ruc")
  */
 class Informacion
 {
