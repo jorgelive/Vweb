@@ -2,6 +2,13 @@
 {% block title %}Lista de tipos de items{% endblock title %}
 {% block titulo %}Lista de tipos de items{% endblock titulo %}
 {% block content %}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_itemtipo_new') }}">
+                Agregar un tipo de item
+            </a>
+        </li>
+    </ul>
     <table class="listaRegistros">
         <thead>
             <tr>
@@ -33,7 +40,6 @@
         {% endfor %}
         </tbody>
     </table>
-
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_itemtipo_new') }}">

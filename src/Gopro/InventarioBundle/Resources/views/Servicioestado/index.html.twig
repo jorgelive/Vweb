@@ -2,6 +2,13 @@
 {% block title %}Lista de estados de servicio{% endblock title %}
 {% block titulo %}Lista de estados de servicio{% endblock titulo %}
 {% block content %}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_servicioestado_new') }}">
+                Agregar un estado de servicio
+            </a>
+        </li>
+    </ul>
     <table class="listaRegistros">
         <thead>
             <tr>
@@ -33,7 +40,6 @@
         {% endfor %}
         </tbody>
     </table>
-
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_servicioestado_new') }}">

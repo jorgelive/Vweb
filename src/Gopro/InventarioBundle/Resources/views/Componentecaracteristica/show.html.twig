@@ -20,9 +20,16 @@
     </table>
 
     <ul class="registroAcciones">
+        {% if entity.componente %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_componente_show', { 'id': entity.componente.id }) }}">
+                    Ir al componente
+                </a>
+            </li>
+        {% endif %}
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica') }}">
-                Volver a la lista
+                Ir a la lista
             </a>
         </li>
         <li>

@@ -2,9 +2,14 @@
 {% block title %}Lista de componentes{% endblock title %}
 {% block titulo %}Lista de componentes{% endblock titulo %}
 {% block content %}
-
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componente_new') }}">
+                Agregar un componente
+            </a>
+        </li>
+    </ul>
     {{ grid(grid) }}
-
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente_new') }}">

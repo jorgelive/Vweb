@@ -2,9 +2,19 @@
 {% block title %}Lista de servicios{% endblock title %}
 {% block titulo %}Lista de servicios{% endblock titulo %}
 {% block content %}
-
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_servicio_new') }}">
+                Agregar un servicio
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_servicio_lista') }}">
+                Lista de servicios ISO
+            </a>
+        </li>
+    </ul>
     {{ grid(grid) }}
-
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_servicio_new') }}">

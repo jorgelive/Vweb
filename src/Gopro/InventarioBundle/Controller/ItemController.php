@@ -28,7 +28,7 @@ class ItemController extends BaseController
     /**
      * Lists all Item entities.
      *
-     * @Route("/index", name="gopro_inventario_item")
+     * @Route("/", name="gopro_inventario_item")
      * @Method({"POST","GET"})
      * @Template()
      */

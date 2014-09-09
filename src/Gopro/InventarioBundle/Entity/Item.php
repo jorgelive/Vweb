@@ -127,8 +127,17 @@ class Item
      */
     public function setCodigo($codigo)
     {
+        if(
+            is_object($this->getDependencia())
+            && is_object($this->getItemtipo())
+            && !empty($this->getId())
+            && $codigo == $this->getIniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT)
+        ){
+            $this->codigo = '';
+        }else{
+            $this->codigo = $codigo;
+        }
         $this->codigo = $codigo;
-        return null;
         return $this;
     }
 
@@ -141,8 +150,14 @@ class Item
     {
         if(!empty($this->codigo)){
             return $this->codigo;
-        }else{
+        }elseif(
+            is_object($this->getDependencia())
+            && is_object($this->getItemtipo())
+            && !empty($this->getId())
+        ){
             return $this->getIniciales($this->getDependencia()->getNombre().' '.$this->getItemtipo()->getNombre()).str_pad($this->getId(), 4, '0', STR_PAD_LEFT);
+        }else{
+            return '';
         }
 
     }

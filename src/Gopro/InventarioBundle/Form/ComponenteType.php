@@ -5,7 +5,7 @@ namespace Gopro\InventarioBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Gopro\InventarioBundle\Form\EventListener\AgregarCampoFechabajaSubscriber;
+use Gopro\InventarioBundle\Form\EventListener\ComponenteCamposSubscriber;
 
 class ComponenteType extends AbstractType
 {
@@ -16,7 +16,7 @@ class ComponenteType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('item')
+            //->add('item')
             ->add('componentetipo',null, array('label' => 'Tipo'))
             ->add('componenteestado',null, array('label' => 'Estado'))
             ->add('fechacompra',null, array(
@@ -32,7 +32,7 @@ class ComponenteType extends AbstractType
                 'attr' => array('class' => 'datePicker-0--1')
             ))
 
-            ->addEventSubscriber(new AgregarCampoFechabajaSubscriber());
+            ->addEventSubscriber(new ComponenteCamposSubscriber());
         ;
     }
     

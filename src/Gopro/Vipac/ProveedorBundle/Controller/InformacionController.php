@@ -30,7 +30,7 @@ class InformacionController extends BaseController
     /**
      * Lists all Informacion entities.
      *
-     * @Route("/index", name="gopro_vipac_proveedor_informacion")
+     * @Route("/", name="gopro_vipac_proveedor_informacion")
      * @Method({"POST","GET"})
      * @Secure(roles="ROLE_STAFF")
      * @Template()

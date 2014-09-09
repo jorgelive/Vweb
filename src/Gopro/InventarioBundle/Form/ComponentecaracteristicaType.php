@@ -5,6 +5,7 @@ namespace Gopro\InventarioBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Gopro\InventarioBundle\Form\EventListener\ComponentecaracteristicaCamposSubscriber;
 
 class ComponentecaracteristicaType extends AbstractType
 {
@@ -16,8 +17,8 @@ class ComponentecaracteristicaType extends AbstractType
     {
         $builder
             ->add('contenido')
-            ->add('componente')
             ->add('caracteristica',null, array('label' => 'Característica'))
+            ->addEventSubscriber(new ComponentecaracteristicaCamposSubscriber());
         ;
     }
     

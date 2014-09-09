@@ -100,13 +100,22 @@ class ComponenteController extends BaseController
     /**
      * Displays a form to create a new Componente entity.
      *
-     * @Route("/new", name="gopro_inventario_componente_new")
+     * @Route("/new/{item_id}", requirements={"item_id" = "\d+"}, name="gopro_inventario_componente_new", defaults={"item_id" = null} )
      * @Method("GET")
      * @Template()
      */
-    public function newAction()
+    public function newAction($item_id)
     {
         $entity = new Componente();
+        if(!empty($item_id)){
+            $em = $this->getDoctrine()->getManager();
+            $item = $em->getRepository('GoproInventarioBundle:Item')->find($item_id);
+            if(is_object($item)){
+                $entity->setItem($item);
+            }
+
+        }
+
         $form   = $this->createCreateForm($entity);
 
         return array(
@@ -118,7 +127,7 @@ class ComponenteController extends BaseController
     /**
      * Finds and displays a Componente entity.
      *
-     * @Route("/{id}", name="gopro_inventario_componente_show")
+     * @Route("/{id}/", name="gopro_inventario_componente_show")
      * @Method("GET")
      * @Template()
      */

@@ -28,14 +28,6 @@
                 <th>Fecha de baja</th>
                 <td>{{ entity.fechabaja|date('Y-m-d') }}</td>
             </tr>
-            <tr>
-                <th>Creado</th>
-                <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
-            </tr>
-            <tr>
-                <th>Modificado</th>
-                <td>{{ entity.modificado|date('Y-m-d H:i:s') }}</td>
-            </tr>
         </tbody>
     </table>
 
@@ -47,8 +39,7 @@
             <th>Id</th>
             <th>Característica</th>
             <th>Contenido</th>
-            <th>Creado</th>
-            <th>Modificado</th>
+            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -57,29 +48,45 @@
                 <td>{{ componentecaracteristica.id }}</td>
                 <td>{{ componentecaracteristica.caracteristica.nombre }}</td>
                 <td>{{ componentecaracteristica.contenido }}</td>
-                <td>{{ componentecaracteristica.creado|date('Y-m-d H:i:s') }}</td>
-                <td>{{ componentecaracteristica.modificado|date('Y-m-d H:i:s') }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('gopro_inventario_componentecaracteristica_show', { 'id': componentecaracteristica.id }) }}">mostrar</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('gopro_inventario_componentecaracteristica_edit', { 'id': componentecaracteristica.id }) }}">editar</a>
+                        </li>
+                    </ul>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_new', { 'componente_id': entity.id }) }}">
+                Agregar caracteristica
+            </a>
+        </li>
+    </ul>
 
     <ul class="registroAcciones">
+        {% if entity.item %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_item_show', { 'id': entity.item.id }) }}">
+                    Ir al item
+                </a>
+            </li>
+        {% endif %}
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente') }}">
-                Volver a la lista
+                Ir a la lista
             </a>
         </li>
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente_edit', { 'id': entity.id }) }}">
                 Editar
-            </a>
-        </li>
-        <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente_new') }}">
-                Crear otro
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

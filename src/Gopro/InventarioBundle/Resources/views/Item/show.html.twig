@@ -16,14 +16,6 @@
                 <th>Nombre</th>
                 <td>{{ entity.nombre }}</td>
             </tr>
-            <tr>
-                <th>Creado</th>
-                <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
-            </tr>
-            <tr>
-                <th>Modificado</th>
-                <td>{{ entity.modificado|date('Y-m-d H:i:s') }}</td>
-            </tr>
         </tbody>
     </table>
     <h2>Componentes</h2>
@@ -35,8 +27,6 @@
             <th>Fecha de compra</th>
             <th>Fin de garantía</th>
             <th>Fecha de Baja</th>
-            <th>Creado</th>
-            <th>Modificado</th>
             <th>Acciones</th>
         </tr>
         </thead>
@@ -48,8 +38,6 @@
                 <td>{% if componente.fechacompra %}{{ componente.fechacompra|date('Y-m-d') }}{% endif %}</td>
                 <td>{% if componente.fechafingarantia %}{{ componente.fechafingarantia|date('Y-m-d') }}{% endif %}</td>
                 <td>{% if componente.fechabaja %}{{ componente.fechabaja|date('Y-m-d') }}{% endif %}</td>
-                <td>{% if componente.creado %}{{ componente.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if componente.modificado %}{{ componente.modificado|date('Y-m-d H:i:s') }}{% endif %}</td>
                 <td>
                     <ul>
                         <li>
@@ -65,7 +53,13 @@
         </tbody>
     </table>
 
-
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componente_new', { 'item_id': entity.id }) }}">
+                Crear componente
+            </a>
+        </li>
+    </ul>
 
 
     <ul class="registroAcciones">
@@ -76,12 +70,12 @@
         </li>
         <li>
             <a class="boton" href="{{ path('gopro_inventario_item_edit', { 'id': entity.id }) }}">
-                Editar
+                Editar el item
             </a>
         </li>
         <li>
             <a class="boton" href="{{ path('gopro_inventario_item_new') }}">
-                Crear otro
+                Crear componente
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

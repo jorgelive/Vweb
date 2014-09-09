@@ -5,7 +5,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AgregarCampoFechabajaSubscriber implements EventSubscriberInterface
+class ComponenteCamposSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {
@@ -18,10 +18,14 @@ class AgregarCampoFechabajaSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
         $form = $event->getForm();
+        if (!$data->getItem()) {
+            $form->add('item');
+        }else{
+            $form->add('item',null,array(
+                'disabled'=> true
+            ));
+        }
 
-        // check if the product object is "new"
-        // If you didn't pass any data to the form, the data is "null".
-        // This should be considered a new "Product"
         if (!$data || !$data->getId()) {
             $form->add('fechabaja',null, array(
                 'label' => 'Baja',
@@ -30,12 +34,13 @@ class AgregarCampoFechabajaSubscriber implements EventSubscriberInterface
                 'disabled'=> true
             ));
         }else{
-           $form->add('fechabaja',null, array(
+            $form->add('fechabaja',null, array(
                 'label' => 'Baja',
                 'input'  => 'datetime',
                 'widget' => 'single_text',
                 'attr' => array('class' => 'datePicker-0--1')
             ));
         }
+
     }
 }

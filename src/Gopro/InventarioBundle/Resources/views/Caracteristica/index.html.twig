@@ -2,6 +2,13 @@
 {% block title %}Lista de características{% endblock title %}
 {% block titulo %}Lista de características{% endblock titulo %}
 {% block content %}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_caracteristica_new') }}">
+                Agregar una característica
+            </a>
+        </li>
+    </ul>
     <table class="listaRegistros">
         <thead>
             <tr>

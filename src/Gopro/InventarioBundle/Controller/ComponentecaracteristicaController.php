@@ -85,13 +85,24 @@ class ComponentecaracteristicaController extends BaseController
     /**
      * Displays a form to create a new Componentecaracteristica entity.
      *
-     * @Route("/new", name="gopro_inventario_componentecaracteristica_new")
+     * @Route("/new/{componente_id}", requirements={"componente_id" = "\d+"}, name="gopro_inventario_componentecaracteristica_new", defaults={"componente_id" = null})
      * @Method("GET")
      * @Template()
      */
-    public function newAction()
+    public function newAction($componente_id)
     {
         $entity = new Componentecaracteristica();
+
+        if(!empty($componente_id)){
+            $em = $this->getDoctrine()->getManager();
+            $componente = $em->getRepository('GoproInventarioBundle:Componente')->find($componente_id);
+            if(is_object($componente)){
+                $entity->setComponente($componente);
+            }
+
+        }
+
+
         $form   = $this->createCreateForm($entity);
 
         return array(

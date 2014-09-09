@@ -2,6 +2,13 @@
 {% block title %}Lista de estados de componentes{% endblock title %}
 {% block titulo %}Lista de estados de componentes{% endblock titulo %}
 {% block content %}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componenteestado_new') }}">
+                Agregar un estado de componente
+            </a>
+        </li>
+    </ul>
     <table class="listaRegistros">
         <thead>
             <tr>
@@ -33,7 +40,6 @@
         {% endfor %}
         </tbody>
     </table>
-
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componenteestado_new') }}">

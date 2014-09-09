@@ -4,9 +4,16 @@
 {% block content %}
     {{ form(edit_form) }}
     <ul class="registroAcciones">
+        {% if edit_form.vars.value.item.id %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_item_show', { 'id': edit_form.vars.value.item.id }) }}">
+                    Ir al item
+                </a>
+            </li>
+        {% endif %}
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente') }}">
-                Volver a la lista
+                Ir a la lista
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

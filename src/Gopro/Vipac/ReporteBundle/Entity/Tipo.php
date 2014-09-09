@@ -186,7 +186,7 @@ class Tipo
      * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operadores
      * @return Tipo
      */
-    public function addOperadore(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
+    public function addOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
     {
         $this->operadores[] = $operadores;
 
@@ -198,7 +198,7 @@ class Tipo
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operadores
      */
-    public function removeOperadore(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
+    public function removeOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
     {
         $this->operadores->removeElement($operadores);
     }

@@ -143,15 +143,14 @@ class Operador
     }
 
     /**
-     * Add tipos
+     * Add tipo
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipo
      * @return Operador
      */
-    public function addTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos)
+    public function addTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipo)
     {
-        $this->tipos[] = $tipos;
-
+        $tipo->addOperador($this);
         return $this;
     }
 
