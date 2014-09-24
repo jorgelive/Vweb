@@ -1,0 +1,14 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Modificar patrón de servicios{% endblock title %}
+{% block titulo %}Modificar patrón de servicios{% endblock titulo %}
+{% block content %}
+    {{ form(edit_form) }}
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_servicio') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

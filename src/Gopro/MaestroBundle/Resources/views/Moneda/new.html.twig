@@ -1,0 +1,13 @@
+{% extends 'GoproMaestroBundle::layout.html.twig' %}
+{% block title %}Agregar moneda{% endblock title %}
+{% block titulo %}Agregar moneda{% endblock titulo %}
+{% block content %}
+    {{ form(form) }}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_maestro_moneda') }}">
+                Vover a la lista
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

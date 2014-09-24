@@ -1,0 +1,43 @@
+{% extends 'GoproMaestroBundle::layout.html.twig' %}
+{% block title %}Monedas{% endblock title %}
+{% block titulo %}Monedas{% endblock titulo %}
+{% block content %}
+    <table class="registroPropiedades">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ entity.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Código</th>
+                <td>{{ entity.codigo }}</td>
+            </tr>
+            <tr>
+                <th>Creado</th>
+                <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Modificado</th>
+                <td>{{ entity.modificado|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_maestro_moneda') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_maestro_moneda_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>{{ form(delete_form) }}</li>
+    </ul>
+{% endblock content %}

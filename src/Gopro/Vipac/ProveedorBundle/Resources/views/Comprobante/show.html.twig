@@ -1,0 +1,38 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Información{% endblock title %}
+{% block titulo %}Información{% endblock titulo %}
+{% block content %}
+    <table class="registroPropiedades">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Serie</th>
+                <td>{{ entity.serie }}</td>
+            </tr>
+            <tr>
+                <th>Número</th>
+                <td>{{ entity.numero }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <ul class="registroAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_comprobante') }}">
+                Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_comprobante_edit', { 'id': entity.id }) }}">
+                Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_comprobante_new') }}">
+                Crear otro
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

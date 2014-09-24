@@ -8,10 +8,15 @@ gopro_vipac_reporte:
     type:     annotation
     prefix:   /reporte
 
-gopro_vipac_main:
+gopro_main:
     resource: "@GoproMainBundle/Controller/"
     type:     annotation
     prefix:   /
+
+gopro_maestro:
+    resource: "@GoproMaestroBundle/Controller/"
+    type:     annotation
+    prefix:   /maestro
 
 gopro_vipac_extra:
     resource: "@GoproVipacExtraBundle/Controller/"

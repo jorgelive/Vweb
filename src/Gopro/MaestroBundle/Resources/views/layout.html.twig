@@ -1,0 +1,16 @@
+{% extends "::global.html.twig" %}
+{% block title %}Tablas Maestras - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="GoproMaestroBundle">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+{% endblock container %}
+{% block javascriptsfinal %}
+    {{ parent() }}
+{% endblock javascriptsfinal %}

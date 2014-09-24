@@ -1,0 +1,22 @@
+{% extends 'GoproVipacProveedorBundle::layout.html.twig' %}
+{% block title %}Lista de patrones de servicios{% endblock title %}
+{% block titulo %}Lista de patrones de servicios{% endblock titulo %}
+{% block content %}
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_servicio_new') }}">
+                Crear un nuevo registro
+            </a>
+        </li>
+    </ul>
+
+    {{ grid(grid) }}
+
+    <ul class="listaAcciones">
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_proveedor_servicio_new') }}">
+                Crear un nuevo registro
+            </a>
+        </li>
+    </ul>
+{% endblock content %}

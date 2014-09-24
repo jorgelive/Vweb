@@ -36,8 +36,8 @@ class DefaultController extends Controller
             array('nombre'=>'Inventario Items','route'=>'gopro_inventario_item'),
             array('nombre'=>'Inventario Componentes','route'=>'gopro_inventario_componente'),
             array('nombre'=>'Inventario Caracteristicas','route'=>'gopro_inventario_componentecaracteristica'),
-            array('nombre'=>'Servicios tecnicos','route'=>'gopro_inventario_servicio'),
-            array('nombre'=>'Registro de Proveedor','route'=>'gopro_vipac_proveedor_informacion'),
+            array('nombre'=>'Servicios técnicos','route'=>'gopro_inventario_servicio'),
+            array('nombre'=>'Servicios de proveedores','route'=>'gopro_vipac_proveedor_servicio'),
         );
         return array('items'=> $items);
     }
