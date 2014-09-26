@@ -57,7 +57,7 @@ class Comprobante
     private $modificado;
 
     /**
-     * @ORM\OneToMany(targetEntity="Serviciofile", mappedBy="informacion", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Serviciofile", mappedBy="comprobante", cascade={"persist"})
      */
     private $serviciofiles;
 

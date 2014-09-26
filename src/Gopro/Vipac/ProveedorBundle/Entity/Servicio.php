@@ -281,7 +281,7 @@ class Servicio
     public function addServiciofile(\Gopro\Vipac\ProveedorBundle\Entity\Serviciofile $serviciofiles)
     {
         $this->serviciofiles[] = $serviciofiles;
-
+        $serviciofiles->setServicio($this);
         return $this;
     }
 

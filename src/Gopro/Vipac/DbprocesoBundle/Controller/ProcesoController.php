@@ -422,7 +422,6 @@ class ProcesoController extends BaseController
                 foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
                     $montoProcesado=0;
                     if($i<count($dataCP[$nroLinea]['FILES'])){
-
                         if(!empty($file['NUM_PAX'])&&!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
                             $montoProcesado=round($montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'],2);
                             $this->setCantidadTotal($montoProcesado,null,[$nombreRubro,null]);
@@ -642,7 +641,7 @@ class ProcesoController extends BaseController
         $columnaspecs[0]=array('nombre'=>'CUENTA_CONTABLE','llave'=>'no','proceso'=>'no');
         $columnaspecs[1]=array('nombre'=>'DESCRIPCION','llave'=>'no','proceso'=>'no');
         $columnaspecs[2]=array('nombre'=>'ASIENTO_ARCHIVO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[3]=array('nombre'=>'TIPO_DE_DOCUMENTO','llave'=>'no','proceso'=>'no');
+        $columnaspecs[3]=array('nombre'=>'TIPO_DE_DOCUMENTO','llave'=>'si');
         $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'si');
         $columnaspecs[5]=array('nombre'=>'REFERENCIA','llave'=>'no','proceso'=>'no');
         $columnaspecs[6]=array('nombre'=>'DEBITO_LOCAL','llave'=>'no','proceso'=>'no');
@@ -669,7 +668,7 @@ class ProcesoController extends BaseController
             ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
             ->setArchivo()
             ->setParametrosReader($tablaSpecs,$columnaspecs)
-            ->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DOCUMENTO','ASIENTO_ARCHIVO'])
+            ->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DEBITO_LOCAL','DEBITO_DOLAR','DOCUMENTO','ASIENTO_ARCHIVO','TIPO_DE_DOCUMENTO'])
         ;
 
         if(!$procesoArchivo->parseExcel()){
@@ -732,18 +731,21 @@ class ProcesoController extends BaseController
             return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
+
         foreach($this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
             if(
                 isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
             ){
-
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]);
+                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$this->container->get('gopro_main_variableproceso')->utf($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]);
                 array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
                 $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
-                if($this->getCantidadTotal('montoTotal')!=0&&!empty($procesoArchivo->getExistentesCustomIndizados()[$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
+
+                if($this->getCantidadTotal('montoTotal')!=0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
                     $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getCantidadTotal('montoTotal');
+                }elseif($this->getCantidadTotal('montoTotal')!=0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]['DEBITO_DOLAR'])){
+                    $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['DEBITO_DOLAR']/$this->getCantidadTotal('montoTotal');
                 }else{
                     $coeficiente=0;
                 }
@@ -751,9 +753,9 @@ class ProcesoController extends BaseController
                 $this->resetCantidadTotal('montoTotal');
             }else{
                 if(empty($valor['ANO'])||empty($valor['NUM_FILE_FISICO'])){
-                    $this->setMensajes('No hay resultados para la factura: '.$valor['DOCUMENTO']);
+                    $this->setMensajes('No hay resultados para la factura: '.$valor['TIPO_DE_DOCUMENTO'].'-'.$valor['DOCUMENTO']);
                 }else{
-                    $this->setMensajes('No hay resultados para la factura: '.$valor['DOCUMENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
+                    $this->setMensajes('No hay resultados para la factura: '.$valor['TIPO_DE_DOCUMENTO'].'-'.$valor['DOCUMENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
                 }
             }
         endforeach;
@@ -765,7 +767,10 @@ class ProcesoController extends BaseController
         }
         $i=0;
         foreach($preResultado as $valor):
+            $j=0;
             foreach($valor['items'] as $item):
+                $j++;
+
                 $resultado[$i]=$item;
                 $resultado[$i]['NUM_FILE_FISICO']=$valor['NUM_FILE_FISICO'];
                 $resultado[$i]['ANO']=$valor['ANO'];
@@ -777,6 +782,16 @@ class ProcesoController extends BaseController
                 }
                 $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
+                if(!empty($valor['DEBITO_DOLAR'])){
+                    $resultado[$i]['DEBITO_DOLAR']=$valor['DEBITO_DOLAR'];
+                }else{
+                    $resultado[$i]['DEBITO_DOLAR']='';
+                }
+                if(!empty($valor['DEBITO_LOCAL'])){
+                    $resultado[$i]['DEBITO_LOCAL']=$valor['DEBITO_LOCAL'];
+                }else{
+                    $resultado[$i]['DEBITO_LOCAL']='';
+                }
                 if(!empty($valor['CREDITO_DOLAR'])){
                     $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
                 }else{
@@ -788,16 +803,63 @@ class ProcesoController extends BaseController
                     $resultado[$i]['CREDITO_LOCAL']='';
                 }
                 $resultado[$i]['DOCUMENTO']=$valor['DOCUMENTO'];
-                $resultado[$i]['MONTO_PRORRATEADO']=$item['MONTO']*$valor['coeficiente'];
-                if(!empty($valor['CREDITO_LOCAL'])){
-                    $resultado[$i]['MONTO_PRORRATEADO_LOCAL']=$resultado[$i]['MONTO_PRORRATEADO']*$valor['CREDITO_LOCAL']/$valor['CREDITO_DOLAR'];
+                $resultado[$i]['TIPO_DE_DOCUMENTO']=$valor['TIPO_DE_DOCUMENTO'];
+                if( $j == count($valor['items']) && count($valor['items']) != 1 ){
+                    if(!empty($valor['CREDITO_DOLAR'])) {
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
+                        $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = $valor['CREDITO_DOLAR'] - $this->getCantidadTotal('sumaCreditoDolares');
+                        if (!empty($valor['CREDITO_LOCAL'])) {
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = $valor['CREDITO_LOCAL'] - $this->getCantidadTotal('sumaCreditoSoles');
+                        } else {
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                        }
+                    }else{
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = $valor['DEBITO_DOLAR'] - $this->getCantidadTotal('sumaDebitoDolares');
+                        if (!empty($valor['DEBITO_LOCAL'])) {
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = $valor['DEBITO_LOCAL'] - $this->getCantidadTotal('sumaDebitoSoles');
+                        } else {
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
+                        }
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = '';
+                        $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                    }
                 }else{
-                    $resultado[$i]['MONTO_PRORRATEADO_LOCAL']='';
+                    if(!empty($valor['CREDITO_DOLAR'])) {
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
+                        $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = round($item['MONTO'] * $valor['coeficiente'],2);
+                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'], null, ['sumaCreditoDolares', null]);
+                        if (!empty($valor['CREDITO_LOCAL'])) {
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] * $valor['CREDITO_LOCAL'] / $valor['CREDITO_DOLAR'],2);
+                            $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_CREDITO'], null, ['sumaCreditoSoles', null]);
+                        } else {
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                        }
+
+                    }else{
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = round($item['MONTO'] * $valor['coeficiente'],2);
+                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'], null, ['sumaDebitoDolares', null]);
+                        if (!empty($valor['DEBITO_LOCAL'])) {
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] * $valor['DEBITO_LOCAL'] / $valor['DEBITO_DOLAR'],2);
+                            $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_DEBITO'], null, ['sumaDebitoSoles', null]);
+                        } else {
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                        }
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO']='';
+                        $resultado[$i]['PRORRATEADO_LOCAL_CREDITO']='';
+                    }
+
                 }
+
                 $resultado[$i]['COEFICIENTE']=$valor['coeficiente'];
                 //
                 $i++;
             endforeach;
+            $this->resetCantidadTotal('sumaDebitoSoles');
+            $this->resetCantidadTotal('sumaDebitoDolares');
+            $this->resetCantidadTotal('sumaCreditoSoles');
+            $this->resetCantidadTotal('sumaCreditoDolares');
         endforeach;
         if(empty($resultado)){
             $this->setMensajes($procesoArchivo->getMensajes());

@@ -60,10 +60,11 @@ class BaseController extends Controller
         if(empty($this->cantidadTotal[$vars[0]])){
             $this->cantidadTotal[$vars[0]]=0;
         }
-        if(empty($vars[1])||$key==$vars[1]){
-            $this->cantidadTotal[$vars[0]]=$this->cantidadTotal[$vars[0]]+$valor;
+        if( empty($vars[1]) || $key == $vars[1] ){
+            $this->cantidadTotal[$vars[0]] = $this->cantidadTotal[$vars[0]] + $valor;
             return true;
         }
+
         return false;
     }
 
@@ -73,7 +74,8 @@ class BaseController extends Controller
      */
     protected function resetCantidadTotal($id)
     {
-        $this->cantidadTotal[$id]=0;
+        $this->cantidadTotal[$id] = 0;
+
         return $this;
     }
 
@@ -86,6 +88,7 @@ class BaseController extends Controller
         if(empty($this->cantidadTotal[$id])){
             return 0;
         }
+
         return $this->cantidadTotal[$id];
     }
 

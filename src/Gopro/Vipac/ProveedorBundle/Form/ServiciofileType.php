@@ -18,7 +18,7 @@ class ServiciofileType extends AbstractType
         $builder
             ->add('file')
             ->add('numpax')
-            ->add('servicio')
+            //->add('servicio')
         ;
     }
     
