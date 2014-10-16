@@ -44,8 +44,8 @@ class TransferenciaCommand extends ContainerAwareCommand
         }
         $datosTransferencia=$this->getContainer()->get('gopro_dbproceso_proceso');
         $datosTransferencia->setConexion($this->getContainer()->get('doctrine.dbal.vipac_connection'));
-        $datosTransferencia->setTabla('VVW_TRANSFERENCIA_CB');
-        $datosTransferencia->setSchema('VIAPAC');
+        $datosTransferencia->setTabla('EXT_TRANSFERENCIA_CB');
+        $datosTransferencia->setSchema('VWEB');
         $datosTransferencia->setCamposSelect([
             'CONSECUTIVO',
             'CUENTA_ORIGEN',
@@ -65,7 +65,7 @@ class TransferenciaCommand extends ContainerAwareCommand
             'CATEGORIA_PROVEED',
             'PAIS'
         ]);
-        $datosTransferencia->setQueryVariables($datos->getExistentesCustom());
+        $datosTransferencia->setQueryVariables($datos->getExistentesCustomRaw());
 
         if(!$datosTransferencia->ejecutarSelectQuery()||empty($datosTransferencia->getExistentesRaw())){
             $output->writeln('No hay datos coincidentes con la tabla de proceso');
@@ -74,6 +74,7 @@ class TransferenciaCommand extends ContainerAwareCommand
 
         $resultado = $this->getContainer()->get('gopro_main_variableproceso')->utf($datosTransferencia->getExistentesRaw());
 
+        $mails = [];
         foreach($resultado as $linea):
             if(!empty(trim($linea['E_MAIL']))){
                 $mails[$linea['CONTRIBUYENTE']]['email'][]=trim($linea['E_MAIL']);
