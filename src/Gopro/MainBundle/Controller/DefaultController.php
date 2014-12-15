@@ -33,11 +33,8 @@ class DefaultController extends Controller
             array('nombre'=>'Cargador de CP','route'=>'gopro_vipac_dbproceso_proceso_cargadorcp'),
             array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
             array('nombre'=>'Reportes','route'=>'gopro_vipac_reporte_sentencia'),
-            array('nombre'=>'Inventario Items','route'=>'gopro_inventario_item'),
-            array('nombre'=>'Inventario Componentes','route'=>'gopro_inventario_componente'),
-            array('nombre'=>'Inventario Caracteristicas','route'=>'gopro_inventario_componentecaracteristica'),
+            array('nombre'=>'Inventario de equipos','route'=>'gopro_inventario_item'),
             array('nombre'=>'Servicios técnicos','route'=>'gopro_inventario_servicio'),
-            array('nombre'=>'Servicios de proveedores','route'=>'gopro_vipac_proveedor_servicio'),
         );
         return array('items'=> $items);
     }

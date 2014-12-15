@@ -28,11 +28,6 @@ gopro_vipac_dbproceso:
     type:     annotation
     prefix:   /dbproceso
 
-gopro_vipac_preveedor:
-    resource: "@GoproVipacProveedorBundle/Controller/"
-    type:     annotation
-    prefix:   /proveedor
-
 sonata_user_security:
     resource: "@SonataUserBundle/Resources/config/routing/sonata_security_1.xml"
 

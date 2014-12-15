@@ -56,7 +56,7 @@
     <ul class="listaAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente_new', { 'item_id': entity.id }) }}">
-                Crear componente
+                Agregar componente
             </a>
         </li>
     </ul>
@@ -65,7 +65,7 @@
     <ul class="registroAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_inventario_item') }}">
-                Volver a la lista
+                Ir a la lista de items
             </a>
         </li>
         <li>
@@ -75,7 +75,7 @@
         </li>
         <li>
             <a class="boton" href="{{ path('gopro_inventario_item_new') }}">
-                Crear componente
+                Agregar item
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

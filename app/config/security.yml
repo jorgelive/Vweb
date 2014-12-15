@@ -91,8 +91,8 @@ security:
         - { path: ^/dbproceso/, role: ROLE_STAFF }
 
         #- { path: ^/proveedor/informacion/, ROLE_ADMIN } en annotaciones
-
         #- { path: ^/reporte/sentencia/, ROLE_ADMIN } en annotaciones
+
         - { path: ^/reporte/campo, role: ROLE_ADMIN }
         - { path: ^/reporte/tipo, role: ROLE_ADMIN }
         - { path: ^/reporte/operador, role: ROLE_ADMIN }
@@ -104,7 +104,7 @@ security:
         - { path: ^/inventario/componentetipo, role: ROLE_ADMIN }
         - { path: ^/inventario/item, role: ROLE_ADMIN }
         - { path: ^/inventario/itemtipo, role: ROLE_ADMIN }
-        - { path: ^/inventario/sevicio, role: ROLE_ADMIN }
+        - { path: ^/inventario/servicio, role: ROLE_ADMIN }
         - { path: ^/inventario/servicioestado, role: ROLE_ADMIN }
         - { path: ^/inventario/serviciotipo, role: ROLE_ADMIN }
 

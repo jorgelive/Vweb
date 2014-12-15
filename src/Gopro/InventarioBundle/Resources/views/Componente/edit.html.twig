@@ -10,12 +10,13 @@
                     Ir al item
                 </a>
             </li>
+        {% else %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_componente') }}">
+                    Vover a la lista
+                </a>
+            </li>
         {% endif %}
-        <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente') }}">
-                Ir a la lista
-            </a>
-        </li>
         <li>{{ form(delete_form) }}</li>
     </ul>
 {% endblock content %}

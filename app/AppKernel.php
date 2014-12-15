@@ -37,7 +37,6 @@ class AppKernel extends Kernel
             new Gopro\MainBundle\GoproMainBundle(),
             new Gopro\MaestroBundle\GoproMaestroBundle(),
             new Gopro\Vipac\ReporteBundle\GoproVipacReporteBundle(),
-            new Gopro\Vipac\ProveedorBundle\GoproVipacProveedorBundle(),
             new Gopro\InventarioBundle\GoproInventarioBundle(),
         );
 

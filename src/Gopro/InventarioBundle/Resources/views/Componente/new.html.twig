@@ -4,10 +4,19 @@
 {% block content %}
     {{ form(form) }}
     <ul class="listaAcciones">
-        <li>
-            <a class="boton" href="{{ path('gopro_inventario_componente') }}">
-                Vover a la lista
-            </a>
-        </li>
+        {% if form.vars.value.item.id %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_item_show', { 'id': form.vars.value.item.id }) }}">
+                    Ir al item
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a class="boton" href="{{ path('gopro_inventario_componente') }}">
+                    Vover a la lista
+                </a>
+            </li>
+        {% endif %}
+
     </ul>
 {% endblock content %}
