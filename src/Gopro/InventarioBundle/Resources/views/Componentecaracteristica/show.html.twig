@@ -9,6 +9,18 @@
                 <td>{{ entity.id }}</td>
             </tr>
             <tr>
+                <th>Componente</th>
+                <td>{{ entity.componente.item.nombre }} - {{ entity.componente.componentetipo.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Caracteristica</th>
+                <td>{{ entity.caracteristica.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Valor</th>
+                <td>{{ entity.contenido }}</td>
+            </tr>
+            <tr>
                 <th>Creado</th>
                 <td>{{ entity.creado|date('Y-m-d H:i:s') }}</td>
             </tr>
@@ -33,8 +45,8 @@
             </a>
         </li>
         <li>
-            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_new') }}">
-                Crear otro
+            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_new', { 'componente_id': entity.componente.id }) }}">
+                Agregar otra característica
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

@@ -6,12 +6,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
+use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Componentecaracteristica
  *
  * @ORM\Table(name="inv_componentecaracteristica")
  * @ORM\Entity
+ * @GRID\Source(columns="id, componente.item.id, componente.item.nombre, componente.componentetipo.nombre, caracteristica.nombre, contenido")
  */
 class Componentecaracteristica
 {
@@ -21,6 +23,7 @@ class Componentecaracteristica
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Grid\Column(visible=false, field="id", title="ID")
      */
     private $id;
 
@@ -51,12 +54,16 @@ class Componentecaracteristica
     /**
      * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecaracteristicas")
      * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", visible=false, field="componente.item.id", title="Item ID")
+     * @Grid\Column(filter="select", field="componente.item.nombre", title="Item")
+     * @Grid\Column(filter="select", field="componente.componentetipo.nombre", title="Componente")
      */
     private $componente;
 
     /**
      * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="componentecaracteristicas")
      * @ORM\JoinColumn(name="caracteristica_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="caracteristica.nombre", title="Caracteristica")
      */
     private $caracteristica;
 

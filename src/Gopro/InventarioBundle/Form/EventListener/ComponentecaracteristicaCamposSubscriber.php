@@ -22,7 +22,7 @@ class ComponentecaracteristicaCamposSubscriber implements EventSubscriberInterfa
             $form->add('componente');
         }else{
             $form->add('componente',null,array(
-                'disabled'=> true
+                'read_only'=> true
             ));
         }
 

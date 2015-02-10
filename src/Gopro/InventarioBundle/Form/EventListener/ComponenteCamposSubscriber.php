@@ -22,7 +22,7 @@ class ComponenteCamposSubscriber implements EventSubscriberInterface
             $form->add('item');
         }else{
             $form->add('item',null,array(
-                'disabled'=> true
+                'read_only'=> true
             ));
         }
 

@@ -18,15 +18,15 @@
             </tr>
             <tr>
                 <th>Fecha de compra</th>
-                <td>{{ entity.fechacompra|date('Y-m-d') }}</td>
+                <td>{% if entity.fechacompra %}{{ entity.fechacompra|date('Y-m-d') }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Finde garantía</th>
-                <td>{{ entity.fechafingarantia|date('Y-m-d') }}</td>
+                <td>{% if entity.fechafingarantia %}{{ entity.fechafingarantia|date('Y-m-d') }}{% endif %}</td>
             </tr>
             <tr>
                 <th>Fecha de baja</th>
-                <td>{{ entity.fechabaja|date('Y-m-d') }}</td>
+                <td>{% if entity.fechabaja %}{{ entity.fechabaja|date('Y-m-d') }}{% endif %}</td>
             </tr>
         </tbody>
     </table>
@@ -82,6 +82,11 @@
         <li>
             <a class="boton" href="{{ path('gopro_inventario_componente_edit', { 'id': entity.id }) }}">
                 Editar
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_inventario_componente_new', { 'item_id': entity.item.id }) }}">
+                Agregar otro componente
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

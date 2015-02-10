@@ -98,7 +98,7 @@ class Componente
      */
     function __toString()
     {
-        return $this->getItem()->getNombre().'-'.$this->getComponentetipo()->getNombre();
+        return $this->getItem()->getNombre().' - '.$this->getComponentetipo()->getNombre();
     }
 
     /**
