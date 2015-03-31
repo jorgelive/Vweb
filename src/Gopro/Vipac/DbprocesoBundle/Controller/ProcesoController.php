@@ -95,10 +95,11 @@ class ProcesoController extends BaseController
 
         $resultados=array();
         foreach($fusion as $fusionPart):
-            if(!isset($resultados[$fusionPart['CENTRO_COSTO_PAIS']])){
-                $resultados[$fusionPart['CENTRO_COSTO_PAIS']]=0;
+            if(!isset($resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)])){
+
+                $resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]=0;
             }
-            $resultados[$fusionPart['CENTRO_COSTO_PAIS']]=$resultados[$fusionPart['CENTRO_COSTO_PAIS']]+$fusionPart['MONTO'];
+            $resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]=$resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]+$fusionPart['MONTO'];
         endforeach;
 
         $this->setMensajes($procesoArchivo->getMensajes());
