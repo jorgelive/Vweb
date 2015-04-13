@@ -703,24 +703,24 @@ class ProcesoController extends BaseController
         $serviciosHoteles->setCamposSelect([
             'ANO',
             'NUM_FILE_FISICO',
-            'NOM_FILE',
-            'NUM_PAX',
-            'COD_CONTACTO',
-            'NOM_CONTACTO',
-            'RAZON_SOCIAL',
+            //'NOM_FILE',
+            //'NUM_PAX',
+            //'COD_CONTACTO',
+            //'NOM_CONTACTO',
+            //'RAZON_SOCIAL',
             'COD_PAIS',
-            'NOM_PAIS',
-            'COD_MERCADO',
-            'NOMBRE_MERCADO',
+            //'NOM_PAIS',
+            //'COD_MERCADO',
+            //'NOMBRE_MERCADO',
             'CENTRO_COSTO',
             'COD_SERVICIO',
             'NOM_SERVICIO',
-            'IND_PRIVADO',
+            //'IND_PRIVADO',
             'COD_OPERADOR',
             'NOM_OPERADOR',
             'FEC_INICIO',
             'FEC_FIN',
-            'ESTADO',
+            //'ESTADO',
 	        'MONTO',
 	        'CUENTA'
         ]);
@@ -783,76 +783,76 @@ class ProcesoController extends BaseController
                 }
                 $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
                 $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
-                if(!empty($valor['DEBITO_DOLAR'])){
-                    $resultado[$i]['DEBITO_DOLAR']=$valor['DEBITO_DOLAR'];
-                }else{
-                    $resultado[$i]['DEBITO_DOLAR']='';
-                }
                 if(!empty($valor['DEBITO_LOCAL'])){
                     $resultado[$i]['DEBITO_LOCAL']=$valor['DEBITO_LOCAL'];
                 }else{
                     $resultado[$i]['DEBITO_LOCAL']='';
                 }
-                if(!empty($valor['CREDITO_DOLAR'])){
-                    $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
+                if(!empty($valor['DEBITO_DOLAR'])){
+                    $resultado[$i]['DEBITO_DOLAR']=$valor['DEBITO_DOLAR'];
                 }else{
-                    $resultado[$i]['CREDITO_DOLAR']='';
+                    $resultado[$i]['DEBITO_DOLAR']='';
                 }
                 if(!empty($valor['CREDITO_LOCAL'])){
                     $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
                 }else{
                     $resultado[$i]['CREDITO_LOCAL']='';
                 }
+                if(!empty($valor['CREDITO_DOLAR'])){
+                    $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
+                }else{
+                    $resultado[$i]['CREDITO_DOLAR']='';
+                }
                 $resultado[$i]['DOCUMENTO']=$valor['DOCUMENTO'];
                 $resultado[$i]['TIPO_DE_DOCUMENTO']=$valor['TIPO_DE_DOCUMENTO'];
                 if( $j == count($valor['items']) && count($valor['items']) != 1 ){
                     if(!empty($valor['CREDITO_DOLAR'])) {
-                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
                         $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = $valor['CREDITO_DOLAR'] - $this->getCantidadTotal('sumaCreditoDolares');
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
                         if (!empty($valor['CREDITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = $valor['CREDITO_LOCAL'] - $this->getCantidadTotal('sumaCreditoSoles');
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($valor['CREDITO_LOCAL'] - $this->getCantidadTotal('sumaCreditoSoles'),2);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] =round($valor['CREDITO_DOLAR'] - $this->getCantidadTotal('sumaCreditoDolares'),2);
+
                     }else{
-                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = $valor['DEBITO_DOLAR'] - $this->getCantidadTotal('sumaDebitoDolares');
                         if (!empty($valor['DEBITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = $valor['DEBITO_LOCAL'] - $this->getCantidadTotal('sumaDebitoSoles');
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($valor['DEBITO_LOCAL'] - $this->getCantidadTotal('sumaDebitoSoles'),2);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
                         }
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = '';
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = round($valor['DEBITO_DOLAR'] - $this->getCantidadTotal('sumaDebitoDolares'),2);
                         $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = '';
                     }
                 }else{
                     if(!empty($valor['CREDITO_DOLAR'])) {
-                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
                         $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = round($item['MONTO'] * $valor['coeficiente'],2);
-                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'], null, ['sumaCreditoDolares', null]);
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
+                        $prorrateoDolarCredito = round($item['MONTO'] * $valor['coeficiente'],2);
                         if (!empty($valor['CREDITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] * $valor['CREDITO_LOCAL'] / $valor['CREDITO_DOLAR'],2);
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($prorrateoDolarCredito * $valor['CREDITO_LOCAL'] / $valor['CREDITO_DOLAR'],2);
                             $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_CREDITO'], null, ['sumaCreditoSoles', null]);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
-
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = $prorrateoDolarCredito;
+                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'], null, ['sumaCreditoDolares', null]);
                     }else{
-                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = round($item['MONTO'] * $valor['coeficiente'],2);
-                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'], null, ['sumaDebitoDolares', null]);
+                        $prorrateoDolarDebito = round($item['MONTO'] * $valor['coeficiente'],2);
                         if (!empty($valor['DEBITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] * $valor['DEBITO_LOCAL'] / $valor['DEBITO_DOLAR'],2);
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($prorrateoDolarDebito * $valor['DEBITO_LOCAL'] / $valor['DEBITO_DOLAR'],2);
                             $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_DEBITO'], null, ['sumaDebitoSoles', null]);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO']='';
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = $prorrateoDolarDebito;
+                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'], null, ['sumaDebitoDolares', null]);
                         $resultado[$i]['PRORRATEADO_LOCAL_CREDITO']='';
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO']='';
                     }
-
                 }
-
                 $resultado[$i]['COEFICIENTE']=$valor['coeficiente'];
                 //
                 $i++;
