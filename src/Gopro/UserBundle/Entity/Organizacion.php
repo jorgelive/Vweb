@@ -186,11 +186,11 @@ class Organizacion
     /**
      * Remove dependencias
      *
-     * @param \Gopro\UserBundle\Entity\Dependencia $dependencias
+     * @param \Gopro\UserBundle\Entity\Dependencia $dependencia
      */
-    public function removeDependencia(\Gopro\UserBundle\Entity\Dependencia $dependencias)
+    public function removeDependencia(\Gopro\UserBundle\Entity\Dependencia $dependencia)
     {
-        $this->dependencias->removeElement($dependencias);
+        $this->dependencias->removeElement($dependencia);
     }
 
     /**

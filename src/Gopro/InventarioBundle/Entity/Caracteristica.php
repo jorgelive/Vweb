@@ -160,11 +160,11 @@ class Caracteristica
     /**
      * Remove componentecaracteristicas
      *
-     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
+     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica
      */
-    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
+    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica)
     {
-        $this->componentecaracteristicas->removeElement($componentecaracteristicas);
+        $this->componentecaracteristicas->removeElement($componentecaracteristica);
     }
 
     /**

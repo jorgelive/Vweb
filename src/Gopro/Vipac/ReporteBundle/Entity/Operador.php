@@ -33,7 +33,7 @@ class Operador
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Operador
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -157,11 +157,11 @@ class Operador
     /**
      * Remove tipos
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Tipo $tipo
      */
-    public function removeTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipos)
+    public function removeTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipo)
     {
-        $this->tipos->removeElement($tipos);
+        $this->tipos->removeElement($tipo);
     }
 
     /**

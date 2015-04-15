@@ -27,28 +27,28 @@ class Componente
     private $id;
 
     /**
-     * @var datetime $fechacompra
+     * @var \DateTime $fechacompra
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $fechacompra;
 
     /**
-     * @var datetime $fechafingarantia
+     * @var \DateTime$fechafingarantia
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $fechafingarantia;
 
     /**
-     * @var datetime $fechafingarantia
+     * @var \DateTime $fechafingarantia
      *
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $fechabaja;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -56,7 +56,7 @@ class Componente
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -85,12 +85,24 @@ class Componente
     private $componenteestado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="componente", cascade={"persist","remove"})
      */
     private $componentecaracteristicas;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Software",inversedBy="componentes")
+     * @ORM\JoinTable(name="inv_componente_software")
+     *
+     */
+    private $softwares;
+
     public function __construct() {
         $this->componentecaracteristicas = new ArrayCollection();
+        $this->softwares = new ArrayCollection();
     }
 
     /**
@@ -314,9 +326,9 @@ class Componente
      *
      * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
      */
-    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
+    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica)
     {
-        $this->componentecaracteristicas->removeElement($componentecaracteristicas);
+        $this->componentecaracteristicas->removeElement($componentecaracteristica);
     }
 
     /**
@@ -327,6 +339,39 @@ class Componente
     public function getComponentecaracteristicas()
     {
         return $this->componentecaracteristicas;
+    }
+
+    /**
+     * Add softwares
+     *
+     * @param \Gopro\InventarioBundle\Entity\Software $softwares
+     * @return Componente
+     */
+    public function addSoftware(\Gopro\InventarioBundle\Entity\Software $softwares)
+    {
+        $this->softwares[] = $softwares;
+
+        return $this;
+    }
+
+    /**
+     * Remove softwares
+     *
+     * @param \Gopro\InventarioBundle\Entity\Software $software
+     */
+    public function removeSoftware(\Gopro\InventarioBundle\Entity\Software $software)
+    {
+        $this->softwares->removeElement($software);
+    }
+
+    /**
+     * Get softwares
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSoftwares()
+    {
+        return $this->softwares;
     }
 
 }

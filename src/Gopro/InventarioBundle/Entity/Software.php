@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Componentetipo
+ * Software
  *
- * @ORM\Table(name="inv_componentetipo")
+ * @ORM\Table(name="inv_software")
  * @ORM\Entity
  */
-class Componentetipo
+class Software
 {
     /**
      * @var integer
@@ -33,7 +33,7 @@ class Componentetipo
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Componentetipo
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -49,7 +49,10 @@ class Componentetipo
     private $modificado;
 
     /**
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componentetipo", cascade={"persist"})
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Componente",mappedBy="softwares")
+     *
      */
     private $componentes;
 
@@ -65,7 +68,6 @@ class Componentetipo
         return $this->getNombre();
     }
 
-
     /**
      * Get id
      *
@@ -80,7 +82,7 @@ class Componentetipo
      * Set nombre
      *
      * @param string $nombre
-     * @return Componentetipo
+     * @return Software
      */
     public function setNombre($nombre)
     {
@@ -103,7 +105,7 @@ class Componentetipo
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Componentetipo
+     * @return Software
      */
     public function setCreado($creado)
     {
@@ -126,7 +128,7 @@ class Componentetipo
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Componentetipo
+     * @return Software
      */
     public function setModificado($modificado)
     {
@@ -146,20 +148,19 @@ class Componentetipo
     }
 
     /**
-     * Add componentes
+     * Add componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
-     * @return Componentetipo
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
+     * @return Software
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes[] = $componentes;
-
+        $componente->addSoftware($this);
         return $this;
     }
 
     /**
-     * Remove componentes
+     * Remove componente
      *
      * @param \Gopro\InventarioBundle\Entity\Componente $componente
      */
@@ -171,7 +172,7 @@ class Componentetipo
     /**
      * Get componentes
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getComponentes()
     {

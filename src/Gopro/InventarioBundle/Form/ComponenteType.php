@@ -31,7 +31,12 @@ class ComponenteType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => array('class' => 'datePicker-0--1')
             ))
-
+            ->add('softwares', 'entity', array(
+                'multiple' => true,   // Multiple selection allowed
+                'expanded' => true,   // Render as checkboxes
+                'property' => 'nombre', // Assuming that the entity has a "name" property
+                'class'    => 'Gopro\InventarioBundle\Entity\Software'
+            ))
             ->addEventSubscriber(new ComponenteCamposSubscriber());
         ;
     }

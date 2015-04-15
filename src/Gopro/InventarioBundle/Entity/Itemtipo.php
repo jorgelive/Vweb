@@ -161,11 +161,11 @@ class Itemtipo
     /**
      * Remove items
      *
-     * @param \Gopro\InventarioBundle\Entity\Item $items
+     * @param \Gopro\InventarioBundle\Entity\Item $item
      */
-    public function removeItem(\Gopro\InventarioBundle\Entity\Item $items)
+    public function removeItem(\Gopro\InventarioBundle\Entity\Item $item)
     {
-        $this->items->removeElement($items);
+        $this->items->removeElement($item);
     }
 
     /**

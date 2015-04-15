@@ -315,11 +315,11 @@ class Servicio
     /**
      * Remove servicioacciones
      *
-     * @param \Gopro\InventarioBundle\Entity\Servicioaccion $servicioacciones
+     * @param \Gopro\InventarioBundle\Entity\Servicioaccion $servicioaccion
      */
-    public function removeServicioaccion(\Gopro\InventarioBundle\Entity\Servicioaccion $servicioacciones)
+    public function removeServicioaccion(\Gopro\InventarioBundle\Entity\Servicioaccion $servicioaccion)
     {
-        $this->servicioacciones->removeElement($servicioacciones);
+        $this->servicioacciones->removeElement($servicioaccion);
     }
 
     /**

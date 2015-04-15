@@ -32,7 +32,7 @@ class Tipo
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -40,7 +40,7 @@ class Tipo
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -54,7 +54,7 @@ class Tipo
 
     /**
      * @ORM\ManyToMany(targetEntity="Operador", inversedBy="tipos")
-     * @ORM\JoinTable(name="rep_tipos_operadores")
+     * @ORM\JoinTable(name="rep_tipo_operador")
      */
     private $operadores;
 
@@ -163,11 +163,11 @@ class Tipo
     /**
      * Remove campos
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      */
-    public function removeCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campos)
+    public function removeCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campo)
     {
-        $this->campos->removeElement($campos);
+        $this->campos->removeElement($campo);
     }
 
     /**
@@ -198,9 +198,9 @@ class Tipo
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operadores
      */
-    public function removeOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
+    public function removeOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operador)
     {
-        $this->operadores->removeElement($operadores);
+        $this->operadores->removeElement($operador);
     }
 
     /**

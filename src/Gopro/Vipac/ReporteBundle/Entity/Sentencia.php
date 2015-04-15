@@ -39,14 +39,14 @@ class Sentencia
     private $descripcion;
 
     /**
-     * @var text
+     * @var string
      * @Assert\NotBlank
      * @ORM\Column(name="contenido", type="text")
      */
     private $contenido;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -54,7 +54,7 @@ class Sentencia
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -63,7 +63,7 @@ class Sentencia
 
     /**
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
-     * @ORM\JoinTable(name="rep_sentencias_areas")
+     * @ORM\JoinTable(name="rep_sentencia_area")
      *
      */
     protected $areas;
@@ -232,9 +232,9 @@ class Sentencia
      *
      * @param \Gopro\UserBundle\Entity\Area $areas
      */
-    public function removeArea(\Gopro\UserBundle\Entity\Area $areas)
+    public function removeArea(\Gopro\UserBundle\Entity\Area $area)
     {
-        $this->areas->removeElement($areas);
+        $this->areas->removeElement($area);
     }
 
     /**
@@ -263,11 +263,11 @@ class Sentencia
     /**
      * Remove campos
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      */
-    public function removeCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campos)
+    public function removeCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campo)
     {
-        $this->campos->removeElement($campos);
+        $this->campos->removeElement($campo);
     }
 
     /**
@@ -294,13 +294,13 @@ class Sentencia
     }
 
     /**
-     * Remove parametros
+     * Remove parametro
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros
      */
-    public function removeParametro(\Gopro\Vipac\ReporteBundle\Entity\Parametro $parametros)
+    public function removeParametro(\Gopro\Vipac\ReporteBundle\Entity\Parametro $parametro)
     {
-        $this->parametros->removeElement($parametros);
+        $this->parametros->removeElement($parametro);
     }
 
     /**

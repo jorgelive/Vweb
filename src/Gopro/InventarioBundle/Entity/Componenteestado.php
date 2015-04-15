@@ -161,11 +161,11 @@ class Componenteestado
     /**
      * Remove componentes
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
      */
-    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes->removeElement($componentes);
+        $this->componentes->removeElement($componente);
     }
 
     /**

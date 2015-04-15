@@ -173,11 +173,11 @@ class Dependencia
     /**
      * Remove users
      *
-     * @param \Gopro\UserBundle\Entity\User $users
+     * @param \Gopro\UserBundle\Entity\User $user
      */
-    public function removeUser(\Gopro\UserBundle\Entity\User $users)
+    public function removeUser(\Gopro\UserBundle\Entity\User $user)
     {
-        $this->users->removeElement($users);
+        $this->users->removeElement($user);
     }
 
     /**
