@@ -25,6 +25,7 @@ class Parametro
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=50)
      */
@@ -32,6 +33,7 @@ class Parametro
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="contenido", type="text")
      */
@@ -61,22 +63,28 @@ class Parametro
     private $modificado;
 
     /**
+     * @var \Gopro\Vipac\ReporteBundle\Entity\Sentencia
+     *
      * @ORM\ManyToOne(targetEntity="Sentencia", inversedBy="parametros")
      * @ORM\JoinColumn(name="sentencia_id", referencedColumnName="id", nullable=false)
      */
     private $sentencia;
 
     /**
+     * @var \Gopro\UserBundle\Entity\User
+     *
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->nombre;
     }
-
 
     /**
      * Get id

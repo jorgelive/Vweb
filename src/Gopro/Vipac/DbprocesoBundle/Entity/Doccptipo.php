@@ -13,6 +13,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class Doccptipo
 {
     /**
+     * @var integer
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -20,59 +22,81 @@ class Doccptipo
     private $id;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=30)
      * @Assert\NotBlank
      */
     private $nombre;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=5)
      * @Assert\NotBlank
      */
     private $tipo;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=3)
      * @Assert\NotBlank
      */
     private $subtipo;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $subtotal;
 
     /**
+     * @var bool
+     *
      * @ORM\Column(type="boolean")
      */
     private $impuesto1;
 
     /**
+     * @var bool
+     *
      * @ORM\Column(type="boolean")
      */
     private $impuesto2;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $rubro1;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=30, nullable=true)
      */
     private $rubro2;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $retencion;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $codretencion;
 
     /**
+     * @var integer
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
 
@@ -81,7 +105,7 @@ class Doccptipo
 
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -89,7 +113,7 @@ class Doccptipo
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")

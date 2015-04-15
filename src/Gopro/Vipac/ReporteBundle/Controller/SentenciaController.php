@@ -376,7 +376,7 @@ class SentenciaController extends BaseController
                         (
                             empty($campos[$filtro['campo']])
                             || empty($operadores[$filtro['campo']][$filtro['operador']])
-                            || empty($filtro['valor'])
+                            || (empty($filtro['valor']) && !is_numeric($filtro['valor']))
                         ) && $filtro['operador'] != 9
                     ){
                         $this->setMensajes('El filtro de la fila '.$i.' no es válido.');

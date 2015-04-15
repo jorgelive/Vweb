@@ -18,6 +18,8 @@ class Organizacion
 {
 
     /**
+     * @var integer
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -25,30 +27,40 @@ class Organizacion
     protected $id;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank
      */
     private $nombre;
 
     /**
+     * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(type="string", length=11, unique=true)
      */
     private $ruc;
 
     /**
+     * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(type="string", length=100)
      */
     private $email;
 
     /**
+     * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(type="string", length=200)
      */
     private $direccion;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Dependencia", mappedBy="organizacion", cascade={"persist"})
      */
     protected $dependencias;
@@ -203,6 +215,9 @@ class Organizacion
         return $this->dependencias;
     }
 
+    /**
+     * @return string
+     */
     function __toString()
     {
         return $this->getNombre();

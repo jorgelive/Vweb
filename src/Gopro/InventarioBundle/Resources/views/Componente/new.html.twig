@@ -2,9 +2,10 @@
 {% block title %}Nuevo componente{% endblock title %}
 {% block titulo %}Nuevo componente{% endblock titulo %}
 {% block content %}
+    {% form_theme form 'GoproMainBundle:Form:standard.html.twig' %}
     {{ form(form) }}
     <ul class="listaAcciones">
-        {% if form.vars.value.item.id %}
+        {% if form.vars.value.item %}
             <li>
                 <a class="boton" href="{{ path('gopro_inventario_item_show', { 'id': form.vars.value.item.id }) }}">
                     Ir al item
@@ -20,3 +21,5 @@
 
     </ul>
 {% endblock content %}
+
+

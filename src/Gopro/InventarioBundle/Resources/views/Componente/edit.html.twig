@@ -2,7 +2,7 @@
 {% block title %}Actualizar componente{% endblock title %}
 {% block titulo %}Actualizar componente{% endblock titulo %}
 {% block content %}
-    {% form_theme edit_form _self %}
+    {% form_theme edit_form 'GoproMainBundle:Form:standard.html.twig' %}
     {{ form(edit_form) }}
     <ul class="registroAcciones">
         {% if edit_form.vars.value.item.id %}
@@ -21,17 +21,3 @@
         <li>{{ form(delete_form) }}</li>
     </ul>
 {% endblock content %}
-
-{% block choice_widget_expanded %}
-    {% spaceless %}
-        <div {{ block('widget_container_attributes') }}>
-
-            {% for child in form %}
-                <div class="opcionMultipleExpandida">
-                    {{ form_label(child) }}
-                    {{ form_widget(child) }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endspaceless %}
-{% endblock choice_widget_expanded %}

@@ -36,7 +36,7 @@ class Componentecaracteristica
     private $contenido;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -44,7 +44,7 @@ class Componentecaracteristica
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -52,6 +52,8 @@ class Componentecaracteristica
     private $modificado;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Componente
+     *
      * @ORM\ManyToOne(targetEntity="Componente", inversedBy="componentecaracteristicas")
      * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", visible=false, field="componente.item.id", title="Item ID")
@@ -61,6 +63,8 @@ class Componentecaracteristica
     private $componente;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Caracteristica
+     *
      * @ORM\ManyToOne(targetEntity="Caracteristica", inversedBy="componentecaracteristicas")
      * @ORM\JoinColumn(name="caracteristica_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="caracteristica.nombre", title="Caracteristica")

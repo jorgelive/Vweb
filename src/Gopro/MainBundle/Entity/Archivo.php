@@ -36,7 +36,7 @@ class Archivo
     private $operacion;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -44,7 +44,7 @@ class Archivo
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -52,6 +52,8 @@ class Archivo
     private $modificado;
 
     /**
+     * @var \Gopro\UserBundle\Entity\User
+     *
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
@@ -62,6 +64,9 @@ class Archivo
      */
     private $archivo;
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->nombre;

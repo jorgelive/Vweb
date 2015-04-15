@@ -13,7 +13,7 @@ use APY\DataGridBundle\Grid\Mapping as GRID;
  *
  * @ORM\Table(name="inv_componente")
  * @ORM\Entity
- * @GRID\Source(columns="id, item.nombre, componentetipo.nombre, componenteestado.nombre")
+ * @GRID\Source(columns="id, item.id, item.nombre, componentetipo.nombre, componenteestado.nombre, fechacompra, fechafingarantia, componentecaracteristicas.contenido:Group_Concat:Distinct, softwares.nombre:Group_Concat:Distinct", groupBy={"id", "item.nombre"})
  */
 class Componente
 {
@@ -30,6 +30,7 @@ class Componente
      * @var \DateTime $fechacompra
      *
      * @ORM\Column(type="datetime", nullable=true)
+     * @Grid\Column(field="fechacompra", title="Compra", format="Y-m-d")
      */
     private $fechacompra;
 
@@ -37,6 +38,7 @@ class Componente
      * @var \DateTime$fechafingarantia
      *
      * @ORM\Column(type="datetime", nullable=true)
+     * @Grid\Column(field="fechafingarantia", title="Garantía", format="Y-m-d")
      */
     private $fechafingarantia;
 
@@ -64,13 +66,18 @@ class Componente
     private $modificado;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Item
+     *
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="componentes")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(field="item.nombre", title="Item")
+     * @Grid\Column(filter="select", visible=false, field="item.id", title="Item ID")
      */
     private $item;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Componentetipo
+     *
      * @ORM\ManyToOne(targetEntity="Componentetipo", inversedBy="componentes")
      * @ORM\JoinColumn(name="componentetipo_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="componentetipo.nombre", title="Tipo")
@@ -78,6 +85,8 @@ class Componente
     private $componentetipo;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Componenteestado
+     *
      * @ORM\ManyToOne(targetEntity="Componenteestado", inversedBy="componentes")
      * @ORM\JoinColumn(name="componenteestado_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="componenteestado.nombre", title="Estado")
@@ -88,6 +97,7 @@ class Componente
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="componente", cascade={"persist","remove"})
+     * @GRID\Column(field="componentecaracteristicas.contenido:Group_Concat:Distinct", title="Caracteristicas", filterable=false)
      */
     private $componentecaracteristicas;
 
@@ -96,7 +106,7 @@ class Componente
      *
      * @ORM\ManyToMany(targetEntity="Software",inversedBy="componentes")
      * @ORM\JoinTable(name="inv_componente_software")
-     *
+     * @GRID\Column(field="softwares.nombre:Group_Concat:Distinct", title="Software", filterable=false)
      */
     private $softwares;
 

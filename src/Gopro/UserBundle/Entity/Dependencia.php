@@ -18,6 +18,8 @@ class Dependencia
 {
 
     /**
+     * @var integer
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -25,27 +27,37 @@ class Dependencia
     protected $id;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank
      */
     private $nombre;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $email;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=200, nullable=true)
      */
     private $direccion;
 
     /**
+     * @var \Gopro\UserBundle\Entity\Organizacion
+     *
      * @ORM\ManyToOne(targetEntity="Organizacion", inversedBy="dependencias")
      */
     protected $organizacion;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="User", mappedBy="dependencia")
      */
     protected $users;
@@ -190,6 +202,9 @@ class Dependencia
         return $this->users;
     }
 
+    /**
+     * @return string
+     */
     function __toString()
     {
         return $this->getNombre();

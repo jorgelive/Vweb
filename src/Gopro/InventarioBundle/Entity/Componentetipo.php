@@ -33,7 +33,7 @@ class Componentetipo
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Componentetipo
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -49,6 +49,8 @@ class Componentetipo
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Componente", mappedBy="componentetipo", cascade={"persist"})
      */
     private $componentes;
@@ -64,7 +66,6 @@ class Componentetipo
     {
         return $this->getNombre();
     }
-
 
     /**
      * Get id

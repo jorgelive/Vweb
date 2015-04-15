@@ -18,6 +18,8 @@ class Area
 {
 
     /**
+     * @var integer
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -25,12 +27,16 @@ class Area
     protected $id;
 
     /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=100)
      * @Assert\NotBlank
      */
     private $nombre;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="User", mappedBy="area")
      */
     protected $users;

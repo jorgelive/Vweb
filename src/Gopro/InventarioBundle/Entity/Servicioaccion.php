@@ -33,7 +33,7 @@ class Servicioaccion
     private $contenido;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Servicioaccion
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -49,6 +49,8 @@ class Servicioaccion
     private $modificado;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Servicio
+     *
      * @ORM\ManyToOne(targetEntity="Servicio", inversedBy="servicioacciones")
      * @ORM\JoinColumn(name="servicio_id", referencedColumnName="id", nullable=false)
      */
@@ -61,7 +63,6 @@ class Servicioaccion
     {
         return $this->getContenido();
     }
-
 
     /**
      * Get id

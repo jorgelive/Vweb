@@ -25,6 +25,7 @@ class Campo
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=50)
      */
@@ -32,6 +33,7 @@ class Campo
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombremostrar", type="string", length=100)
      */
@@ -61,12 +63,16 @@ class Campo
     private $modificado;
 
     /**
+     * @var \Gopro\Vipac\ReporteBundle\Entity\Sentencia
+     *
      * @ORM\ManyToOne(targetEntity="Sentencia", inversedBy="campos")
      * @ORM\JoinColumn(name="sentencia_id", referencedColumnName="id", nullable=false)
      */
     private $sentencia;
 
     /**
+     * @var \Gopro\Vipac\ReporteBundle\Entity\Tipo
+     *
      * @ORM\ManyToOne(targetEntity="Tipo", inversedBy="campos")
      * @ORM\JoinColumn(name="tipo_id", referencedColumnName="id", nullable=true)
      */

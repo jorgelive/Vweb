@@ -29,7 +29,7 @@ class Moneda
     private $codigo;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -37,13 +37,16 @@ class Moneda
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
      */
     private $modificado;
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->getNombre();

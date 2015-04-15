@@ -27,6 +27,7 @@ class Operador
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=50)
      */
@@ -49,6 +50,8 @@ class Operador
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="Tipo", mappedBy="operadores")
      */
     private $tipos;
@@ -57,6 +60,9 @@ class Operador
         $this->tipos = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->nombre;

@@ -26,6 +26,7 @@ class Tipo
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=100)
      */
@@ -48,11 +49,15 @@ class Tipo
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Campo", mappedBy="tipo", cascade={"persist"})
      */
     private $campos;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="Operador", inversedBy="tipos")
      * @ORM\JoinTable(name="rep_tipo_operador")
      */
@@ -63,6 +68,9 @@ class Tipo
         $this->campos = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->nombre;

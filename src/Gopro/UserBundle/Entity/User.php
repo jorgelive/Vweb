@@ -15,6 +15,8 @@ class User extends BaseUser
 {
 
     /**
+     * @var integer
+     *
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -22,11 +24,15 @@ class User extends BaseUser
     protected $id;
 
     /**
+     * @var \Gopro\UserBundle\Entity\Dependencia
+     *
      * @ORM\ManyToOne(targetEntity="Dependencia", inversedBy="users")
      */
     protected $dependencia;
 
     /**
+     * @var \Gopro\UserBundle\Entity\Area
+     *
      * @ORM\ManyToOne(targetEntity="Area", inversedBy="users")
      */
     protected $area;

@@ -46,7 +46,7 @@ class Servicio
     private $fecha;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -54,7 +54,7 @@ class Servicio
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -62,6 +62,8 @@ class Servicio
     private $modificado;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Item
+     *
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="servicios")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(field="item.nombre", title="Item")
@@ -69,6 +71,8 @@ class Servicio
     private $item;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Serviciotipo
+     *
      * @ORM\ManyToOne(targetEntity="Serviciotipo", inversedBy="servicios")
      * @ORM\JoinColumn(name="serviciotipo_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="serviciotipo.nombre", title="Tipo")
@@ -76,6 +80,8 @@ class Servicio
     private $serviciotipo;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Servicioestado
+     *
      * @ORM\ManyToOne(targetEntity="Servicioestado", inversedBy="servicios")
      * @ORM\JoinColumn(name="servicioestado_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="servicioestado.nombre", title="Estado")
@@ -83,12 +89,16 @@ class Servicio
     private $servicioestado;
 
     /**
+     * @var \Gopro\UserBundle\Entity\User
+     *
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Servicioaccion", mappedBy="servicio", cascade={"persist","remove"})
      */
     private $servicioacciones;

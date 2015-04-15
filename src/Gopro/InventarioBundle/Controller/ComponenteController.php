@@ -46,6 +46,17 @@ class ComponenteController extends BaseController
         $editarAction = new RowAction('editar', 'gopro_inventario_componente_edit');
         $editarAction->setRouteParameters(array('id'));
         $grid->addRowAction($editarAction);
+
+        $mostrarItemAction = new RowAction('mostrar item', 'gopro_inventario_item_show');
+        $mostrarItemAction->setRouteParameters(array('item.id'));
+        $mostrarItemAction->setRouteParametersMapping(array('item.id' => 'id'));
+        $grid->addRowAction($mostrarItemAction);
+
+        $editarItemAction = new RowAction('editar item', 'gopro_inventario_item_edit');
+        $editarItemAction->setRouteParameters(array('item.id'));
+        $editarItemAction->setRouteParametersMapping(array('item.id' => 'id'));
+        $grid->addRowAction($editarItemAction);
+
         $grid->setSource($source);
 
         return $grid->getGridResponse();

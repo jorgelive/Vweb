@@ -4,7 +4,7 @@
 {% block content %}
     {{ form(form) }}
     <ul class="listaAcciones">
-        {% if form.vars.value.componente.id %}
+        {% if form.vars.value.componente %}
             <li>
                 <a class="boton" href="{{ path('gopro_inventario_componente_show', { 'id': form.vars.value.componente.id }) }}">
                     Ir al componente

@@ -26,6 +26,7 @@ class Sentencia
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="nombre", type="string", length=100)
      */
@@ -33,6 +34,7 @@ class Sentencia
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="descripcion", type="string", length=255)
      */
@@ -40,6 +42,7 @@ class Sentencia
 
     /**
      * @var string
+     *
      * @Assert\NotBlank
      * @ORM\Column(name="contenido", type="text")
      */
@@ -62,6 +65,8 @@ class Sentencia
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
      * @ORM\JoinTable(name="rep_sentencia_area")
      *
@@ -69,11 +74,15 @@ class Sentencia
     protected $areas;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist","remove"})
      */
     private $campos;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Parametro", mappedBy="sentencia", cascade={"persist","remove"})
      */
     private $parametros;
@@ -84,6 +93,9 @@ class Sentencia
         $this->parametros = new ArrayCollection();
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->nombre;

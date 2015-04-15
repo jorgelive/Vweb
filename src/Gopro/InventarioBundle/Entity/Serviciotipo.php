@@ -34,6 +34,8 @@ class Serviciotipo
     private $nombre;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Servicio", mappedBy="serviciotipo", cascade={"persist"})
      */
     private $servicios;

@@ -35,7 +35,7 @@ class Servicioestado
 
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -43,7 +43,7 @@ class Servicioestado
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -51,6 +51,8 @@ class Servicioestado
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Servicio", mappedBy="servicioestado", cascade={"persist"})
      */
     private $servicios;
@@ -66,7 +68,6 @@ class Servicioestado
     {
         return $this->getNombre();
     }
-
 
     /**
      * Get id

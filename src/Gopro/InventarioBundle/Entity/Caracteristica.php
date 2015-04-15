@@ -33,7 +33,7 @@ class Caracteristica
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -41,7 +41,7 @@ class Caracteristica
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -49,6 +49,8 @@ class Caracteristica
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="caracteristica", cascade={"persist"})
      */
     private $componentecaracteristicas;

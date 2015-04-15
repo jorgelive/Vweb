@@ -41,7 +41,7 @@ class Item
     private $nombre;
 
     /**
-     * @var datetime $creado
+     * @var \DateTime $creado
      *
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
@@ -49,7 +49,7 @@ class Item
     private $creado;
 
     /**
-     * @var datetime $modificado
+     * @var \DateTime $modificado
      *
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
@@ -57,17 +57,23 @@ class Item
     private $modificado;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Componente", mappedBy="item", cascade={"persist","remove"})
      */
     private $componentes;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
      * @ORM\JoinTable(name="inv_items_areas")
      */
     private $areas;
 
     /**
+     * @var \Gopro\UserBundle\Entity\Dependencia
+     *
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Dependencia")
      * @ORM\JoinColumn(name="dependencia_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="dependencia.nombre", title="Ubicacíón")
@@ -75,6 +81,8 @@ class Item
     private $dependencia;
 
     /**
+     * @var \Gopro\InventarioBundle\Entity\Itemtipo
+     *
      * @ORM\ManyToOne(targetEntity="Itemtipo", inversedBy="items")
      * @ORM\JoinColumn(name="itemtipo_id", referencedColumnName="id", nullable=false)
      * @Grid\Column(filter="select", field="itemtipo.nombre", title="Tipo")
@@ -82,6 +90,8 @@ class Item
     private $itemtipo;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\User")
      * @ORM\JoinTable(name="inv_items_users")
      *
@@ -89,6 +99,8 @@ class Item
     private $users;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\OneToMany(targetEntity="Servicio", mappedBy="item", cascade={"persist","remove"})
      */
     private $servicios;
@@ -107,7 +119,6 @@ class Item
     {
         return $this->getNombre();
     }
-
 
     /**
      * Get id
