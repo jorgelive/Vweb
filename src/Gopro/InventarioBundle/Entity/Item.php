@@ -67,7 +67,7 @@ class Item
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
-     * @ORM\JoinTable(name="inv_items_areas")
+     * @ORM\JoinTable(name="inv_item_area")
      */
     private $areas;
 
@@ -93,7 +93,7 @@ class Item
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="inv_items_users")
+     * @ORM\JoinTable(name="inv_item_user")
      *
      */
     private $users;

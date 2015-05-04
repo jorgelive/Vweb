@@ -1,0 +1,6 @@
+services:
+    gopro_inventario.admin.item:
+        class: Gopro\InventarioBundle\Admin\ItemAdmin
+        arguments: [~, Gopro\InventarioBundle\Entity\Item, GoproInventarioBundle:ItemAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Inventario, label: Items}

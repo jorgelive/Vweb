@@ -3,6 +3,7 @@
 namespace Gopro\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Sonata\UserBundle\Entity\BaseUser as BaseUser;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * User
@@ -36,6 +37,17 @@ class User extends BaseUser
      * @ORM\ManyToOne(targetEntity="Area", inversedBy="users")
      */
     protected $area;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\OneToMany(targetEntity="Cuenta", mappedBy="user", cascade={"persist"})
+     */
+    private $cuentas;
+
+    public function __construct() {
+        $this->cuentas = new ArrayCollection();
+    }
 
 
     /**
@@ -103,6 +115,39 @@ class User extends BaseUser
     public function getNombre()
     {
         return $this->getFirstname().' '.$this->getLastname();
+    }
+
+    /**
+     * Add cuenta
+     *
+     * @param \Gopro\UserBundle\Entity\Cuenta $cuentas
+     * @return User
+     */
+    public function addCuenta(\Gopro\UserBundle\Entity\Cuenta $cuentas)
+    {
+        $this->cuentas[] = $cuentas;
+
+        return $this;
+    }
+
+    /**
+     * Remove cuenta
+     *
+     * @param \Gopro\UserBundle\Entity\Cuenta $cuenta
+     */
+    public function removeCuenta(\Gopro\UserBundle\Entity\Cuenta $cuenta)
+    {
+        $this->cuentas->removeElement($cuenta);
+    }
+
+    /**
+     * Get cuentas
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCuentas()
+    {
+        return $this->cuentas;
     }
 
 

@@ -29,6 +29,6 @@ class UserAdmin extends SonataUserAdmin
                 'multiple' => false,'label' => 'Area'
             ))
             ->end()
-    ;
+        ;
     }
 }
