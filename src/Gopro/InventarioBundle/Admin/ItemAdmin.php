@@ -18,9 +18,11 @@ class ItemAdmin extends Admin
         $datagridMapper
             ->add('id')
             ->add('nombre')
-            ->add('codigo')
+            ->add('codigo', null, array('label' => 'Código'))
             ->add('dependencia')
-            ->add('itemtipo')
+            ->add('itemtipo', null, array('label' => 'Tipo'))
+            ->add('users', null, array('label' => 'Usuarios'))
+            ->add('areas', null, array('label' => 'Areas'))
         ;
     }
 
@@ -32,8 +34,11 @@ class ItemAdmin extends Admin
         $listMapper
             ->add('id')
             ->add('nombre', null, array('editable' => true))
-            ->add('codigo', null, array('editable' => true))
+            ->add('codigo', null, array('label' => 'Código', 'editable' => true))
             ->add('dependencia', null, array('editable' => true))
+            ->add('itemtipo', null, array('label' => 'Tipo', 'editable' => true))
+            ->add('users', 'sonata_type_model', array('label' => 'Usuarios', 'associated_tostring' => 'getUserName'))
+            ->add('areas', 'sonata_type_model', array('label' => 'Areas', 'associated_tostring' => 'getNombre'))
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'show' => array(),
@@ -51,18 +56,31 @@ class ItemAdmin extends Admin
     {
         $formMapper
             ->add('nombre')
-            ->add('codigo')
+            ->add('codigo', null, array('label' => 'Código'))
             ->add('dependencia')
-            ->add('itemtipo')
+            ->add('itemtipo', null, array('label' => 'Tipo'))
             ->add('areas', 'sonata_type_model', array(
-                'expanded' => true,
-                'by_reference' => false,
-                'multiple' => true))
-            ->add('users', 'sonata_type_collection', array(),array(
-                    'edit' => 'inline',
-                    'inline' => 'table'
+                    'expanded' => false,
+                    'multiple' => true,
+                    'required' => false
                 )
             )
+            ->add('users', 'sonata_type_model', array(
+                    'expanded' => false,
+                    'multiple' => true,
+                    'required' => false
+                )
+            )
+            ->add('componentes','sonata_type_model', array(
+                'expanded' => false,
+                'multiple' => true,
+                'required' => false
+            ))
+            //->add('users', 'sonata_type_collection', array(),array(
+            //        'edit' => 'inline',
+            //        'inline' => 'table'
+            //    )
+            //)
         ;
     }
 
@@ -76,6 +94,8 @@ class ItemAdmin extends Admin
             ->add('nombre')
             ->add('dependencia')
             ->add('itemtipo')
+            ->add('users', 'sonata_type_model', array('label' => 'Usuarios', 'associated_tostring' => 'getUserName'))
+            ->add('areas', 'sonata_type_model', array('label' => 'Areas', 'associated_tostring' => 'getNombre'))
         ;
     }
 }

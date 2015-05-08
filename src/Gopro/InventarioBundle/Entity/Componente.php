@@ -120,6 +120,9 @@ class Componente
      */
     function __toString()
     {
+        if(empty($this->getItem()) || empty($this->getComponentetipo())){
+            return null;
+        }
         return $this->getItem()->getNombre().' - '.$this->getComponentetipo()->getNombre();
     }
 

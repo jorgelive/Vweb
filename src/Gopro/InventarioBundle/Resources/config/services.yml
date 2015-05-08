@@ -4,3 +4,13 @@ services:
         arguments: [~, Gopro\InventarioBundle\Entity\Item, GoproInventarioBundle:ItemAdmin]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Items}
+    gopro_inventario.admin.componente:
+        class: Gopro\InventarioBundle\Admin\ComponenteAdmin
+        arguments: [~, Gopro\InventarioBundle\Entity\Componente, GoproInventarioBundle:ComponenteAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Inventario, label: Componentes}
+    gopro_inventario.admin.software:
+            class: Gopro\InventarioBundle\Admin\SoftwareAdmin
+            arguments: [~, Gopro\InventarioBundle\Entity\Software, GoproInventarioBundle:SoftwareAdmin]
+            tags:
+                - {name: sonata.admin, manager_type: orm, group: Inventario, label: Software}
