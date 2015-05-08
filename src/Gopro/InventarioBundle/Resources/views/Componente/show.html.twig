@@ -43,18 +43,18 @@
         </tr>
         </thead>
         <tbody>
-        {% for componentecaracteristica in entity.componentecaracteristicas %}
+        {% for caracteristica in entity.caracteristicas %}
             <tr>
-                <td>{{ componentecaracteristica.id }}</td>
-                <td>{{ componentecaracteristica.caracteristica.nombre }}</td>
-                <td>{{ componentecaracteristica.contenido }}</td>
+                <td>{{ caracteristica.id }}</td>
+                <td>{{ caracteristica.caracteristicatipo.nombre }}</td>
+                <td>{{ caracteristica.contenido }}</td>
                 <td>
                     <ul>
                         <li>
-                            <a href="{{ path('gopro_inventario_componentecaracteristica_show', { 'id': componentecaracteristica.id }) }}">mostrar</a>
+                            <a href="{{ path('gopro_inventario_caracteristica_show', { 'id': caracteristica.id }) }}">mostrar</a>
                         </li>
                         <li>
-                            <a href="{{ path('gopro_inventario_componentecaracteristica_edit', { 'id': componentecaracteristica.id }) }}">editar</a>
+                            <a href="{{ path('gopro_inventario_caracteristica_edit', { 'id': caracteristica.id }) }}">editar</a>
                         </li>
                     </ul>
                 </td>
@@ -65,7 +65,7 @@
 
     <ul class="listaAcciones">
         <li>
-            <a class="boton" href="{{ path('gopro_inventario_componentecaracteristica_new', { 'componente_id': entity.id }) }}">
+            <a class="boton" href="{{ path('gopro_inventario_caracteristica_new', { 'componente_id': entity.id }) }}">
                 Agregar caracteristica
             </a>
         </li>

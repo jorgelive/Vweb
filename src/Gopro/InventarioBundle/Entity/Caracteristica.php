@@ -5,13 +5,14 @@ namespace Gopro\InventarioBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Doctrine\Common\Collections\ArrayCollection;
+use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Caracteristica
  *
  * @ORM\Table(name="inv_caracteristica")
  * @ORM\Entity
+ * @GRID\Source(columns="id, componente.item.id, componente.item.nombre, componente.componentetipo.nombre, caracteristicatipo.nombre, contenido")
  */
 class Caracteristica
 {
@@ -21,16 +22,17 @@ class Caracteristica
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Grid\Column(visible=false, field="id", title="ID")
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=100)
+     * @ORM\Column(name="contenido", type="string", length=100)
      * @Assert\NotBlank
      */
-    private $nombre;
+    private $contenido;
 
     /**
      * @var \DateTime $creado
@@ -49,23 +51,33 @@ class Caracteristica
     private $modificado;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Gopro\InventarioBundle\Entity\Componente
      *
-     * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="caracteristica", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Componente", inversedBy="caracteristicas")
+     * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", visible=false, field="componente.item.id", title="Item ID")
+     * @Grid\Column(filter="select", field="componente.item.nombre", title="Item")
+     * @Grid\Column(filter="select", field="componente.componentetipo.nombre", title="Componente")
      */
-    private $componentecaracteristicas;
+    private $componente;
 
-    public function __construct() {
-        $this->componentecaracteristicas = new ArrayCollection();
-    }
+    /**
+     * @var \Gopro\InventarioBundle\Entity\Caracteristicatipo
+     *
+     * @ORM\ManyToOne(targetEntity="Caracteristicatipo", inversedBy="caracteristicas")
+     * @ORM\JoinColumn(name="caracteristicatipo_id", referencedColumnName="id", nullable=false)
+     * @Grid\Column(filter="select", field="caracteristicatipo.nombre", title="Caracteristicatipo")
+     */
+    private $caracteristicatipo;
 
     /**
      * @return string
      */
     function __toString()
     {
-        return $this->getNombre();
+        return $this->getContenido();
     }
+
 
     /**
      * Get id
@@ -78,26 +90,26 @@ class Caracteristica
     }
 
     /**
-     * Set nombre
+     * Set contenido
      *
-     * @param string $nombre
+     * @param string $contenido
      * @return Caracteristica
      */
-    public function setNombre($nombre)
+    public function setContenido($contenido)
     {
-        $this->nombre = $nombre;
+        $this->contenido = $contenido;
 
         return $this;
     }
 
     /**
-     * Get nombre
+     * Get contenido
      *
      * @return string 
      */
-    public function getNombre()
+    public function getContenido()
     {
-        return $this->nombre;
+        return $this->contenido;
     }
 
     /**
@@ -147,35 +159,49 @@ class Caracteristica
     }
 
     /**
-     * Add componentecaracteristicas
+     * Set componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
      * @return Caracteristica
      */
-    public function addComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
+    public function setComponente(\Gopro\InventarioBundle\Entity\Componente $componente = null)
     {
-        $this->componentecaracteristicas[] = $componentecaracteristicas;
+        $this->componente = $componente;
 
         return $this;
     }
 
     /**
-     * Remove componentecaracteristicas
+     * Get componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica
+     * @return \Gopro\InventarioBundle\Entity\Componente 
      */
-    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica)
+    public function getComponente()
     {
-        $this->componentecaracteristicas->removeElement($componentecaracteristica);
+        return $this->componente;
     }
 
     /**
-     * Get componentecaracteristicas
+     * Set caracteristicatipo
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @param \Gopro\InventarioBundle\Entity\Caracteristicatipo $caracteristicatipo
+     * @return Caracteristica
      */
-    public function getComponentecaracteristicas()
+    public function setCaracteristicatipo(\Gopro\InventarioBundle\Entity\Caracteristicatipo $caracteristicatipo = null)
     {
-        return $this->componentecaracteristicas;
+        $this->caracteristicatipo = $caracteristicatipo;
+
+        return $this;
     }
+
+    /**
+     * Get caracteristicatipo
+     *
+     * @return \Gopro\InventarioBundle\Entity\Caracteristicatipo
+     */
+    public function getCaracteristicatipo()
+    {
+        return $this->caracteristicatipo;
+    }
+
 }

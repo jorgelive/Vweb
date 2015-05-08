@@ -136,10 +136,10 @@ class ServicioController extends BaseController
             ->addSelect('u')
             ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
             ->addSelect('c')
-            ->leftJoin('c.componentecaracteristicas','cc')
-            ->addSelect('cc')
-            ->leftJoin('cc.caracteristica','ca')
+            ->leftJoin('ca.caracteristicas','ca')
             ->addSelect('ca')
+            ->leftJoin('ca.caracteristicatipo','ct')
+            ->addSelect('ct')
             ->where($em->createQueryBuilder()->expr()->eq('s.serviciotipo', 1))
             ->orderBy('i.id', 'ASC')
             ->getQuery()
@@ -179,16 +179,16 @@ class ServicioController extends BaseController
                     $resultado[$iItems][]=implode(' | ',$areaList);
                     $itemList=array();
                     foreach($item['item']->getComponentes() as $componete):
-                        foreach($componete->getComponentecaracteristicas() as $componentecaracteristica):
-                            if(in_array($componentecaracteristica->getCaracteristica()->getId(),[1,2,3])){
-                                $itemList[$componentecaracteristica->getCaracteristica()->getId()]=$componentecaracteristica->getContenido();
+                        foreach($componete->getCaracteristicas() as $caracteristica):
+                            if(in_array($caracteristica->getCaracteristicatipo()->getId(),[1,2,3])){
+                                $itemList[$caracteristica->getCaracteristica()->getId()]=$caracteristica->getContenido();
                             }
                         endforeach;
 
                     endforeach;
-                    for($iCaracteristica=1;$iCaracteristica<=3;$iCaracteristica++):
-                        if(!empty($itemList[$iCaracteristica])){
-                            $resultado[$iItems][]=$itemList[$iCaracteristica];
+                    for($iCaracteristicatipo=1;$iCaracteristicatipo<=3;$iCaracteristicatipo++):
+                        if(!empty($itemList[$iCaracteristicatipo])){
+                            $resultado[$iItems][]=$itemList[$iCaracteristicatipo];
                         }else{
                             $resultado[$iItems][]='';
                         }

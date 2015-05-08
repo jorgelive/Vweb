@@ -51,7 +51,7 @@ class Itemtipo
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Item", mappedBy="itemtipo", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Item", mappedBy="itemtipo", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $items;
 
@@ -147,14 +147,16 @@ class Itemtipo
     }
 
     /**
-     * Add items
+     * Add item
      *
      * @param \Gopro\InventarioBundle\Entity\Item $items
      * @return Itemtipo
      */
-    public function addItem(\Gopro\InventarioBundle\Entity\Item $items)
+    public function addItem(\Gopro\InventarioBundle\Entity\Item $item)
     {
-        $this->items[] = $items;
+        $item->setItemtipo($this);
+
+        $this->items[] = $item;
 
         return $this;
     }

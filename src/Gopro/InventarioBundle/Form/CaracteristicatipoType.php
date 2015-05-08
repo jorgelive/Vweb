@@ -5,9 +5,8 @@ namespace Gopro\InventarioBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Gopro\InventarioBundle\Form\EventListener\ComponentecaracteristicaCamposSubscriber;
 
-class ComponentecaracteristicaType extends AbstractType
+class CaracteristicatipoType extends AbstractType
 {
         /**
      * @param FormBuilderInterface $builder
@@ -16,9 +15,7 @@ class ComponentecaracteristicaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('contenido')
-            ->add('caracteristica',null, array('label' => 'Característica'))
-            ->addEventSubscriber(new ComponentecaracteristicaCamposSubscriber());
+            ->add('nombre')
         ;
     }
     
@@ -28,7 +25,7 @@ class ComponentecaracteristicaType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Gopro\InventarioBundle\Entity\Componentecaracteristica'
+            'data_class' => 'Gopro\InventarioBundle\Entity\Caracteristicatipo'
         ));
     }
 
@@ -37,6 +34,6 @@ class ComponentecaracteristicaType extends AbstractType
      */
     public function getName()
     {
-        return 'gopro_inventariobundle_componentecaracteristica';
+        return 'gopro_inventariobundle_caracteristicatipo';
     }
 }

@@ -161,10 +161,10 @@ class ItemController extends BaseController
             ->addSelect('s')
             ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
             ->addSelect('c')
-            ->leftJoin('c.componentecaracteristicas','cc')
-            ->addSelect('cc')
-            ->leftJoin('cc.caracteristica','ca')
+            ->leftJoin('c.caracteristicas','ca')
             ->addSelect('ca')
+            ->leftJoin('ca.caracteristicatipo','ct')
+            ->addSelect('ct')
             ->orderBy('i.id', 'ASC');
 
         if(is_numeric($id)){
@@ -188,9 +188,9 @@ class ItemController extends BaseController
             if(!empty($item->getComponentes()[0])){
                 $componentePrincipal=$item->getComponentes()[0];
 
-                foreach($componentePrincipal->getComponentecaracteristicas() as $componentecaracteristica):
-                    $componenteCadena .= $componentecaracteristica->getCaracteristica()->getNombre().': ';
-                    $componenteCadena .= $componentecaracteristica->getContenido().'. ';
+                foreach($componentePrincipal->getCaracteristicas() as $caracteristica):
+                    $componenteCadena .= $caracteristica->getCaracteristicatipo()->getNombre().': ';
+                    $componenteCadena .= $caracteristica->getContenido().'. ';
                 endforeach;
 
             }

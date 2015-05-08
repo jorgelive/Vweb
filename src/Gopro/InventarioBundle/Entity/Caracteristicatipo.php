@@ -8,12 +8,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Software
+ * Caracteristicatipo
  *
- * @ORM\Table(name="inv_software")
+ * @ORM\Table(name="inv_caracteristicatipo")
  * @ORM\Entity
  */
-class Software
+class Caracteristicatipo
 {
     /**
      * @var integer
@@ -51,13 +51,12 @@ class Software
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="Componente",mappedBy="softwares")
-     *
+     * @ORM\OneToMany(targetEntity="Caracteristica", mappedBy="caracteristicatipo", cascade={"persist","remove"}, orphanRemoval=true)
      */
-    private $componentes;
+    private $caracteristicas;
 
     public function __construct() {
-        $this->componentes = new ArrayCollection();
+        $this->caracteristicas = new ArrayCollection();
     }
 
     /**
@@ -82,7 +81,7 @@ class Software
      * Set nombre
      *
      * @param string $nombre
-     * @return Software
+     * @return Caracteristicatipo
      */
     public function setNombre($nombre)
     {
@@ -105,7 +104,7 @@ class Software
      * Set creado
      *
      * @param \DateTime $creado
-     * @return Software
+     * @return Caracteristicatipo
      */
     public function setCreado($creado)
     {
@@ -128,7 +127,7 @@ class Software
      * Set modificado
      *
      * @param \DateTime $modificado
-     * @return Software
+     * @return Caracteristicatipo
      */
     public function setModificado($modificado)
     {
@@ -148,35 +147,37 @@ class Software
     }
 
     /**
-     * Add componente
+     * Add caracteristica
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componente
-     * @return Software
+     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristicas
+     * @return Caracteristicatipo
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
+    public function addCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica)
     {
-        $componente->addSoftware($this);
+        $caracteristica->setCaracteristicatipo($this);
+
+        $this->caracteristicas[] = $caracteristica;
 
         return $this;
     }
 
     /**
-     * Remove componente
+     * Remove caracteristica
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componente
+     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristica
      */
-    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
+    public function removeCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica)
     {
-        $this->componentes->removeElement($componente);
+        $this->caracteristicas->removeElement($caracteristica);
     }
 
     /**
-     * Get componentes
+     * Get caracteristicas
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getComponentes()
+    public function getCaracteristicas()
     {
-        return $this->componentes;
+        return $this->caracteristicas;
     }
 }

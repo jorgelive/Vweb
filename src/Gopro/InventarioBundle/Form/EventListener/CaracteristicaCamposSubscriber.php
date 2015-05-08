@@ -5,7 +5,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ComponentecaracteristicaCamposSubscriber implements EventSubscriberInterface
+class CaracteristicaCamposSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents()
     {

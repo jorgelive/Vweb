@@ -13,7 +13,7 @@ use APY\DataGridBundle\Grid\Mapping as GRID;
  *
  * @ORM\Table(name="inv_componente")
  * @ORM\Entity
- * @GRID\Source(columns="id, item.id, item.nombre, componentetipo.nombre, componenteestado.nombre, fechacompra, fechafingarantia, componentecaracteristicas.contenido:Group_Concat:Distinct, softwares.nombre:Group_Concat:Distinct", groupBy={"id", "item.nombre"})
+ * @GRID\Source(columns="id, item.id, item.nombre, componentetipo.nombre, componenteestado.nombre, fechacompra, fechafingarantia, caracteristicas.contenido:Group_Concat:Distinct, softwares.nombre:Group_Concat:Distinct", groupBy={"id", "item.nombre"})
  */
 class Componente
 {
@@ -96,10 +96,10 @@ class Componente
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Componentecaracteristica", mappedBy="componente", cascade={"persist","remove"})
-     * @GRID\Column(field="componentecaracteristicas.contenido:Group_Concat:Distinct", title="Caracteristicas", filterable=false)
+     * @ORM\OneToMany(targetEntity="Caracteristica", mappedBy="componente", cascade={"persist","remove"}, orphanRemoval=true)
+     * @GRID\Column(field="caracteristicas.contenido:Group_Concat:Distinct", title="Caracteristicas", filterable=false)
      */
-    private $componentecaracteristicas;
+    private $caracteristicas;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -111,7 +111,7 @@ class Componente
     private $softwares;
 
     public function __construct() {
-        $this->componentecaracteristicas = new ArrayCollection();
+        $this->caracteristicas = new ArrayCollection();
         $this->softwares = new ArrayCollection();
     }
 
@@ -322,36 +322,38 @@ class Componente
     }
 
     /**
-     * Add componentecaracteristicas
+     * Add caracteristica
      *
-     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
+     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristica
      * @return Componente
      */
-    public function addComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas)
+    public function addCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica)
     {
-        $this->componentecaracteristicas[] = $componentecaracteristicas;
+        $caracteristica->setComponente($this);
+
+        $this->caracteristicas[] = $caracteristica;
 
         return $this;
     }
 
     /**
-     * Remove componentecaracteristicas
+     * Remove caracteristica
      *
-     * @param \Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristicas
+     * @param \Gopro\InventarioBundle\Entity\Caracteristica $caracteristica
      */
-    public function removeComponentecaracteristica(\Gopro\InventarioBundle\Entity\Componentecaracteristica $componentecaracteristica)
+    public function removeCaracteristica(\Gopro\InventarioBundle\Entity\Caracteristica $caracteristica)
     {
-        $this->componentecaracteristicas->removeElement($componentecaracteristica);
+        $this->caracteristicas->removeElement($caracteristica);
     }
 
     /**
-     * Get componentecaracteristicas
+     * Get caracteristicas
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getComponentecaracteristicas()
+    public function getCaracteristicas()
     {
-        return $this->componentecaracteristicas;
+        return $this->caracteristicas;
     }
 
     /**

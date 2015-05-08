@@ -71,16 +71,11 @@ class ItemAdmin extends Admin
                     'required' => false
                 )
             )
-            ->add('componentes','sonata_type_model', array(
-                'expanded' => false,
-                'multiple' => true,
-                'required' => false
-            ))
-            //->add('users', 'sonata_type_collection', array(),array(
-            //        'edit' => 'inline',
-            //        'inline' => 'table'
-            //    )
-            //)
+            ->add('componentes', 'sonata_type_collection', array('by_reference' => false),array(
+                    'edit' => 'inline',
+                    'inline' => 'table'
+                )
+            )
         ;
     }
 

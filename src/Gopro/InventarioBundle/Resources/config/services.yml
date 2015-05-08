@@ -9,6 +9,16 @@ services:
         arguments: [~, Gopro\InventarioBundle\Entity\Componente, GoproInventarioBundle:ComponenteAdmin]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Componentes}
+    gopro_inventario.admin.caracteristica:
+            class: Gopro\InventarioBundle\Admin\CaracteristicaAdmin
+            arguments: [~, Gopro\InventarioBundle\Entity\Caracteristica, GoproInventarioBundle:CaracteristicaAdmin]
+            tags:
+                - {name: sonata.admin, manager_type: orm, group: Inventario, label: Caracteristicas}
+    gopro_inventario.admin.caracteristicatipo:
+                class: Gopro\InventarioBundle\Admin\CaracteristicatipoAdmin
+                arguments: [~, Gopro\InventarioBundle\Entity\Caracteristicatipo, GoproInventarioBundle:CaracteristicatipoAdmin]
+                tags:
+                    - {name: sonata.admin, manager_type: orm, group: Inventario, label: 'Tipo de caracteristicas'}
     gopro_inventario.admin.software:
             class: Gopro\InventarioBundle\Admin\SoftwareAdmin
             arguments: [~, Gopro\InventarioBundle\Entity\Software, GoproInventarioBundle:SoftwareAdmin]

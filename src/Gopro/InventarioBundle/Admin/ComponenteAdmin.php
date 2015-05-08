@@ -18,12 +18,13 @@ class ComponenteAdmin extends Admin
         $datagridMapper
             ->add('id')
             ->add('item')
+            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('fechacompra', null, array('label' => 'Fecha de compra'))
             ->add('fechafingarantia', null, array('label' => 'Fin de garantia'))
-            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('componenteestado', null, array('label' => 'Estado'))
             ->add('fechabaja', null, array('label' => 'Fecha de baja'))
             ->add('softwares', null, array('label' => 'Software instalado'))
+            ->add('caracteristicas', null, array('label' => 'Caracteristicas'))
         ;
     }
 
@@ -35,12 +36,13 @@ class ComponenteAdmin extends Admin
         $listMapper
             ->add('id')
             ->add('item')
+            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('fechacompra', null, array('label' => 'Fecha de compra', 'format' => 'Y-m-d'))
             ->add('fechafingarantia', null, array('label' => 'Fin de garantia','format' => 'Y-m-d'))
-            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('componenteestado', null, array('label' => 'Estado'))
             ->add('fechabaja', null, array('label' => 'Fecha de baja', 'format' => 'Y-m-d'))
             ->add('softwares','sonata_type_model', array('label' => 'Software instalado', 'associated_tostring' => 'getNombre'))
+            ->add('caracteristicas', 'sonata_type_collection', array('label' => 'Caracteristicas'))
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'show' => array(),
@@ -56,18 +58,28 @@ class ComponenteAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $formMapper)
     {
+        //if (!$this->isChild()) {
+        if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Item') {
+            $formMapper
+                ->add('item')
+            ;
+        }
         $formMapper
-            ->add('fechacompra', 'sonata_type_date_picker', array('label' => 'Fecha de compra'))
-            ->add('fechafingarantia', 'sonata_type_date_picker', array('label' => 'Fin de garantia','required' => false))
             ->add('componentetipo', null, array('label' => 'Tipo'))
-            ->add('item')
+            ->add('fechacompra', 'sonata_type_date_picker', array('label' => 'Fecha de compra', 'required' => false))
+            ->add('fechafingarantia', 'sonata_type_date_picker', array('label' => 'Fin de garantia', 'required' => false))
             ->add('componenteestado', null, array('label' => 'Estado'))
-            ->add('fechabaja', 'sonata_type_date_picker', array('label' => 'Fecha de baja','required' => false))
+            ->add('fechabaja', 'sonata_type_date_picker', array('label' => 'Fecha de baja', 'required' => false))
             ->add('softwares', 'sonata_type_model', array(
                 'label' => 'Software instalado',
                 'expanded' => false,
                 'multiple' => true,
                 'required' => false
+                )
+            )
+            ->add('caracteristicas','sonata_type_collection', array('by_reference' => false),array(
+                'edit' => 'inline',
+                'inline' => 'table'
                 )
             )
         ;
@@ -81,12 +93,13 @@ class ComponenteAdmin extends Admin
         $showMapper
             ->add('id')
             ->add('item')
+            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('fechacompra', null, array('label' => 'Fecha de compra', 'format' => 'Y-m-d'))
             ->add('fechafingarantia', null, array('label' => 'Fin de garantia','format' => 'Y-m-d'))
-            ->add('componentetipo', null, array('label' => 'Tipo'))
             ->add('componenteestado', null, array('label' => 'Estado'))
             ->add('fechabaja', null, array('label' => 'Fecha de baja', 'format' => 'Y-m-d'))
             ->add('softwares','sonata_type_model', array('label' => 'Software instalado', 'associated_tostring' => 'getNombre'))
+            ->add('caracteristicas', null, array('label' => 'Caracteristicas'))
         ;
     }
 }

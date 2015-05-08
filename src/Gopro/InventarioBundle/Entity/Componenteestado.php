@@ -51,7 +51,7 @@ class Componenteestado
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componenteestado", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componenteestado", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $componentes;
 
@@ -148,14 +148,16 @@ class Componenteestado
     }
 
     /**
-     * Add componentes
+     * Add componente
      *
      * @param \Gopro\InventarioBundle\Entity\Componente $componentes
      * @return Componenteestado
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes[] = $componentes;
+        $componente->setComponenteestado($this);
+
+        $this->componentes[] = $componente;
 
         return $this;
     }

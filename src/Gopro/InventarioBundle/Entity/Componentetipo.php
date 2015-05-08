@@ -51,7 +51,7 @@ class Componentetipo
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componentetipo", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Componente", mappedBy="componentetipo", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $componentes;
 
@@ -147,14 +147,16 @@ class Componentetipo
     }
 
     /**
-     * Add componentes
+     * Add componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
      * @return Componentetipo
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes[] = $componentes;
+        $componente->setComponentetipo($this);
+
+        $this->componentes[] = $componente;
 
         return $this;
     }

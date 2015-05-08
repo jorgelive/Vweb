@@ -11,6 +11,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Gopro\InventarioBundle\Entity\Caracteristica;
 use Gopro\InventarioBundle\Form\CaracteristicaType;
 
+use APY\DataGridBundle\Grid\Source\Entity;
+use APY\DataGridBundle\Grid\Column\TextColumn;
+use APY\DataGridBundle\Grid\Column\ActionsColumn;
+use APY\DataGridBundle\Grid\Action\MassAction;
+use APY\DataGridBundle\Grid\Action\DeleteMassAction;
+use APY\DataGridBundle\Grid\Action\RowAction;
+
 /**
  * Caracteristica controller.
  *
@@ -23,18 +30,44 @@ class CaracteristicaController extends BaseController
      * Lists all Caracteristica entities.
      *
      * @Route("/", name="gopro_inventario_caracteristica")
-     * @Method("GET")
+     * @Method({"POST","GET"})
      * @Template()
      */
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
+        $source = new Entity('GoproInventarioBundle:Caracteristica');
+
+        $grid = $this->get('grid');
+
+        $mostrarAction = new RowAction('mostrar', 'gopro_inventario_caracteristica_show');
+        $mostrarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($mostrarAction);
+
+        $editarAction = new RowAction('editar', 'gopro_inventario_caracteristica_edit');
+        $editarAction->setRouteParameters(array('id'));
+        $grid->addRowAction($editarAction);
+
+        $mostrarItemAction = new RowAction('mostrar item', 'gopro_inventario_item_show');
+        $mostrarItemAction->setRouteParameters(array('componente.item.id'));
+        $mostrarItemAction->setRouteParametersMapping(array('componente.item.id' => 'id'));
+        $grid->addRowAction($mostrarItemAction);
+
+        $editarItemAction = new RowAction('editar item', 'gopro_inventario_item_edit');
+        $editarItemAction->setRouteParameters(array('componente.item.id'));
+        $editarItemAction->setRouteParametersMapping(array('componente.item.id' => 'id'));
+        $grid->addRowAction($editarItemAction);
+
+        $grid->setSource($source);
+
+        return $grid->getGridResponse();
+
+        /*$em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('GoproInventarioBundle:Caracteristica')->findAll();
 
         return array(
             'entities' => $entities,
-        );
+        );*/
     }
     /**
      * Creates a new Caracteristica entity.
@@ -85,13 +118,24 @@ class CaracteristicaController extends BaseController
     /**
      * Displays a form to create a new Caracteristica entity.
      *
-     * @Route("/new", name="gopro_inventario_caracteristica_new")
+     * @Route("/new/{componente_id}", requirements={"componente_id" = "\d+"}, name="gopro_inventario_caracteristica_new", defaults={"componente_id" = null})
      * @Method("GET")
      * @Template()
      */
-    public function newAction()
+    public function newAction($componente_id)
     {
         $entity = new Caracteristica();
+
+        if(!empty($componente_id)){
+            $em = $this->getDoctrine()->getManager();
+            $componente = $em->getRepository('GoproInventarioBundle:Componente')->find($componente_id);
+            if(is_object($componente)){
+                $entity->setComponente($componente);
+            }
+
+        }
+
+
         $form   = $this->createCreateForm($entity);
 
         return array(

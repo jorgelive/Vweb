@@ -36,7 +36,7 @@ class Serviciotipo
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Servicio", mappedBy="serviciotipo", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Servicio", mappedBy="serviciotipo", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $servicios;
 
@@ -86,14 +86,16 @@ class Serviciotipo
     }
 
     /**
-     * Add servicios
+     * Add servicio
      *
-     * @param \Gopro\InventarioBundle\Entity\Servicio $servicios
+     * @param \Gopro\InventarioBundle\Entity\Servicio $servicio
      * @return Serviciotipo
      */
-    public function addServicio(\Gopro\InventarioBundle\Entity\Servicio $servicios)
+    public function addServicio(\Gopro\InventarioBundle\Entity\Servicio $servicio)
     {
-        $this->servicios[] = $servicios;
+        $servicio->setServiciotipo($this);
+
+        $this->servicios[] = $servicio;
 
         return $this;
     }

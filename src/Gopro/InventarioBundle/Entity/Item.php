@@ -59,7 +59,7 @@ class Item
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Componente", mappedBy="item", cascade={"persist","remove"})
+     * @ORM\OneToMany(targetEntity="Componente", mappedBy="item", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $componentes;
 
@@ -101,7 +101,7 @@ class Item
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Servicio", mappedBy="item", cascade={"persist","remove"})
+     * @ORM\OneToMany(targetEntity="Servicio", mappedBy="item", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $servicios;
 
@@ -255,26 +255,28 @@ class Item
     }
 
     /**
-     * Add componentes
+     * Add componente
      *
      * @param \Gopro\InventarioBundle\Entity\Componente $componentes
      * @return Item
      */
-    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function addComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes[] = $componentes;
+        $componente->setItem($this);
+
+        $this->componentes[] = $componente;
 
         return $this;
     }
 
     /**
-     * Remove componentes
+     * Remove componente
      *
-     * @param \Gopro\InventarioBundle\Entity\Componente $componentes
+     * @param \Gopro\InventarioBundle\Entity\Componente $componente
      */
-    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componentes)
+    public function removeComponente(\Gopro\InventarioBundle\Entity\Componente $componente)
     {
-        $this->componentes->removeElement($componentes);
+        $this->componentes->removeElement($componente);
     }
 
     /**
@@ -288,26 +290,26 @@ class Item
     }
 
     /**
-     * Add areas
+     * Add area
      *
-     * @param \Gopro\UserBundle\Entity\Area $areas
+     * @param \Gopro\UserBundle\Entity\Area $area
      * @return Item
      */
-    public function addArea(\Gopro\UserBundle\Entity\Area $areas)
+    public function addArea(\Gopro\UserBundle\Entity\Area $area)
     {
-        $this->areas[] = $areas;
+        $this->areas[] = $area;
 
         return $this;
     }
 
     /**
-     * Remove areas
+     * Remove area
      *
-     * @param \Gopro\UserBundle\Entity\Area $areas
+     * @param \Gopro\UserBundle\Entity\Area $area
      */
-    public function removeArea(\Gopro\UserBundle\Entity\Area $areas)
+    public function removeArea(\Gopro\UserBundle\Entity\Area $area)
     {
-        $this->areas->removeElement($areas);
+        $this->areas->removeElement($area);
     }
 
     /**
@@ -367,26 +369,26 @@ class Item
     }
 
     /**
-     * Add users
+     * Add user
      *
-     * @param \Gopro\UserBundle\Entity\User $users
+     * @param \Gopro\UserBundle\Entity\User $user
      * @return Item
      */
-    public function addUser(\Gopro\UserBundle\Entity\User $users)
+    public function addUser(\Gopro\UserBundle\Entity\User $user)
     {
-        $this->users[] = $users;
+        $this->users[] = $user;
 
         return $this;
     }
 
     /**
-     * Remove users
+     * Remove user
      *
-     * @param \Gopro\UserBundle\Entity\User $users
+     * @param \Gopro\UserBundle\Entity\User $user
      */
-    public function removeUser(\Gopro\UserBundle\Entity\User $users)
+    public function removeUser(\Gopro\UserBundle\Entity\User $user)
     {
-        $this->users->removeElement($users);
+        $this->users->removeElement($user);
     }
 
     /**
@@ -400,26 +402,28 @@ class Item
     }
 
     /**
-     * Add servicios
+     * Add servicio
      *
-     * @param \Gopro\InventarioBundle\Entity\Servicio $servicios
+     * @param \Gopro\InventarioBundle\Entity\Servicio $servicio
      * @return Item
      */
-    public function addServicio(\Gopro\InventarioBundle\Entity\Servicio $servicios)
+    public function addServicio(\Gopro\InventarioBundle\Entity\Servicio $servicio)
     {
-        $this->servicios[] = $servicios;
+        $servicio->setItem($this);
+
+        $this->servicios[] = $servicio;
 
         return $this;
     }
 
     /**
-     * Remove servicios
+     * Remove servicio
      *
-     * @param \Gopro\InventarioBundle\Entity\Servicio $servicios
+     * @param \Gopro\InventarioBundle\Entity\Servicio $servicio
      */
-    public function removeServicio(\Gopro\InventarioBundle\Entity\Servicio $servicios)
+    public function removeServicio(\Gopro\InventarioBundle\Entity\Servicio $servicio)
     {
-        $this->servicios->removeElement($servicios);
+        $this->servicios->removeElement($servicio);
     }
 
     /**
