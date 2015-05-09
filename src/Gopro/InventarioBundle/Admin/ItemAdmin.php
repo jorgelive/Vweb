@@ -91,6 +91,7 @@ class ItemAdmin extends Admin
             ->add('itemtipo')
             ->add('users', 'sonata_type_model', array('label' => 'Usuarios', 'associated_tostring' => 'getUserName'))
             ->add('areas', 'sonata_type_model', array('label' => 'Areas', 'associated_tostring' => 'getNombre'))
+            ->add('componentes', 'sonata_type_collection', array('label' => 'Componentes')            )
         ;
     }
 }

@@ -7,15 +7,16 @@
         "psr-0": { "": "src/" }
     },
         "require": {
-        "php": ">=5.3.3",
-        "symfony/symfony": "2.4.*",
-        "doctrine/orm": "~2.2,>=2.2.3",
-        "doctrine/doctrine-bundle": "~1.2",
-        "twig/extensions": "~1.0",
+        "php": ">=5.3.9",
+        "symfony/symfony": "~2.6,<2.7",
+        "doctrine/orm": "~2.2,>=2.2.3,<2.5",
+        "doctrine/dbal": "<2.5",
+        "doctrine/doctrine-bundle": "~1.4",
+        "twig/extensions": "dev-master",
         "symfony/assetic-bundle": "~2.3",
         "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
-        "sensio/distribution-bundle": "~2.3",
+        "sensio/distribution-bundle": "~3.0,>=3.0.12",
         "sensio/framework-extra-bundle": "~3.0",
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
@@ -46,13 +47,15 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "php -r \"copy('fixes/sonata-project/admin-bundle/Admin/AdminHelper.php', 'vendor/sonata-project/admin-bundle/Admin/AdminHelper.php');\"",
+            "php -r \"copy('fixes/sonata-project/admin-bundle/Controller/HelperController.php', 'vendor/sonata-project/admin-bundle/Controller/HelperController.php');\""
         ]
     },
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web",
