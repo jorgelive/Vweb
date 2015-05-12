@@ -1,5 +1,11 @@
 <ul>
     {% for item in items %}
-    <li><a href="{{ path(item.route) }}">{{ item.nombre }}</a></li>
+        {% if item.route is defined %}
+            <li><a href="{{ path(item.route) }}">{{ item.nombre }}</a></li>
+        {% elseif kenny.url %}
+            <li><a href="http://{{ item.url }}">{{ item.nombre }}</a></li>
+        {% else %}
+
+        {% endif %}
     {% endfor %}
 </ul>
