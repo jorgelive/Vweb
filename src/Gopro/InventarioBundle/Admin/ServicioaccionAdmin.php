@@ -8,7 +8,7 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 
-class CaracteristicaAdmin extends Admin
+class ServicioaccionAdmin extends Admin
 {
     /**
      * @param DatagridMapper $datagridMapper
@@ -17,11 +17,9 @@ class CaracteristicaAdmin extends Admin
     {
         $datagridMapper
             ->add('id')
-            ->add('componente.item')
-            ->add('componente')
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('servicio')
+            ->add('tiempo')
             ->add('contenido')
-
         ;
     }
 
@@ -32,10 +30,9 @@ class CaracteristicaAdmin extends Admin
     {
         $listMapper
             ->add('id')
-            ->add('componente.item')
-            ->add('componente')
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
-            ->add('contenido')
+            ->add('servicio')
+            ->add('tiempo', null, array('label' => 'Realizada en', 'format' => 'Y-m-d H:i'))
+            ->add('contenido', null, array('editable' => true))
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'show' => array(),
@@ -51,14 +48,13 @@ class CaracteristicaAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $formMapper)
     {
-        //if (!$this->isChild()) {
-        if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Item' && $this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Componente' ) {
+        if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Servicio') {
             $formMapper
-                ->add('componente')
+                ->add('servicio')
             ;
         }
         $formMapper
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('tiempo', 'sonata_type_datetime_picker', array('label' => 'Realizada en'))
             ->add('contenido')
         ;
     }
@@ -70,9 +66,8 @@ class CaracteristicaAdmin extends Admin
     {
         $showMapper
             ->add('id')
-            ->add('componente.item')
-            ->add('componente')
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('servicio')
+            ->add('tiempo', null, array('label' => 'Realizado en', 'format' => 'Y-m-d H:i'))
             ->add('contenido')
         ;
     }

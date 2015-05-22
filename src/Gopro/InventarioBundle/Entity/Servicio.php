@@ -40,10 +40,10 @@ class Servicio
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha", type="datetime")
-     * @Grid\Column(format="Y-m-d", title="Fecha")
+     * @ORM\Column(name="tiempo", type="datetime")
+     * @Grid\Column(format="Y-m-d", title="Tiempo")
      */
-    private $fecha;
+    private $tiempo;
 
     /**
      * @var \DateTime $creado
@@ -149,26 +149,26 @@ class Servicio
     }
 
     /**
-     * Set fecha
+     * Set tiempo
      *
      * @param \DateTime $fecha
      * @return Servicio
      */
-    public function setFecha($fecha)
+    public function setTiempo($tiempo)
     {
-        $this->fecha = $fecha;
+        $this->tiempo = $tiempo;
 
         return $this;
     }
 
     /**
-     * Get fecha
+     * Get tiempo
      *
      * @return \DateTime 
      */
-    public function getFecha()
+    public function getTiempo()
     {
-        return $this->fecha;
+        return $this->tiempo;
     }
 
     /**

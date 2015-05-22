@@ -68,7 +68,8 @@ class ItemAdmin extends Admin
             ->add('users', 'sonata_type_model', array(
                     'expanded' => false,
                     'multiple' => true,
-                    'required' => false
+                    'required' => false,
+                    'label' => 'Usuarios'
                 )
             )
             ->add('componentes', 'sonata_type_collection', array('by_reference' => false),array(

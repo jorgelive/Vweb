@@ -17,9 +17,9 @@ class CuentaAdmin extends Admin
     {
         $datagridMapper
             ->add('id')
-            ->add('user')
-            ->add('cuentatipo')
-            ->add('nombre')
+            ->add('user', null, array('label' => 'Usuario'))
+            ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
+            ->add('nombre', null, array('label' => 'Contraseña'))
             ->add('password')
         ;
     }
@@ -31,10 +31,10 @@ class CuentaAdmin extends Admin
     {
         $listMapper
             ->add('id')
-            ->add('user')
-            ->add('cuentatipo')
+            ->add('user', null, array('label' => 'Usuario'))
+            ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
             ->add('nombre', null, array('editable' => true))
-            ->add('password', null, array('editable' => true))
+            ->add('password', null, array('editable' => true, 'label' => 'Contraseña'))
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'show' => array(),
@@ -51,10 +51,10 @@ class CuentaAdmin extends Admin
     protected function configureFormFields(FormMapper $formMapper)
     {
         $formMapper
-            ->add('user')
-            ->add('cuentatipo')
+            ->add('user', null, array('label' => 'Usuario'))
+            ->add('cuentatipo', null, array('label' => 'Contraseña'))
             ->add('nombre')
-            ->add('password')
+            ->add('password', null, array('label' => 'Contraseña'))
         ;
     }
 
@@ -65,9 +65,10 @@ class CuentaAdmin extends Admin
     {
         $showMapper
             ->add('id')
-            ->add('cuentatipo')
+            ->add('user', null, array('label' => 'Usuario'))
+            ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
             ->add('nombre')
-            ->add('password')
+            ->add('password', null, array('label' => 'Contraseña'))
         ;
     }
 }

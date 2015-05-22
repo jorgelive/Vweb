@@ -151,7 +151,7 @@ class ServicioController extends BaseController
 
         $itemsAnoDependencia=array();
         foreach($servicios as $servicio):
-            $ano=$servicio->getFecha()->format('Y');
+            $ano=$servicio->getTiempo()->format('Y');
             $dependencia=$servicio->getItem()->getDependencia()->getId();
             $itemsAnoDependencia[$ano][$dependencia]['dependencia']=$servicio->getItem()->getDependencia();
             $itemsAnoDependencia[$ano][$dependencia]['items'][$servicio->getItem()->getId()]['item']=$servicio->getItem();
@@ -200,7 +200,7 @@ class ServicioController extends BaseController
                     }
                     $serviciosList=array();
                     foreach($item['item']->getServicios() as $servicio):
-                        if($servicio->getFecha()->format('d')>=15){
+                        if($servicio->getTiempo()->format('d')>=15){
                             $quincena=2;
                         }else{
                             $quincena=1;
@@ -210,8 +210,8 @@ class ServicioController extends BaseController
                         }else{
                             $marca='✓';
                         }
-                        if($servicio->getFecha()->format('Y')==$ano){
-                            $serviciosList[(($servicio->getFecha()->format('m')-1)*2)+$quincena]=$marca;
+                        if($servicio->getTiempo()->format('Y')==$ano){
+                            $serviciosList[(($servicio->getTiempo()->format('m')-1)*2)+$quincena]=$marca;
                         }
                     endforeach;
                     for($iServicios=1;$iServicios<=24;$iServicios++):
@@ -288,7 +288,7 @@ class ServicioController extends BaseController
             $items = $em->createQueryBuilder()
                 ->addSelect('i')
                 ->from('GoproInventarioBundle:Item', 'i')
-                ->leftJoin('i.servicios', 'm', 'WITH', 'm.fecha>=:fechaInicio and m.fecha<:fechaFin')
+                ->leftJoin('i.servicios', 'm', 'WITH', 'm.tiempo>=:fechaInicio and m.tiempo<:fechaFin')
                 ->addSelect('m')
                 ->orderBy('i.id', 'ASC')
                 ->where($em->createQueryBuilder()->expr()->eq('i.dependencia', ':dependencia'))
@@ -310,7 +310,7 @@ class ServicioController extends BaseController
                     ${'servicio'.$key} = new Servicio();
                     ${'servicio'.$key}
                         ->setItem($em->getRepository('GoproInventarioBundle:Item')->find($item['id']))
-                        ->setFecha(clone $fecha)
+                        ->setTiempo(clone $fecha)
                         ->setServiciotipo($tipo)
                         ->setUser($ejecutor)
                         ->setDescripcion('Limpieza interna y externa, optimizacion de programas y archivos, actualización de software.')

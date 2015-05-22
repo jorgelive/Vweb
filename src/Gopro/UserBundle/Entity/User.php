@@ -46,7 +46,11 @@ class User extends BaseUser
     private $cuentas;
 
     public function __construct() {
+
+        parent::__construct();
+
         $this->cuentas = new ArrayCollection();
+
     }
 
 

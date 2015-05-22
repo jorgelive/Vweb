@@ -17,17 +17,19 @@ class UserAdmin extends SonataUserAdmin
         parent::configureFormFields($formMapper);
 
         $formMapper
-            ->with('Organización')
-            ->add('dependencia', 'sonata_type_model', array(
-                'required' => false,
-                'expanded' => false,
-                'multiple' => false,'label' => 'Dependencia'
-            ))
-            ->add('area', 'sonata_type_model', array(
-                'required' => false,
-                'expanded' => false,
-                'multiple' => false,'label' => 'Area'
-            ))
+            ->tab('Vipac')
+                ->with('Organización')
+                    ->add('dependencia', 'sonata_type_model', array(
+                        'required' => false,
+                        'expanded' => false,
+                        'multiple' => false,'label' => 'Dependencia'
+                    ))
+                    ->add('area', 'sonata_type_model', array(
+                        'required' => false,
+                        'expanded' => false,
+                        'multiple' => false,'label' => 'Area'
+                    ))
+                ->end()
             ->end()
         ;
     }
