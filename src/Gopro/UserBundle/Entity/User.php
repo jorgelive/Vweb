@@ -87,7 +87,6 @@ class User extends BaseUser
         return $this->dependencia;
     }
 
-
     /**
      * Set area
      *

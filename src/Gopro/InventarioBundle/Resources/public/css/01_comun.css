@@ -20,7 +20,7 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_servicioestado div lab
 div#GoproInventarioBundle form div#gopro_inventariobundle_serviciotipo div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_servicio div label{text-align:right; display: inline-block; margin-right: 5px; width: 100px; vertical-align: top;}
 
-div#GoproInventarioBundle form div#gopro_inventariobundle_componente div div.opcionMultipleExpandida {display: inline-block;}
+div#GoproInventarioBundle form div#gopro_inventariobundle_componente div div.opcionMultipleExpandida {display: inline-block; margin-left: 0px;}
 div#GoproInventarioBundle form div#gopro_inventariobundle_componente div div.opcionMultipleExpandida label{display: inline-block; margin-right: 5px; width: 200px; vertical-align: middle;}
 
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristicatipo div ul,
@@ -44,7 +44,7 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_item div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_servicioestado div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_serviciotipo div ul li,
 div#GoproInventarioBundle form div#gopro_inventariobundle_servicio div ul li{color:#cd0a0a; font-size: 9px;}
-/*
+
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristicatipo div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div div,
@@ -56,6 +56,7 @@ div#GoproInventarioBundle form div#gopro_inventariobundle_servicioestado div div
 div#GoproInventarioBundle form div#gopro_inventariobundle_serviciotipo div div,
 div#GoproInventarioBundle form div#gopro_inventariobundle_servicio div div{margin-top: 5px; margin-left: 100px;}
 
+/*
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristicatipo div div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_caracteristica div div label,
 div#GoproInventarioBundle form div#gopro_inventariobundle_componenteestado div div label,

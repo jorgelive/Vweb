@@ -157,6 +157,7 @@ class Operador
     public function addTipo(\Gopro\Vipac\ReporteBundle\Entity\Tipo $tipo)
     {
         $tipo->addOperador($this);
+
         return $this;
     }
 

@@ -156,20 +156,22 @@ class Tipo
     }
 
     /**
-     * Add campos
+     * Add campo
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      * @return Tipo
      */
-    public function addCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campos)
+    public function addCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campo)
     {
-        $this->campos[] = $campos;
+        $campo->setTipo($this);
+
+        $this->campos[] = $campo;
 
         return $this;
     }
 
     /**
-     * Remove campos
+     * Remove campo
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      */
@@ -189,22 +191,23 @@ class Tipo
     }
 
     /**
-     * Add operadores
+     * Add operador
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operadores
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operador
      * @return Tipo
      */
-    public function addOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operadores)
+    public function addOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operador)
     {
-        $this->operadores[] = $operadores;
+
+        $this->operadores[] = $operador;
 
         return $this;
     }
 
     /**
-     * Remove operadores
+     * Remove operador
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operadores
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Operador $operador
      */
     public function removeOperador(\Gopro\Vipac\ReporteBundle\Entity\Operador $operador)
     {

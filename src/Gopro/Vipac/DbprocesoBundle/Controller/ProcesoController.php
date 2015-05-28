@@ -361,7 +361,7 @@ class ProcesoController extends BaseController
                 $resultado[$nroLinea]['RUBRO6']='';
             }
 
-            if($this->getUser()->hasGroup('Cusco')) {
+            if($this->getUser()->getDependencia()->getId() == 3) {
                 $resultado[$nroLinea]['RUBRO7']='CUZCO';
                 $mercadoSufijo='.CU.OP';
             }else{

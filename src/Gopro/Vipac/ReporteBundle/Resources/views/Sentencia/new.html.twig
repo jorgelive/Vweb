@@ -2,6 +2,7 @@
 {% block title %}Creación de sentencias SQL{% endblock title %}
 {% block titulo %}Creación de sentencias SQL{% endblock titulo %}
 {% block content %}
+    {% form_theme edit_form 'GoproMainBundle:Form:standard.html.twig' %}
     {{ form(form) }}
     <ul class="listaAcciones">
         <li>

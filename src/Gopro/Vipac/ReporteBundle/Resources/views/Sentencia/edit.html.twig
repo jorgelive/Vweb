@@ -2,6 +2,7 @@
 {% block title %}Modificar sentencia SQL{% endblock title %}
 {% block titulo %}Modificar sentencia SQL{% endblock titulo %}
 {% block content %}
+    {% form_theme edit_form 'GoproMainBundle:Form:standard.html.twig' %}
     {{ form(edit_form) }}
     <ul class="registroAcciones">
         <li>

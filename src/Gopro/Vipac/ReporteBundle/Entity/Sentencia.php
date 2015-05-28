@@ -67,23 +67,23 @@ class Sentencia
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Area")
-     * @ORM\JoinTable(name="rep_sentencia_area")
+     * @ORM\ManyToMany(targetEntity="Gopro\UserBundle\Entity\Group")
+     * @ORM\JoinTable(name="rep_sentencia_group")
      *
      */
-    protected $areas;
+    protected $groups;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist","remove"})
+     * @ORM\OneToMany(targetEntity="Campo", mappedBy="sentencia", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $campos;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="Parametro", mappedBy="sentencia", cascade={"persist","remove"})
+     * @ORM\OneToMany(targetEntity="Parametro", mappedBy="sentencia", cascade={"persist","remove"}, orphanRemoval=true)
      */
     private $parametros;
 
@@ -227,53 +227,56 @@ class Sentencia
     }
 
     /**
-     * Add areas
+     * Add group
      *
-     * @param \Gopro\UserBundle\Entity\Area $areas
+     * @param \Gopro\UserBundle\Entity\Group $group
      * @return Sentencia
      */
-    public function addArea(\Gopro\UserBundle\Entity\Area $areas)
+    public function addGroup(\Gopro\UserBundle\Entity\Group $group)
     {
-        $this->areas[] = $areas;
+
+        $this->groups[] = $group;
 
         return $this;
     }
 
     /**
-     * Remove areas
+     * Remove group
      *
-     * @param \Gopro\UserBundle\Entity\Area $areas
+     * @param \Gopro\UserBundle\Entity\Group $group
      */
-    public function removeArea(\Gopro\UserBundle\Entity\Area $area)
+    public function removeGroup(\Gopro\UserBundle\Entity\Group $group)
     {
-        $this->areas->removeElement($area);
+        $this->groups->removeElement($group);
     }
 
     /**
-     * Get areas
+     * Get groups
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getAreas()
+    public function getGroups()
     {
-        return $this->areas;
+        return $this->groups;
     }
 
     /**
-     * Add campos
+     * Add campo
      *
-     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campos
+     * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      * @return Sentencia
      */
-    public function addCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campos)
+    public function addCampo(\Gopro\Vipac\ReporteBundle\Entity\Campo $campo)
     {
-        $this->campos[] = $campos;
+        $campo->setSentencia($this);
+
+        $this->campos[] = $campo;
 
         return $this;
     }
 
     /**
-     * Remove campos
+     * Remove campo
      *
      * @param \Gopro\Vipac\ReporteBundle\Entity\Campo $campo
      */
