@@ -225,7 +225,7 @@ class TipoController extends Controller
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('tipo'));
+        return $this->redirect($this->generateUrl('gopro_vipac_reporte_tipo'));
     }
 
     /**

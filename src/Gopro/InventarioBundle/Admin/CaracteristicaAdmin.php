@@ -17,8 +17,9 @@ class CaracteristicaAdmin extends Admin
     {
         $datagridMapper
             ->add('id')
-            ->add('componente.item')
+            ->add('componente.item', null, array('label' => 'Item'))
             ->add('componente')
+            ->add('componente.componenteestado', null, array('label' => 'Estado'))
             ->add('caracteristicatipo', null, array('label' => 'Tipo'))
             ->add('contenido')
 
@@ -32,10 +33,11 @@ class CaracteristicaAdmin extends Admin
     {
         $listMapper
             ->add('id')
-            ->add('componente.item')
+            ->add('componente.item', null, array('label' => 'Item'))
             ->add('componente')
+            ->add('componente.componenteestado', null, array('label' => 'Estado'))
             ->add('caracteristicatipo', null, array('label' => 'Tipo'))
-            ->add('contenido')
+            ->add('contenido', null, array('editable' => true))
             ->add('_action', 'actions', array(
                 'actions' => array(
                     'show' => array(),
@@ -70,8 +72,9 @@ class CaracteristicaAdmin extends Admin
     {
         $showMapper
             ->add('id')
-            ->add('componente.item')
+            ->add('componente.item', null, array('label' => 'Item'))
             ->add('componente')
+            ->add('componente.componenteestado', null, array('label' => 'Estado'))
             ->add('caracteristicatipo', null, array('label' => 'Tipo'))
             ->add('contenido')
         ;

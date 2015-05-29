@@ -774,7 +774,7 @@ class SentenciaController extends BaseController
             $em->flush();
         }
 
-        return $this->redirect($this->generateUrl('sentencia'));
+        return $this->redirect($this->generateUrl('gopro_vipac_reporte_sentencia'));
     }
 
     /**

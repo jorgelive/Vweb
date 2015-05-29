@@ -1,0 +1,11 @@
+{% extends "::global.html.twig" %}
+{% block title %}Error 404 - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="ErrorPage">
+        <h2>El contenido que busca no existe.</h2>
+    </div>
+{% endblock container %}

@@ -24,7 +24,7 @@ class ComponenteAdmin extends Admin
             ->add('componenteestado', null, array('label' => 'Estado'))
             ->add('fechabaja', null, array('label' => 'Fecha de baja'))
             ->add('softwares', null, array('label' => 'Software instalado'))
-            ->add('caracteristicas', null, array('label' => 'Caracteristicas'))
+            ->add('caracteristicas.contenido', null, array('label' => 'Caracteristicas'))
         ;
     }
 
