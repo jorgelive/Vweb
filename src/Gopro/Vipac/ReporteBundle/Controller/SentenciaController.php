@@ -233,10 +233,11 @@ class SentenciaController extends BaseController
             $destino=$request->request->all()['parametrosForm']['destino'];
         }
 
-
         $qb=$em->createQueryBuilder();
+
         $condiciones[]=$qb->expr()->orx('p.user = :user');
         $condiciones[]=$qb->expr()->orx('p.publico = :publico');
+
         $parametrosGuardados = $qb->addSelect('p.id, p.nombre, p.contenido')
             ->from('GoproVipacReporteBundle:Parametro', 'p')
             ->orderBy('p.id', 'ASC')
@@ -247,11 +248,14 @@ class SentenciaController extends BaseController
             ->setParameter('sentencia', $entity)
             ->getQuery()
             ->getArrayResult();
+
         foreach($parametrosGuardados as $key => $parametroGuardado):
             $parametrosGuardados[$key]['borrarRoute']=$this->generateUrl('gopro_vipac_reporte_parametro_delete',['id'=>$parametroGuardado['id']]);
         endforeach;
+
         $parametrosGuardadosOpciones=['sentenciaid'=>$id,'agregarurl'=>$this->generateUrl('gopro_vipac_reporte_parametro_create')];
         $parametrosForm = $this->parametrosForm($id,json_encode($camposDropdown),json_encode($tipos),json_encode($operadores),json_encode(['ASC'=>'Ascendente','DESC'=>'Descendente']),json_encode(['COL'=>'Columna','CON'=>'Conteo','AGR'=>'Agregamiento']),json_encode($parametrosGuardados),json_encode($parametrosGuardadosOpciones),$destino,$limite);
+
         if (
             $request->getMethod() == 'POST'
             &&!empty($campos)
@@ -261,8 +265,10 @@ class SentenciaController extends BaseController
             $gruposSelectArray=array();
             $gruposGrupoArray=array();
             $gruposEncabezado=array();
+
             $existeAGR=false;
             $existeCOL=false;
+
             if(!empty($request->request->all()['parametrosForm']['grupo'])){
                 $i=1;
                 foreach($request->request->all()['parametrosForm']['grupo'] as $grupo):
@@ -299,6 +305,7 @@ class SentenciaController extends BaseController
                             }else{
                                 $gruposSelectArray[]=$campos[$grupo['campo']];
                             }
+                            $ordenGrupo[$grupo['campo']]= $campos[$grupo['campo']];
                             $gruposGrupoArray[]=$campos[$grupo['campo']];
                             $existeCOL=true;
                         }
@@ -326,6 +333,7 @@ class SentenciaController extends BaseController
 
             $ordenesString = '';
             $ordenesArray=array();
+
             if(!empty($request->request->all()['parametrosForm']['orden'])){
                 $i=1;
                 foreach($request->request->all()['parametrosForm']['orden'] as $nroOrden => $orden):
@@ -333,7 +341,7 @@ class SentenciaController extends BaseController
                         empty($campos[$orden['campo']])
                         ||empty($orden['orden'])
                     ){
-                        $this->setMensajes('El orden de la fila '.$i.' no es válido.');
+                        $this->setMensajes('El orden de la fila '. $i .' no es válido.');
                     }else{
                         $ordenAplicado[]=['campo'=>$orden['campo'],'orden'=>$orden['orden']];
                         $ordenesArrayPart=array();
@@ -341,6 +349,8 @@ class SentenciaController extends BaseController
                             $ordenesArrayPart[0]=$ordenGrupo[$orden['campo']];
                         }elseif(empty($gruposGrupoString)){
                             $ordenesArrayPart[0]=$campos[$orden['campo']];
+                        }else{
+                            $this->setMensajes('No se ordenará por '. $camposMostrar[$orden['campo']] .', en modo agrupamiento solo se puede ordenar por las filas mostradas.');
                         }
                         if(isset($ordenesArrayPart[0])){
                             $ordenesArrayPart[1]=$orden['orden'];
@@ -371,6 +381,7 @@ class SentenciaController extends BaseController
                     9=>' != '
                 ];
                 $i=1;
+
                 foreach($request->request->all()['parametrosForm']['filtro'] as $nroFiltro => $filtro):
                     if(
                         (
@@ -547,11 +558,13 @@ class SentenciaController extends BaseController
             $limiteSQL=$this->setValoresBind('limite',$limite);
 
             $selectQuery = 'select * from ( select '.implode(', ',$camposArray).' FROM '.$this->getClauses($entity->getContenido())['tabla'].$this->getClauses($entity->getContenido())['condiciones'].$filtrosString.$gruposGrupoString.$ordenesString.' ) WHERE ROWNUM <= '.$limiteSQL;
+
             $statement = $this->container->get('doctrine.dbal.vipac_connection')->prepare($selectQuery);
 
             foreach($this->getValoresBind() as $campoBind => $valorBind ):
                 $statement->bindValue($campoBind,$valorBind);
             endforeach;
+
             if(!$statement->execute()){
                 $this->setMensajes('Hubo un error en la ejecucion de la consulta.');
                 return array(
@@ -564,6 +577,7 @@ class SentenciaController extends BaseController
             $resultados=$this->container->get('gopro_main_variableproceso')->utf($statement->fetchAll());
 
             $encabezados=array();
+
             foreach($encabezadoArray as $campoEncabezado):
                 $encabezados[]=$camposPorNombre[$campoEncabezado];
             endforeach;
@@ -622,9 +636,12 @@ class SentenciaController extends BaseController
      */
     private function parametrosForm($id,$campos,$tipos,$operadores,$ordenes,$grupos,$parametrosGuardados,$parametrosGuardadosOpciones,$destino=null,$limite=null)
     {
+        if(empty($destino)){
+            $destino='pantalla';
+        }
         $destinoChOp = array('pantalla'=>'Pantalla','archivo'=>'Archivo');
         $destinoCh=array('choices'=>$destinoChOp,'multiple'=>false,'expanded'=>true,'data'=>$destino);
-        $limiteChOp = array(500=>'500',1000=>'1000',5000=>'5000');
+        $limiteChOp = array(500=>'500', 1000=>'1000', 5000=>'5000', 10000=>'10000', 50000=>'50000');
         $limiteCh=array('choices'=>$limiteChOp,'multiple'=>false,'expanded'=>false,'label'=>'Límite','data'=>$limite);
         return $this->get('form.factory')->createNamedBuilder(
             'parametrosForm',

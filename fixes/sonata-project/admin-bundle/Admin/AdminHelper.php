@@ -120,16 +120,18 @@ class AdminHelper
 
         $collection = $propertyAccessor->getValue($entity, $elementId);
 
-        if ($collection instanceof \Doctrine\ORM\ArrayCollection) {
-            $entityClassName = $this->entityClassNameFinder($admin, explode('.', preg_replace('#\[\d*?\]#', '', $elementId)));
-        } elseif ($collection instanceof \Doctrine\ORM\PersistentCollection) {
+        if ($collection instanceof \Doctrine\ORM\PersistentCollection || $collection instanceof \Doctrine\ODM\MongoDB\PersistentCollection) {
             //since doctrine 2.4
             $entityClassName = $collection->getTypeClass()->getName();
+        } elseif ($collection instanceof \Doctrine\Common\Collections\Collection) {
+            $entityClassName = $this->entityClassNameFinder($admin, explode('.', preg_replace('#\[\d*?\]#', '', $elementId)));
         } else {
+
             return;
         }
 
         if (!method_exists($collection, 'add')){
+
             return;
         }
 
@@ -142,10 +144,6 @@ class AdminHelper
     protected function entityClassNameFinder(AdminInterface $admin, $elements)
     {
         $element = array_shift($elements);
-
-        if(!is_object($element)){
-            return null;
-        }
 
         $associationAdmin = $admin->getFormFieldDescription($element)->getAssociationAdmin();
 
