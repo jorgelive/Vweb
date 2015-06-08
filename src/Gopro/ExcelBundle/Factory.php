@@ -13,7 +13,7 @@ class Factory
 {
     private $phpExcelIO;
     private $phpExcelCell;
-    private $phpExcelStyle;
+    //private $phpExcelStyle;
 
     public function __construct($phpExcelIO = '\PHPExcel_IOFactory',$phpExcelCell = '\PHPExcel_Cell')
     {
