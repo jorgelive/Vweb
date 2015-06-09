@@ -53,12 +53,13 @@ class CaracteristicaAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $formMapper)
     {
-        //if (!$this->isChild()) {
+
         if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Item' && $this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Componente' ) {
             $formMapper
                 ->add('componente')
             ;
         }
+
         $formMapper
             ->add('caracteristicatipo', null, array('label' => 'Tipo'))
             ->add('contenido')

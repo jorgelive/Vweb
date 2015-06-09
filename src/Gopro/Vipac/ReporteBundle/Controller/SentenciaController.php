@@ -76,7 +76,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/", name="gopro_vipac_reporte_sentencia")
      * @Method("GET")
-     * @Secure(roles="ROLE_STAFF")
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function indexAction()
@@ -168,7 +168,7 @@ class SentenciaController extends BaseController
      *
      * @Route("/{id}", name="gopro_vipac_reporte_sentencia_show")
      * @Method({"GET","POST"})
-     * @Secure(roles="ROLE_STAFF")
+     * @Secure(roles="ROLE_USER")
      * @Template()
      */
     public function showAction(Request $request, $id)
