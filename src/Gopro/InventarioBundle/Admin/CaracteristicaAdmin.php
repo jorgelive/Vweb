@@ -11,12 +11,22 @@ use Sonata\AdminBundle\Show\ShowMapper;
 class CaracteristicaAdmin extends Admin
 {
     /**
+     * Orden Predeterminado del datagrid
+     *
+     * @var array
+     */
+    protected $datagridValues = array(
+        '_page' => 1,
+        '_sort_order' => 'ASC',
+        '_sort_by' => 'componente.item.nombre'
+    );
+
+    /**
      * @param DatagridMapper $datagridMapper
      */
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
         $datagridMapper
-            ->add('id')
             ->add('componente.item', null, array('label' => 'Item'))
             ->add('componente')
             ->add('componente.componenteestado', null, array('label' => 'Estado'))
@@ -32,7 +42,6 @@ class CaracteristicaAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
-            ->add('id')
             ->add('componente.item', null, array('label' => 'Item'))
             ->add('componente')
             ->add('componente.componenteestado', null, array('label' => 'Estado'))
