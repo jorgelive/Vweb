@@ -17,10 +17,12 @@ class CuentaAdmin extends Admin
     {
         $datagridMapper
             ->add('id')
+            ->add('user.dependencia', null, array('label' => 'Dependencia'))
+            ->add('user.area', null, array('label' => 'Area'))
             ->add('user', null, array('label' => 'Usuario'))
             ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
-            ->add('nombre', null, array('label' => 'Contraseña'))
-            ->add('password')
+            ->add('nombre', null, array('label' => 'Nombre'))
+            ->add('password',null, array('label' => 'Contraseña'))
         ;
     }
 
@@ -31,6 +33,8 @@ class CuentaAdmin extends Admin
     {
         $listMapper
             ->add('id')
+            ->add('user.dependencia', null, array('label' => 'Dependencia'))
+            ->add('user.area', null, array('label' => 'Area'))
             ->add('user', null, array('label' => 'Usuario'))
             ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
             ->add('nombre', null, array('editable' => true))
@@ -65,6 +69,8 @@ class CuentaAdmin extends Admin
     {
         $showMapper
             ->add('id')
+            ->add('user.dependencia', null, array('label' => 'Dependencia'))
+            ->add('user.area', null, array('label' => 'Area'))
             ->add('user', null, array('label' => 'Usuario'))
             ->add('cuentatipo', null, array('label' => 'Tipo de cuenta'))
             ->add('nombre')
