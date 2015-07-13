@@ -153,11 +153,10 @@ class ItemController extends BaseController
     public function servicioAction($id)
     {
         $em = $this->getDoctrine()->getManager();
-
         $items = $em->createQueryBuilder()
             ->addSelect('i')
             ->from('GoproInventarioBundle:Item', 'i')
-            ->leftJoin('i.servicios', 's')
+            ->leftJoin('i.servicios', 's', 'WITH', 's.servicioestado=2')
             ->addSelect('s')
             ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
             ->addSelect('c')
@@ -197,7 +196,7 @@ class ItemController extends BaseController
             $mantenimientos=array();
             foreach($item->getServicios() as $key => $servicio):
                 $mantenimientos[$key][]=$key+1;
-                $mantenimientos[$key][]=$servicio->getFecha()->format('Y-m-d');
+                $mantenimientos[$key][]=$servicio->getTiempo()->format('Y-m-d');
                 $mantenimientos[$key][]=$servicio->getServiciotipo()->getNombre().': '.$servicio->getDescripcion();
                 if($servicio->getServiciotipo()->getId()==1){
                     $mantenimientos[$key][]='';
