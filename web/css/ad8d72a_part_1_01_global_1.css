@@ -1,0 +1,56 @@
+* {margin:0; padding:0;}
+h1{font-size: 150%}
+h2{font-size: 130%}
+h3{font-size: 110%}
+h1,h2,h3{margin: 7px 0 5px 0;}
+a{text-decoration: none;}
+a:hover{text-decoration: underline;}
+label.required:after {content: " *";}
+
+body {color:#444; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 75%;}
+
+div#viewPort{ min-width: 800px;}
+
+div#header {width: 100%; height: 40px; background: #FCBA15; padding:5px; display:block; position: relative; }
+div#header div#titulo{color: #fff; margin-left: 10px;}
+div#header div#loginStatus {display:block; position: absolute; top: 0px; right:20px;}
+div#header div#loginStatus a{color:#eee;}
+div#header div#loginStatus a:hover{color:#fff;}
+div#sessionFlash{ display:block; width: 350px; margin: 10px auto;}
+div#sidebar{padding:10px; width:15%; display: inline-block; margin-right: 10px;}
+div#sidebar:empty{display:none;}
+div#sidebar ul{ list-style-type: none;}
+div#sidebar ul li{width: 100%;line-height: 30px;}
+div#sidebar ul li a{margin-bottom: 3px; width: 100%;}
+
+div#container{padding:10px; width:75%; display: inline-block; vertical-align: top;}
+
+table#listaResultados {margin:10px 0; border-collapse: collapse;}
+table#listaResultados thead tr th{font-size: 95%;}
+table#listaResultados thead tr th,
+table#listaResultados tbody tr td{min-width:170px; border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
+
+table#listaArchivos {margin:10px 0; border-collapse: collapse;}
+table#listaArchivos thead tr th{font-size: 95%;}
+table#listaArchivos thead tr th,
+table#listaArchivos tbody tr td{min-width:170px; border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
+table#listaArchivos tbody tr td.nombre{text-align: left; font-weight: bold;}
+table#listaArchivos tbody tr td a{ margin:0 5px; color:#444;}
+table#listaArchivos tbody tr td a:hover{ margin:0 5px; color:#444;}
+
+table.listaRegistros,
+table.registroPropiedades{border-collapse: collapse; margin-bottom: 10px;}
+table.listaRegistros thead tr th,
+table.registroPropiedades thead tr th {color: #0088cc; background: #eee;}
+table.listaRegistros tr td,
+table.registroPropiedades tr td,
+table.listaRegistros tr th,
+table.registroPropiedades tr th{border: #a6c9e2 solid 1px; padding: 5px; text-align: center;}
+table.listaRegistros tr td ul,
+table.registroPropiedades tr td ul{list-style: none outside none; margin: 0px 10px;}
+
+ul.registroAcciones,
+ul.listaAcciones{list-style: none outside none; margin: 10px 0;}
+ul.registroAcciones li,
+ul.listaAcciones li{ display: inline-block;}
+ul.listaMensajes {margin-left: 30px;}

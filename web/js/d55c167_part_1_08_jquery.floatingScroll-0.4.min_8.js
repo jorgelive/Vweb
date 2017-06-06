@@ -1,0 +1,9 @@
+/*!
+ * jQuery Floating Scrollbar - v0.4 - 02/28/2011
+ * http://benalman.com/
+ *
+ * Copyright (c) 2011 "Cowboy" Ben Alman
+ * Dual licensed under the MIT and GPL licenses.
+ * http://benalman.com/about/license/
+ */
+(function($){var win=$(this),html=$("html"),elems=$([]),current,previous,scroller=$('<div id="floating-scrollbar"><div/></div>'),scrollerInner=scroller.children();scroller.hide().css({position:"fixed",bottom:0,height:"30px",overflowX:"auto",overflowY:"hidden"}).scroll(function(){current&&current.scrollLeft(scroller.scrollLeft());});scrollerInner.css({border:"1px solid #fff",opacity:0.01});$.fn.floatingScrollbar=function(state){if(state===false){elems=elems.not(this);this.unbind("scroll",scrollCurrent);if(!elems.length){scroller.detach();win.unbind("resize scroll",update);}}else{if(this.length){if(!elems.length){win.resize(update).scroll(update);}elems=elems.add(this);}}update();return this;};$.floatingScrollbarUpdate=update;function setState(state){scroller.toggle(!!state);}function scrollCurrent(){current&&scroller.scrollLeft(current.scrollLeft());}function update(){previous=current;current=null;elems.each(function(){var elem=$(this),top=elem.offset().top,bottom=top+elem.height(),viewportBottom=win.scrollTop()+win.height(),topOffset=30;if(top+topOffset<viewportBottom&&bottom>viewportBottom){current=elem;return false;}});if(!current){setState();return;}var scroll=current.scrollLeft(),scrollMax=current.scrollLeft(90019001).scrollLeft(),widthOuter=current.innerWidth(),widthInner=widthOuter+scrollMax;current.scrollLeft(scroll);if(widthInner<=widthOuter){setState();return;}setState(true);if(!previous||previous[0]!==current[0]){previous&&previous.unbind("scroll",scrollCurrent);current.scroll(scrollCurrent).after(scroller);}scroller.css({left:current.offset().left-win.scrollLeft(),width:widthOuter}).scrollLeft(scroll);scrollerInner.width(widthInner);}})(jQuery);

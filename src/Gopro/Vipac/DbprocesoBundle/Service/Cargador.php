@@ -1,8 +1,12 @@
 <?php
 namespace Gopro\Vipac\DbprocesoBundle\Service;
-use \Symfony\Component\DependencyInjection\ContainerAware;
 
-class Cargador extends ContainerAware{
+use \Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+class Cargador implements ContainerAwareInterface{
+
+    use ContainerAwareTrait;
 
     private $mensajes=array();
     private $columnaSpecs;

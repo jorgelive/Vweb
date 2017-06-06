@@ -229,7 +229,7 @@ class ServicioController extends BaseController
                     ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),2,'inventario_servicio_lista')
                     ->setArchivo()
                     ->setParametrosWriter('F-SIS-01-'.$ano.'_'.$dependenciaNombre)
-                    ->setCeldas(['texto'=>['B5'=>'AÑO: '.$ano,'G5'=> ($ano-1).'-12-10']])
+                    ->setCeldas(['B5'=>'AÑO: '.$ano,'G5'=> ($ano-1).'-12-10'])
                     ->setTabla($resultado,'A9');
 
                 $archivos[]=[

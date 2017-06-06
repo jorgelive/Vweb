@@ -353,10 +353,10 @@ class ProcesoController extends BaseController
             $resultado[$nroLinea]['FECHA_CONTABLE']=$dataCP[$nroLinea]['FECHA_CONTABLE'];
             if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
                 $resultado[$nroLinea]['RUBRO6']='001';
-                $celdas['texto']['u'.($nroLinea+1)]='001';
+                $celdas['u'.($nroLinea+1)]='001';
             }elseif(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
                 $resultado[$nroLinea]['RUBRO6']='003';
-                $celdas['texto']['u'.($nroLinea+1)]='003';
+                $celdas['u'.($nroLinea+1)]='003';
             }else{
                 $resultado[$nroLinea]['RUBRO6']='';
             }
@@ -509,9 +509,9 @@ class ProcesoController extends BaseController
             ->setCeldas($celdas)
             ->getArchivo()
         ;
-        $archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
-        $archivoGenerado->setCeldas($celdas);
-        return $archivoGenerado->getArchivo();
+        //$archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
+        //$archivoGenerado->setCeldas($celdas);
+        //return $archivoGenerado->getArchivo();
     }
 
     /*

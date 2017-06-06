@@ -1,0 +1,55 @@
+{% extends 'GoproVipacDbprocesoBundle::layout.html.twig' %}
+{% block title %}Generadores de formatos para SAP desde formato Perurail{% endblock title %}
+{% block titulo %}Generadores de formatos para SAP desde formato Perurail{% endblock titulo %}
+{% block content %}
+
+    <div id="archivo">
+        {{ form(formulario) }}
+        <h1>Agregar archivo</h1>
+        <div id="cargadorArchivos">Subir Archivo</div>
+    </div>
+
+
+    <div id="archivos">
+        <h1>Listado de Archivos</h1>
+        <table id="listaArchivos">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha de creación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if archivosAlmacenados|default %}
+                {% for archivo in archivosAlmacenados %}
+                    <tr data-id="{{ archivo.id }}">
+                        <td class="nombre">{{ archivo.nombre }}</td>
+                        <td>{{ archivo.creado | date('Y-m-d H:i:s') }}</td>
+                        <td>
+                            <a href="{{ path('gopro_vipac_dbproceso_procesosap_perurail', {'archivoEjecutar': archivo.id}) }}">Procesar</a>
+                            <a class="borrarFila" data-id="{{ archivo.id }}" href="{{ path('gopro_main_archivo_delete',{'id':archivo.id})}}">Borrar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if mensajes|default %}
+        <div id="mensajes">
+            <h1>Mensajes del proceso</h1>
+            <ul class="listaMensajes">
+                {% for mensaje in mensajes %}
+                    <li>{{ mensaje }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock content %}
+
+
+
+
+

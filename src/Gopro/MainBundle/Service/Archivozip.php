@@ -1,13 +1,16 @@
 <?php
 
 namespace Gopro\MainBundle\Service;
-use \Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
-use Symfony\Component\HttpFoundation\Response;
 
+use \Symfony\Component\Filesystem\Filesystem;
+use \Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use \Symfony\Component\HttpFoundation\Response;
+use \Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class Archivozip extends ContainerAware{
+class Archivozip implements ContainerAwareInterface{
+
+    use ContainerAwareTrait;
 
     private $archivos;
 

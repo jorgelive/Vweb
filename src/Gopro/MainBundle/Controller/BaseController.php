@@ -115,11 +115,44 @@ class BaseController extends Controller
             $this->stack[$vars[0]][][$vars[1]]=$valor;
             return true;
         }elseif(is_array($vars)&&count($vars)==3&&$key==$vars[2]){
-
             $this->stack[$vars[0]][][$vars[1]]=$valor;
             return true;
+
         }
         return false;
 
     }
+
+    protected function seekAndStack($contenedor, $nombreStack, $key, $newKeyName = NULL) {
+        $i = 0;
+        foreach ($contenedor as $k => $v) {
+            if ($key == $k){
+                if(is_array($v)){
+                    foreach($v as $subkey => $subv){
+                        if (is_numeric($subkey)){
+                            if(!isset($this->stack[$nombreStack.'Aux']) || !in_array($subv,$this->stack[$nombreStack.'Aux'])){
+                                $this->stack[$nombreStack][][$newKeyName]=$subv;
+                                $i++;
+                            }
+                            $this->stack[$nombreStack.'Aux']=[$subv];
+                        }
+                    }
+                }else{
+                    if(!isset($this->stack[$nombreStack.'Aux']) || !in_array($v,$this->stack[$nombreStack.'Aux'])) {
+                        $this->stack[$nombreStack][][$newKeyName] = $v;
+                        $i++;
+                    }
+                    $this->stack[$nombreStack.'Aux']=[$v];
+                }
+            }elseif (is_array($v)){
+                $this->seekAndStack($v, $nombreStack, $key, $newKeyName);
+            }
+        }
+        if($i>1){
+            return true;
+        }
+        return false;
+    }
+
+
 }

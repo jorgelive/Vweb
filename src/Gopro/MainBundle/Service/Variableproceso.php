@@ -1,10 +1,13 @@
 <?php
 
 namespace Gopro\MainBundle\Service;
-use \Symfony\Component\DependencyInjection\ContainerAware;
 
+use \Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class Variableproceso extends ContainerAware{
+class Variableproceso implements ContainerAwareInterface{
+
+    use ContainerAwareTrait;
 
 
     public function sanitizeString($str, $what=NULL, $with='')

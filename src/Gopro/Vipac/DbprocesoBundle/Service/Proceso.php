@@ -1,8 +1,12 @@
 <?php
 namespace Gopro\Vipac\DbprocesoBundle\Service;
-use \Symfony\Component\DependencyInjection\ContainerAware;
 
-class Proceso extends ContainerAware{
+use \Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use \Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+class Proceso implements ContainerAwareInterface{
+
+    use ContainerAwareTrait;
 
     private $conexion;
     private $tabla;

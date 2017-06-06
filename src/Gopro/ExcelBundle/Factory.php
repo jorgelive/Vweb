@@ -39,6 +39,19 @@ class Factory
     }
 
     /**
+     * Creates an empty PHPExcel Sheet if the filename is empty, otherwise loads the file into the object.
+     *
+     * @paran \PHPExcel
+     * @param string $filename
+     *
+     * @return \PHPExcel_Worksheet
+     */
+    public function createPHPExcelSheet($phpExcelObject, $name = null)
+    {
+        return new \PHPExcel_Worksheet($phpExcelObject, $name);
+    }
+
+    /**
      * Creates an empty PHPExcel Object if the filename is empty, otherwise loads the file into the object.
      *
      * @param string $column

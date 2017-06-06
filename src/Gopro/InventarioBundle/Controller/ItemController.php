@@ -213,7 +213,7 @@ class ItemController extends BaseController
                 ->setArchivoBase($this->getDoctrine()->getRepository('GoproMainBundle:Archivo'),1,'inventario_item_servicio')
                 ->setArchivo()
                 ->setParametrosWriter('F-SIS-02-'.$item->getDependencia()->getNombre().'_'.$item->getCodigo())
-                ->setCeldas(['texto'=>['C4'=>$componenteCadena,'C5'=>$item->getCodigo()]])
+                ->setCeldas(['C4'=>$componenteCadena,'C5'=>$item->getCodigo()])
                 ->setTabla($mantenimientos,'A9');
 
             if($id!='todo'){
