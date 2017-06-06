@@ -36,7 +36,7 @@ class DefaultController extends Controller
             array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
             array('nombre'=>'Reportes','route'=>'gopro_vipac_reporte_sentencia'),
             array('nombre'=>'Inventario de equipos','route'=>'gopro_inventario_item'),
-            array('nombre'=>'Servicios técnicos','route'=>'gopro_inventario_servicio'),
+            array('nombre'=>'Administrador','route'=>'sonata_admin_dashboard'),
         );
         return array('items'=> $items);
     }

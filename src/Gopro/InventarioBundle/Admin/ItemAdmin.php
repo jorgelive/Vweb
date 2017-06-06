@@ -11,12 +11,22 @@ use Sonata\AdminBundle\Show\ShowMapper;
 class ItemAdmin extends Admin
 {
     /**
+     * Orden Predeterminado del datagrid
+     *
+     * @var array
+     */
+    protected $datagridValues = array(
+        '_page' => 1,
+        '_sort_order' => 'ASC',
+        '_sort_by' => 'nombre'
+    );
+
+    /**
      * @param DatagridMapper $datagridMapper
      */
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
         $datagridMapper
-            ->add('id')
             ->add('nombre')
             ->add('codigo', null, array('label' => 'Código'))
             ->add('dependencia')
@@ -32,7 +42,6 @@ class ItemAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
-            ->add('id')
             ->add('nombre', null, array('editable' => true))
             ->add('codigo', null, array('label' => 'Código', 'editable' => true))
             ->add('dependencia', null, array('editable' => true))
@@ -68,7 +77,8 @@ class ItemAdmin extends Admin
             ->add('users', 'sonata_type_model', array(
                     'expanded' => false,
                     'multiple' => true,
-                    'required' => false
+                    'required' => false,
+                    'label' => 'Usuarios'
                 )
             )
             ->add('componentes', 'sonata_type_collection', array('by_reference' => false),array(

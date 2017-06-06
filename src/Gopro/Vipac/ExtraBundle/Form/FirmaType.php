@@ -8,14 +8,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FirmaType extends AbstractType
 {
-        /**
+    /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $oficinaChOp = array('reducto'=>'Reducto','lamar'=>'La Mar','cusco'=>'Cusco','app'=>'Arequipa');
+        $oficinaChOp = array('reducto'=>'Reducto','lamar'=>'La Mar','cusco'=>'Cusco','aqp'=>'Arequipa');
         $oficinaCh=array('choices'=>$oficinaChOp,'multiple'=>false,'expanded'=>true);
         $idiomaChOp = array('es'=>'Español','en'=>'Inglés','pt'=>'Portugués');
         $idiomaCh=array('choices'=>$idiomaChOp,'multiple'=>false,'expanded'=>true);

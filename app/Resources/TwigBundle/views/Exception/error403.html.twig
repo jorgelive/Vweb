@@ -1,0 +1,11 @@
+{% extends "::global.html.twig" %}
+{% block title %}Error 403 - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="ErrorPage">
+        <h2>No esta autorizado para acceder al contenido.</h2>
+    </div>
+{% endblock container %}

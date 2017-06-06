@@ -46,7 +46,11 @@ class User extends BaseUser
     private $cuentas;
 
     public function __construct() {
+
+        parent::__construct();
+
         $this->cuentas = new ArrayCollection();
+
     }
 
 
@@ -82,7 +86,6 @@ class User extends BaseUser
     {
         return $this->dependencia;
     }
-
 
     /**
      * Set area

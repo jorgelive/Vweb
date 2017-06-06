@@ -25,6 +25,13 @@ class Servicioaccion
     private $id;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="tiempo", type="datetime")
+     */
+    private $tiempo;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="contenido", type="string", length=100)
@@ -72,6 +79,29 @@ class Servicioaccion
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set tiempo
+     *
+     * @param \DateTime $creado
+     * @return Servicioaccion
+     */
+    public function setTiempo($tiempo)
+    {
+        $this->tiempo = $tiempo;
+
+        return $this;
+    }
+
+    /**
+     * Get tiempo
+     *
+     * @return \DateTime
+     */
+    public function getTiempo()
+    {
+        return $this->tiempo;
     }
 
     /**

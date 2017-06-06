@@ -136,7 +136,7 @@ class ServicioController extends BaseController
             ->addSelect('u')
             ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1')
             ->addSelect('c')
-            ->leftJoin('ca.caracteristicas','ca')
+            ->leftJoin('c.caracteristicas','ca')
             ->addSelect('ca')
             ->leftJoin('ca.caracteristicatipo','ct')
             ->addSelect('ct')
@@ -151,7 +151,7 @@ class ServicioController extends BaseController
 
         $itemsAnoDependencia=array();
         foreach($servicios as $servicio):
-            $ano=$servicio->getFecha()->format('Y');
+            $ano=$servicio->getTiempo()->format('Y');
             $dependencia=$servicio->getItem()->getDependencia()->getId();
             $itemsAnoDependencia[$ano][$dependencia]['dependencia']=$servicio->getItem()->getDependencia();
             $itemsAnoDependencia[$ano][$dependencia]['items'][$servicio->getItem()->getId()]['item']=$servicio->getItem();
@@ -181,7 +181,7 @@ class ServicioController extends BaseController
                     foreach($item['item']->getComponentes() as $componete):
                         foreach($componete->getCaracteristicas() as $caracteristica):
                             if(in_array($caracteristica->getCaracteristicatipo()->getId(),[1,2,3])){
-                                $itemList[$caracteristica->getCaracteristica()->getId()]=$caracteristica->getContenido();
+                                $itemList[$caracteristica->getCaracteristicatipo()->getId()]=$caracteristica->getContenido();
                             }
                         endforeach;
 
@@ -200,7 +200,7 @@ class ServicioController extends BaseController
                     }
                     $serviciosList=array();
                     foreach($item['item']->getServicios() as $servicio):
-                        if($servicio->getFecha()->format('d')>=15){
+                        if($servicio->getTiempo()->format('d')>=15){
                             $quincena=2;
                         }else{
                             $quincena=1;
@@ -210,8 +210,8 @@ class ServicioController extends BaseController
                         }else{
                             $marca='✓';
                         }
-                        if($servicio->getFecha()->format('Y')==$ano){
-                            $serviciosList[(($servicio->getFecha()->format('m')-1)*2)+$quincena]=$marca;
+                        if($servicio->getTiempo()->format('Y')==$ano){
+                            $serviciosList[(($servicio->getTiempo()->format('m')-1)*2)+$quincena]=$marca;
                         }
                     endforeach;
                     for($iServicios=1;$iServicios<=24;$iServicios++):
@@ -278,6 +278,7 @@ class ServicioController extends BaseController
             ->getArrayResult();
 
         $fechaInicio=new \DateTime($ano.'-0'.((($semestre-1)*6)+1).'-01');
+
         if($semestre==1){
             $fechaFin=new \DateTime($ano.'-07-01');
         }else{
@@ -288,8 +289,10 @@ class ServicioController extends BaseController
             $items = $em->createQueryBuilder()
                 ->addSelect('i')
                 ->from('GoproInventarioBundle:Item', 'i')
-                ->leftJoin('i.servicios', 'm', 'WITH', 'm.fecha>=:fechaInicio and m.fecha<:fechaFin')
-                ->addSelect('m')
+                ->leftJoin('i.componentes','c', 'WITH', 'c.componentetipo=1 and c.componenteestado=1')
+                ->addSelect('c')
+                ->leftJoin('i.servicios', 's', 'WITH', 's.tiempo>=:fechaInicio and s.tiempo<:fechaFin')
+                ->addSelect('s')
                 ->orderBy('i.id', 'ASC')
                 ->where($em->createQueryBuilder()->expr()->eq('i.dependencia', ':dependencia'))
                 ->setParameter('dependencia', $dependencia)
@@ -307,20 +310,25 @@ class ServicioController extends BaseController
                 }
                 $fecha->add(new \DateInterval('P'.$diasAdd.'D'));
                 if(empty($item['servicios'])){
-                    ${'servicio'.$key} = new Servicio();
-                    ${'servicio'.$key}
-                        ->setItem($em->getRepository('GoproInventarioBundle:Item')->find($item['id']))
-                        ->setFecha(clone $fecha)
-                        ->setServiciotipo($tipo)
-                        ->setUser($ejecutor)
-                        ->setDescripcion('Limpieza interna y externa, optimizacion de programas y archivos, actualización de software.')
-                    ;
-                    if($fecha > new \DateTime()){
-                        ${'servicio'.$key}->setServicioestado($estadoPlanificado);
-                    }else{
-                        ${'servicio'.$key}->setServicioestado($estadoEjecutado);
+                    if(!empty($item['componentes'])) {
+                        foreach ($item['componentes'] as $componente):
+                            if (empty($componente['fechacompra']) || $componente['fechacompra'] < $fechaInicio){
+                                ${'servicio' . $key} = new Servicio();
+                                ${'servicio' . $key}
+                                    ->setItem($em->getRepository('GoproInventarioBundle:Item')->find($item['id']))
+                                    ->setTiempo(clone $fecha)
+                                    ->setServiciotipo($tipo)
+                                    ->setUser($ejecutor)
+                                    ->setDescripcion('Limpieza interna y externa, optimizacion de programas y archivos, actualización de software.');
+                                if ($fecha > new \DateTime()) {
+                                    ${'servicio' . $key}->setServicioestado($estadoPlanificado);
+                                } else {
+                                    ${'servicio' . $key}->setServicioestado($estadoEjecutado);
+                                }
+                                $em->persist(${'servicio' . $key});
+                            }
+                        endforeach;
                     }
-                    $em->persist(${'servicio'.$key});
                 }
             endforeach;
         endforeach;

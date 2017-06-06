@@ -4,7 +4,7 @@ namespace Gopro\Vipac\ReporteBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SentenciaType extends AbstractType
 {
@@ -16,21 +16,28 @@ class SentenciaType extends AbstractType
     {
         $builder
             ->add('nombre')
-            ->add('areas')
+            ->add('groups', null,  array(
+                'label' => 'Grupos',
+                'multiple' => true,
+                'expanded' => true
+            ))
             ->add('descripcion',null, array('label' => 'Descripción'))
             ->add('contenido')
             ->add('campos', 'collection', array(
                 'label'=>false,
                 'type' => new CampoType(),
-                'options' => array('label' => false)
+                'options' => array(
+                    'label' => false,
+                    'data_class' => 'Gopro\Vipac\ReporteBundle\Entity\Campo'
+                )
             ));
         ;
     }
     
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Gopro\Vipac\ReporteBundle\Entity\Sentencia'

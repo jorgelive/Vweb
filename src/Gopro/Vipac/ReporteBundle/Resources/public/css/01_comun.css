@@ -8,9 +8,9 @@ div#GoproVipacReporteBundle form#parametrosForm div#guardadoContent table#guarda
 
 
 div#GoproVipacReporteBundle form#parametrosForm div#guardadoContent{width:180px; display:block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#filtroContent{width:470px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#ordenContent{width:320px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
-div#GoproVipacReporteBundle form#parametrosForm div#grupoContent{width:320px; vertical-align: middle; display:inline-block; margin:5px 0 0 10px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#filtroContent{width:500px; vertical-align: middle; display:block; margin:5px 0 0 30px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#ordenContent{width:500px; vertical-align: middle; display:block; margin:5px 0 0 30px; padding:5px; border: #a6c9e2 solid 1px;}
+div#GoproVipacReporteBundle form#parametrosForm div#grupoContent{width:500px; vertical-align: middle; display:block; margin:5px 0 0 30px; padding:5px; border: #a6c9e2 solid 1px;}
 
 div#GoproVipacReporteBundle form#parametrosForm div#parametrosForm{margin:5px 0;}
 
@@ -24,7 +24,8 @@ div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div{margin-bottom: 7px;}
 
-div#GoproVipacReporteBundle form div#parametrosForm div label,
+div#GoproVipacReporteBundle form div#parametrosForm div label{text-align:left; display: inline-block; margin-right: 5px; width: 90px; vertical-align: top;}
+
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div label,
@@ -52,14 +53,19 @@ div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div div
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div div,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div{margin-top: 5px; margin-left: 100px;}
 
-div#GoproVipacReporteBundle form div#parametrosForm div div label,
+div#GoproVipacReporteBundle form div#parametrosForm div div label {display: inline-block; margin-left: 0px; text-align: left;}
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_campo div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_parametro div div label,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_tipo div div label,
-div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div label{display: inline-block; margin-left: 5px; width: 70px; text-align: left;}
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_operador div div label{display: inline-block; margin-left: 5px; width: 70px; text-align: right;}
 
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div.opcionMultipleExpandida {display: inline-block; margin-left: 0px;}
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div.opcionMultipleExpandida label{display: inline-block; margin-right: 5px; width: 200px; vertical-align: middle;}
+
+div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div input#gopro_vipac_reportebundle_sentencia_nombre,
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div input#gopro_vipac_reportebundle_sentencia_descripcion{width:527px;}
+
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div textarea#gopro_vipac_reportebundle_sentencia_contenido {height: 260px;width: 530px;}
 
 div#GoproVipacReporteBundle form div#gopro_vipac_reportebundle_sentencia div div#gopro_vipac_reportebundle_sentencia_campos{margin:0;}

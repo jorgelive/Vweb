@@ -2,11 +2,17 @@
 {% block title %}Modificar sentencia SQL{% endblock title %}
 {% block titulo %}Modificar sentencia SQL{% endblock titulo %}
 {% block content %}
+    {% form_theme edit_form 'GoproMainBundle:Form:standard.html.twig' %}
     {{ form(edit_form) }}
     <ul class="registroAcciones">
         <li>
             <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia') }}">
                 Volver a la lista
+            </a>
+        </li>
+        <li>
+            <a class="boton" href="{{ path('gopro_vipac_reporte_sentencia_show', { 'id': edit_form.vars.value.id }) }}">
+                Ir a la sentencia
             </a>
         </li>
         <li>{{ form(delete_form) }}</li>

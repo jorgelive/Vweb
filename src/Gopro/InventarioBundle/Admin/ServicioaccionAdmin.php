@@ -8,31 +8,18 @@ use Sonata\AdminBundle\Datagrid\ListMapper;
 use Sonata\AdminBundle\Form\FormMapper;
 use Sonata\AdminBundle\Show\ShowMapper;
 
-class CaracteristicaAdmin extends Admin
+class ServicioaccionAdmin extends Admin
 {
-    /**
-     * Orden Predeterminado del datagrid
-     *
-     * @var array
-     */
-    protected $datagridValues = array(
-        '_page' => 1,
-        '_sort_order' => 'ASC',
-        '_sort_by' => 'componente.item.nombre'
-    );
-
     /**
      * @param DatagridMapper $datagridMapper
      */
     protected function configureDatagridFilters(DatagridMapper $datagridMapper)
     {
         $datagridMapper
-            ->add('componente.item', null, array('label' => 'Item'))
-            ->add('componente')
-            ->add('componente.componenteestado', null, array('label' => 'Estado'))
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('id')
+            ->add('servicio')
+            ->add('tiempo')
             ->add('contenido')
-
         ;
     }
 
@@ -42,10 +29,9 @@ class CaracteristicaAdmin extends Admin
     protected function configureListFields(ListMapper $listMapper)
     {
         $listMapper
-            ->add('componente.item', null, array('label' => 'Item'))
-            ->add('componente')
-            ->add('componente.componenteestado', null, array('label' => 'Estado'))
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('id')
+            ->add('servicio')
+            ->add('tiempo', null, array('label' => 'Realizada en', 'format' => 'Y-m-d H:i'))
             ->add('contenido', null, array('editable' => true))
             ->add('_action', 'actions', array(
                 'actions' => array(
@@ -62,15 +48,13 @@ class CaracteristicaAdmin extends Admin
      */
     protected function configureFormFields(FormMapper $formMapper)
     {
-
-        if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Item' && $this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Componente' ) {
+        if ($this->getRoot()->getClass() != 'Gopro\InventarioBundle\Entity\Servicio') {
             $formMapper
-                ->add('componente')
+                ->add('servicio')
             ;
         }
-
         $formMapper
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('tiempo', 'sonata_type_datetime_picker', array('label' => 'Realizada en'))
             ->add('contenido')
         ;
     }
@@ -82,10 +66,8 @@ class CaracteristicaAdmin extends Admin
     {
         $showMapper
             ->add('id')
-            ->add('componente.item', null, array('label' => 'Item'))
-            ->add('componente')
-            ->add('componente.componenteestado', null, array('label' => 'Estado'))
-            ->add('caracteristicatipo', null, array('label' => 'Tipo'))
+            ->add('servicio')
+            ->add('tiempo', null, array('label' => 'Realizado en', 'format' => 'Y-m-d H:i'))
             ->add('contenido')
         ;
     }

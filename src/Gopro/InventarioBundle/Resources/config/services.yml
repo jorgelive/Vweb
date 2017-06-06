@@ -39,6 +39,18 @@ services:
         arguments: [~, Gopro\InventarioBundle\Entity\Software, GoproInventarioBundle:SoftwareAdmin]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Software}
+    gopro_inventario.admin.servicio:
+        class: Gopro\InventarioBundle\Admin\ServicioAdmin
+        arguments: [~, Gopro\InventarioBundle\Entity\Servicio, GoproInventarioBundle:ServicioAdmin]
+        calls:
+            - [ setSecurityContext, [@security.context]]
+        tags:
+           - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Servicios'}
+    gopro_inventario.admin.servicioaccion:
+        class: Gopro\InventarioBundle\Admin\ServicioaccionAdmin
+        arguments: [~, Gopro\InventarioBundle\Entity\Servicioaccion, GoproInventarioBundle:ServicioaccionAdmin]
+        tags:
+            - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Acciones realizadas'}
     gopro_inventario.admin.serviciotipo:
         class: Gopro\InventarioBundle\Admin\ServiciotipoAdmin
         arguments: [~, Gopro\InventarioBundle\Entity\Serviciotipo, GoproInventarioBundle:ServiciotipoAdmin]

@@ -1,0 +1,11 @@
+{% extends "::global.html.twig" %}
+{% block title %}Error - {{ parent() }}{% endblock title %}
+{% block titulo %}{% endblock titulo %}
+{% block sidebar %}
+    {{ parent() }}
+{% endblock sidebar %}
+{% block container %}
+    <div id="ErrorPage">
+        <h2>Hubo un error al procesar su solicitud.</h2>
+    </div>
+{% endblock container %}
