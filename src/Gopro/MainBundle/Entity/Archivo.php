@@ -106,7 +106,7 @@ class Archivo
     public function preUpload()
     {
         if (null !== $this->getArchivo()) {
-            $this->extension = $this->getArchivo()->guessExtension();
+            !empty($this->getArchivo()->guessExtension()) ? $this->extension = $this->getArchivo()->guessExtension() : $this->extension = $this->getArchivo()->getClientOriginalExtension();
             $this->nombre = preg_replace('/\.[^.]*$/', '', $this->getArchivo()->getClientOriginalName());
         }
     }
@@ -127,7 +127,7 @@ class Archivo
 
         $this->getArchivo()->move(
             $this->getUploadRootDir(),
-            $this->id.'.'.$this->getArchivo()->guessExtension()
+            $this->id.'.'.$this->extension
         );
 
         $this->setArchivo(null);

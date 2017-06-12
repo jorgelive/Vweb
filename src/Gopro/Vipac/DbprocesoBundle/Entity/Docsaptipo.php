@@ -46,11 +46,11 @@ class Docsaptipo
     private $tiposap;
 
     /**
-     * @var string
+     * @var bool
      *
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="boolean")
      */
-    private $impuestosap;
+    private $exoneradoigv;
 
     /**
      * @var string
@@ -167,27 +167,27 @@ class Docsaptipo
     }
 
     /**
-     * Set impuestosap
+     * Set exoneradoigv
      *
-     * @param string $impuestosap
+     * @param boolean $exoneradoigv
      *
      * @return Docsaptipo
      */
-    public function setImpuestosap($impuestosap)
+    public function setExoneradoigv($exoneradoigv)
     {
-        $this->impuestosap = $impuestosap;
+        $this->exoneradoigv = $exoneradoigv;
 
         return $this;
     }
 
     /**
-     * Get impuestosap
+     * Get exoneradoigv
      *
      * @return string
      */
-    public function getImpuestosap()
+    public function getExoneradoigv()
     {
-        return $this->impuestosap;
+        return $this->exoneradoigv;
     }
 
     /**

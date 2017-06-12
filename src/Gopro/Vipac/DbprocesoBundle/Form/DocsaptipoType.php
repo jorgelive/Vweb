@@ -18,7 +18,7 @@ class DocsaptipoType extends AbstractType
             ->add('nombre')
             ->add('tiposunat',null, array('label' => 'Tipo Sunat'))
             ->add('tiposap',null, array('label' => 'Tipo Sap'))
-            ->add('impuestosap',null, array('label' => 'Impuesto'))
+            ->add('exoneradoigv',null, array('label' => 'Exonerado IGV'))
             ->add('cuenta',null, array('label' => 'Cuenta'))
             //->add('impuesto2',null, array('label' => 'Impuesto 2','required' => false))
             ->add('tiposervicio',null, array('label' => 'Tipo de servicio'))

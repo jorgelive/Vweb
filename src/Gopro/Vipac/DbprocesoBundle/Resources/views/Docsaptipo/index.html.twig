@@ -9,7 +9,7 @@
                 <th>Nombre</th>
                 <th>Tipo Sunat</th>
                 <th>Tipo Sap</th>
-                <th>Impuesto</th>
+                <th>Exonerado IGV</th>
                 <th>Cuenta</th>
                 <th>Tipo servicio</th>
                 <th>Creado</th>
@@ -24,7 +24,7 @@
                 <td>{{ entity.nombre }}</td>
                 <td>{{ entity.tiposunat }}</td>
                 <td>{{ entity.tiposap }}</td>
-                <td>{{ entity.impuestosap }}</td>
+                <td>{{ entity.exoneradoigv }}</td>
                 <td>{{ entity.cuenta }}</td>
                 <td>{{ entity.tiposervicio }}</td>
                 <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
