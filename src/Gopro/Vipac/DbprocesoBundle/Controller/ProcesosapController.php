@@ -21,6 +21,214 @@ class ProcesosapController extends BaseController
 {
 
     /**
+     * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_procesosap_generico", defaults={"archivoEjecutar" = null})
+     * @Template()
+     */
+    public function genericoAction(Request $request, $archivoEjecutar)
+    {
+
+        $operacion = 'vipac_dbproceso_procesosap_generico';
+        $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
+
+        $opciones = array('operacion' => $operacion);
+        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+            'action' => $this->generateUrl('gopro_main_archivo_create'),
+        ));
+
+        $formulario->handleRequest($request);
+
+        if (empty($archivoEjecutar)) {
+            $this->setMensajes('No se ha definido ningun archivo');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        $tablaSpecs = array('filasDescartar' => 1);
+        $columnaspecs[] = array('nombre' => 'TIPO_PROCESO');
+        $columnaspecs[] = array('nombre' => 'COD_PROVEEDOR');
+        $columnaspecs[] = array('nombre' => 'NRO_DOCUMENTO');
+        $columnaspecs[] = array('nombre' => 'VALOR_TOTAL');
+        $columnaspecs[] = array('nombre' => 'MONEDA');
+        $columnaspecs[] = array('nombre' => 'FEC_SERVICIO');
+        $columnaspecs[] = array('nombre' => 'FEC_EMISION');
+        $columnaspecs[] = array('nombre' => 'FEC_CONTABLE');
+        $columnaspecs[] = array('nombre' => 'DESCRIPCION');
+        $columnaspecs[] = array('nombre' => 'FILE_1');
+        $columnaspecs[] = array('nombre' => 'FILE_2');
+        $columnaspecs[] = array('nombre' => 'FILE_3');
+        $columnaspecs[] = array('nombre' => 'FILE_4');
+        $columnaspecs[] = array('nombre' => 'FILE_5');
+        $columnaspecs[] = array('nombre' => 'FILE_6');
+        $columnaspecs[] = array('nombre' => 'FILE_7');
+        $columnaspecs[] = array('nombre' => 'FILE_8');
+        $columnaspecs[] = array('nombre' => 'FILE_9');
+        $columnaspecs[] = array('nombre' => 'FILE_10');
+        $columnaspecs[] = array('nombre' => 'FILE_11');
+        $columnaspecs[] = array('nombre' => 'FILE_12');
+        $columnaspecs[] = array('nombre' => 'FILE_13');
+        $columnaspecs[] = array('nombre' => 'FILE_14');
+        $columnaspecs[] = array('nombre' => 'FILE_15');
+        $columnaspecs[] = array('nombre' => 'FILE_16');
+        $columnaspecs[] = array('nombre' => 'FILE_17');
+        $columnaspecs[] = array('nombre' => 'FILE_18');
+        $columnaspecs[] = array('nombre' => 'FILE_19');
+        $columnaspecs[] = array('nombre' => 'FILE_20');
+
+        $archivoInfo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
+            ->setArchivo()
+            ->setSkipRows(1)
+            ->setParametrosReader($tablaSpecs, $columnaspecs)
+            ->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20'])
+            ->setDescartarBlanco(true)
+            ->setTrimEspacios(true);
+
+
+        if (!$archivoInfo->parseExcel()) {
+            $this->setMensajes($archivoInfo->getMensajes());
+            $this->setMensajes('El archivo no se puede procesar');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        } else {
+            $this->setMensajes($archivoInfo->getMensajes());
+        }
+
+        $archivoInfoRaw = $archivoInfo->getExistentesRaw();
+
+        if (!empty($archivoInfoRaw)) {
+            array_walk_recursive($archivoInfoRaw, [$this, 'setStack'], ['fechas', 'FECHA', 'FEC_EMISION']);
+        }
+
+        $tcInfo = $this->container->get('gopro_dbproceso_proceso');
+        $tcInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
+        $tcInfo->setTabla('TIPO_CAMBIO_EXACTUS');
+        $tcInfo->setSchema('RESERVAS');
+        $tcInfo->setCamposSelect([
+            'TIPO_CAMBIO',
+            'FECHA',
+            'MONTO',
+        ]);
+
+        if (empty($this->getStack('fechas'))) {
+            $this->setMensajes('No hay fechas para procesar el tipo de cambio');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        $tcInfo->setQueryVariables($this->getStack('fechas'), 'whereSelect', ['FECHA' => 'exceldate']);
+        $tcInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
+
+        if (!$tcInfo->ejecutarSelectQuery() || empty($tcInfo->getExistentesRaw())) {
+            $this->setMensajes($tcInfo->getMensajes());
+            $this->setMensajes('No existe ninguno de los tipos de cambio');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        } else {
+            $this->setMensajes($tcInfo->getMensajes());
+        }
+
+        foreach ($tcInfo->getExistentesIndizados() as $key => $value) {
+            $tcInfoFormateado[$this->get('gopro_main_variableproceso')->exceldate($key, 'to')] = $value;
+        }
+
+        $filesMulti = $archivoInfo->getExistentesCustomRaw();
+
+        if(empty($filesMulti)){
+            $this->setMensajes('No hay files para procesar');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+        array_walk_recursive($filesMulti,[$this,'setStack'],['files','NUM_FILE']);
+
+        if(empty($this->getStack('files'))) {
+            $this->setMensajes('No se pudieron apilar los fies');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+        }
+        $filesInfo=$this->container->get('gopro_dbproceso_proceso');
+        $filesInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
+        $filesInfo->setTabla('DBP_PROCESO_CARGADORCP_FILE');
+        $filesInfo->setSchema('VWEB');
+        $filesInfo->setCamposSelect([
+            'NUM_FILE',
+            'NOMBRE',
+            'NUM_PAX',
+            'MERCADO',
+            'CENTRO_COSTO',
+            'PAIS_FILE'
+        ]);
+
+        $filesInfo->setQueryVariables($this->getStack('files'));
+
+        if(!$filesInfo->ejecutarSelectQuery()||empty($filesInfo->getExistentesRaw())){
+            $this->setMensajes('No existe ninguno de los files en la lista');
+            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+        }
+
+
+        $now = new \DateTime('now');
+
+        $i = 0;
+
+        foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
+
+            if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
+                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+                continue;
+            }
+
+            if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
+                $preproceso[$i]['Files']=array_unique($archivoInfo->getExistentesCustomRaw()[$nroLinea]);
+            } else {
+                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene numero de file.');
+                continue;
+            }
+
+            //predefinimos el tipo, si vacio se toma fecha de documento.
+            $preproceso[$i]['TipoProceso'] = $linea['TIPO_PROCESO'];
+            //fecha del servicio necesario para diferidos
+            $preproceso[$i]['ServicioDate'] = $linea['FEC_SERVICIO'];
+            //Cabecera
+            $preproceso[$i]['DocTotal'] = $linea['VALOR_TOTAL'];
+            //$preproceso[$i]['DocTaxTotal'] = $linea['VALOR_IGV'];
+
+            $preproceso[$i]['CardCode'] = $linea['COD_PROVEEDOR'];; //peruRail
+            $preproceso[$i]['DocDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($now->format('Y-m-d'), 'to');
+            $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
+            $preproceso[$i]['DocDueDate'] = $preproceso[$i]['DocDate'];
+            $preproceso[$i]['Currency'] = str_replace('SD', 'S$', $linea['MONEDA']);
+            if (isset($tcInfoFormateado[$linea['FEC_EMISION']])) {
+                $preproceso[$i]['DocRate'] = $tcInfoFormateado[$linea['FEC_EMISION']]['MONTO'];
+            } else {
+                $preproceso[$i]['DocRate'] = 'TC no ingresado';
+            }
+
+            //$preproceso[$i]['U_SYP_MDTD'] = '55'; //tipo sunat, predefinido en tipo proceso
+
+            $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
+            $preproceso[$i]['U_SYP_MDCD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[1];
+            $preproceso[$i]['Comments'] = $linea['DESCRIPCION'];
+
+            //$preproceso[$i]['u_syp_tcompra'] = '01'; //tipo sap, predefinido en tipo proceso
+
+            $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_CONTABLE'];
+
+            //detalle
+            //$preproceso[$i]['AcctCode'] = '631121'; //cuenta, predefinido en tipo proceso
+            //$preproceso[$i]['OcrCode4'] = 118; //tiposervicio,, predefinido en tipo proceso
+            $preproceso[$i]['excelRowNumber'] = $linea['excelRowNumber'];
+
+            $i++;
+
+        endforeach;
+
+        if (empty($preproceso)) {
+            $this->setMensajes('No se preproceso ningun elemento');
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+
+        }
+
+        return $this->generarExcel($archivoInfo->getArchivoBase()->getNombre(), $preproceso);
+    }
+
+    /**
      * @Route("/perurail/{archivoEjecutar}", name="gopro_vipac_dbproceso_procesosap_perurail", defaults={"archivoEjecutar" = null})
      * @Template()
      */
@@ -274,6 +482,10 @@ class ProcesosapController extends BaseController
             $fileInfoIndizado = $filesInfo->getExistentesIndizados();
         }
 
+        $resultadoCab = array();
+
+        $resultadoDet = array();
+
         $nroLineaDet = 0;
         $i = 1;
         foreach ($preproceso as $nroLinea => $linea):
@@ -282,31 +494,31 @@ class ProcesosapController extends BaseController
             $mesServicio = '';
             $anoServicio = '';
 
-            if (isset($linea['ServicioDate'])){
-                $mesServicio = date('m',strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
-                $anoServicio = date('m',strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
-                $mesDocumento = date('m',strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
-                $anoDocumento = date('m',strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
-                if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoDocumento) * 12 + intval($mesDocumento)){
+            if (isset($linea['ServicioDate'])) {
+                $mesServicio = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
+                $anoServicio = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
+                $mesDocumento = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
+                $anoDocumento = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
+                if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoDocumento) * 12 + intval($mesDocumento)) {
                     $esDiferido = true;
                 }
             }
 
-            if(!isset($docSapTipos[$linea['TipoProceso']])){
+            if (!isset($docSapTipos[$linea['TipoProceso']])) {
                 $this->setMensajes('El tipo de proceso no puede ser encontrado en la DB');
                 continue;
             }
 
-            if(!empty($esDiferido)){
+            if (!empty($esDiferido)) {
                 $cuenta = '189011';
-                $appendDetalle = $mesServicio . '/'. $anoServicio . '/' . $docSapTipos[$linea['TipoProceso']]['cuenta'] . ' ';
-            }else{
+                $appendDetalle = $mesServicio . '/' . $anoServicio . '/' . $docSapTipos[$linea['TipoProceso']]['cuenta'] . ' ';
+            } else {
                 $cuenta = $docSapTipos[$linea['TipoProceso']]['cuenta'];
                 $appendDetalle = '';
             }
 
             if (!isset($linea['DocTaxTotal'])) {
-                $linea['DocTaxTotal'] = round($linea['DocTaxTotal'] / 1.18, 2);
+                $linea['DocTaxTotal'] = round($linea['DocTotal'] / 1.18, 2);
             }
 
             $linea['CantFiles'] = count($linea['Files']);
@@ -359,6 +571,7 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = '';
 
             $j = 1;
+            //print_r($linea['Files']);
             foreach ($linea['Files'] as $file):
                 $numFileFormat = str_replace('-', '', $file);
                 $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
@@ -382,24 +595,25 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['LineTotal'] = $linea['DocTotal'] - $this->getCantidadTotal('valor');
                     $resultadoDet[$nroLineaDet]['TaxTotal'] = $linea['DocTaxTotal'] - $this->getCantidadTotal('impuesto');
                 }
-                if(empty($docSapTipos[$linea['TipoProceso']]['exoneradoigv'])){
-                    if(isset($linea['ForceTaxCode'])){
+                //print_r($fileInfoIndizado);
+                if (empty($docSapTipos[$linea['TipoProceso']]['exoneradoigv'])) {
+                    if (isset($linea['ForceTaxCode'])) {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['ForceTaxCode'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['ForceTaxCode'];
-                    }elseif($fileInfoIndizado[$file]['COD_PAIS'] == 'PE'){
+                    } elseif ($fileInfoIndizado[$file]['COD_PAIS'] == 'PE') {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = 'IGV';
                         $resultadoDet[$nroLineaDet]['TaxCode'] = 'IGV';
-                    }else{
-                        if(!empty($esDiferido)){
+                    } else {
+                        if (!empty($esDiferido)) {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGD_IGV';
                             $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGD_IGV';
-                        }else{
+                        } else {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGR_IGV';
                             $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGR_IGV';
                         }
                     }
 
-                }else{
+                } else {
                     $resultadoDet[$nroLineaDet]['VatGroup'] = 'EXE_IGV';
                     $resultadoDet[$nroLineaDet]['TaxCode'] = 'EXE_IGV';
                 }
@@ -517,11 +731,12 @@ class ProcesosapController extends BaseController
     */
     private function parseDocNum($numeroDocumento)
     {
+
         if (strpos($numeroDocumento, '-') === false) {
             $resultado[] = '0000';
             $resultado[] = $numeroDocumento;
         } else {
-            $resultado = explode($numeroDocumento['NRO_DOCUMENTO'], '-');
+            $resultado = explode('-', $numeroDocumento);
         }
         return $resultado;
     }
