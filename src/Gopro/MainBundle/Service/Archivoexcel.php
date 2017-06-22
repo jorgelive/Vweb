@@ -321,19 +321,19 @@ class Archivoexcel implements ContainerAwareInterface
                             if (isset($this->columnaSpecs[$columnName[$key]]['tipo']) && $this->columnaSpecs[$columnName[$key]]['tipo'] == 'file' && $key == 1) {
                                 $parteValor = str_pad($parteValor, 10, 0, STR_PAD_LEFT);
                             }
-                            if (trim($parteValor) != '' || empty($this->getDescartarBlanco())) {
+                            if (trim(str_replace(chr(194) . chr(160), "", $parteValor)) != '' || empty($this->getDescartarBlanco())) {
                                 if (!empty($this->getTrimEspacios())) {
-                                    $parteValor = trim($parteValor);
+                                    $parteValor = trim(str_replace(chr(194) . chr(160), "", $parteValor));
                                 }
-                                $existentesRaw[$fila][$this->columnaSpecs[$columnName[$key]]['nombre']] = $parteValor;
+                                $existentesRaw[$fila][$this->columnaSpecs[$columnName[$key]]['nombre']] = str_replace(chr(194) . chr(160), "", $parteValor);
                             }
                         endforeach;
                     } else {
-                        if (trim($value) != '' || empty($this->getDescartarBlanco())) {
+                        if (trim(str_replace(chr(194) . chr(160), "", $value)) != '' || empty($this->getDescartarBlanco())) {
                             if (!empty($this->getTrimEspacios())) {
-                                $value = trim($value);
+                                $value = trim(str_replace(chr(194) . chr(160), "", $value));
                             }
-                            $existentesDescartados[$fila][] = $value;
+                            $existentesDescartados[$fila][] = str_replace(chr(194) . chr(160), "", $value);
                         }
                     }
                     $existentesRaw[$fila]['excelRowNumber'] = $fila + $startRow;

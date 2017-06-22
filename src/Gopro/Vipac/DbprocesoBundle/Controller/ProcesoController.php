@@ -200,7 +200,7 @@ class ProcesoController extends BaseController
         $archivoInfoRaw=$archivoInfo->getExistentesRaw();
 
         if(!empty($archivoInfoRaw)){
-            array_walk_recursive($archivoInfoRaw,[$this,'setStack'],['fechas','FECHA','FECHA_DOCUMENTO']);
+            array_walk_recursive($archivoInfoRaw,[$this,'setStackForWalk'],['fechas','FECHA','FECHA_DOCUMENTO']);
         }
 
         $tcInfo=$this->container->get('gopro_dbproceso_proceso');
@@ -232,7 +232,7 @@ class ProcesoController extends BaseController
         $filesMulti=$archivoInfo->getExistentesCustomRaw();
 
         if(!empty($filesMulti)){
-            array_walk_recursive($filesMulti,[$this,'setStack'],['files','NUM_FILE']);
+            array_walk_recursive($filesMulti,[$this,'setStackForWalk'],['files','NUM_FILE']);
         }
 
         $filesInfo=$this->container->get('gopro_dbproceso_proceso');
