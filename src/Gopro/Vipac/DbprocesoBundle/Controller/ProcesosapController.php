@@ -562,7 +562,7 @@ class ProcesosapController extends BaseController
             //tipos sap
             $resultadoCab[$nroLinea]['u_syp_tcompra'] = $docSapTipos[$linea['TipoProceso']]['tiposap'];
             $resultadoCab[$nroLinea]['u_syp_tpoper'] = '02';
-            $resultadoCab[$nroLinea]['u_syp_biesrvadq'] = '05';
+            $resultadoCab[$nroLinea]['u_syp_biesrvadq'] = '5';
             //fecha rige
             $resultadoCab[$nroLinea]['u_syp_fecrec'] = $linea['u_syp_fecrec'];
             $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = '';
@@ -578,7 +578,7 @@ class ProcesosapController extends BaseController
             $j = 1;
             //print_r($linea['Files']);
             foreach ($linea['Files'] as $file):
-                $numFileFormat = str_replace('-', '', $file);
+                $numFileFormat = str_replace('-', '0', $file);
                 $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
                 $resultadoDet[$nroLineaDet]['DocNum'] = $i;
                 $resultadoDet[$nroLineaDet]['LineNum'] = $j;
@@ -632,12 +632,12 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['OcrCode2'] = '';
                 }
 
-                if ($this->getUser()->hasGroup('Cusco')) {
+                if ($this->getUser()->getDependencia()->getNombre() == 'Cusco') {
                     $resultadoDet[$nroLineaDet]['OcrCode3'] = 'CUZ';
-                } elseif ($this->getUser()->hasGroup('Lima')) {
+                } elseif ($this->getUser()->getDependencia()->getNombre() == 'Reducto' || $this->getUser()->getDependencia()->getNombre() == 'La Mar') {
                     $resultadoDet[$nroLineaDet]['OcrCode3'] = 'LIM';
                 } else {
-                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'USERNOGROUP';
+                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'SELECCIONE LA DEPENDENCIA DEL USUARIO';
                 }
                 $resultadoDet[$nroLineaDet]['OcrCode4'] = $docSapTipos[$linea['TipoProceso']]['tiposervicio'];
                 $resultadoDet[$nroLineaDet]['OcrCode5'] = '100';
