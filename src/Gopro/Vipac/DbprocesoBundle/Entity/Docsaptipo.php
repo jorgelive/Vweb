@@ -53,6 +53,20 @@ class Docsaptipo
     private $exoneradoigv;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(type="float")
+     */
+    private $iscporcentaje;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=4, nullable=true)
+     */
+    private $codigoretencion;
+
+    /**
      * @var string
      *
      * @ORM\Column(type="string", length=10)
@@ -82,7 +96,7 @@ class Docsaptipo
      */
     private $modificado;
 
-
+    
 
     /**
      * Get id
@@ -183,11 +197,59 @@ class Docsaptipo
     /**
      * Get exoneradoigv
      *
-     * @return string
+     * @return boolean
      */
     public function getExoneradoigv()
     {
         return $this->exoneradoigv;
+    }
+
+    /**
+     * Set iscporcentaje
+     *
+     * @param float $iscporcentaje
+     *
+     * @return Docsaptipo
+     */
+    public function setIscporcentaje($iscporcentaje)
+    {
+        $this->iscporcentaje = $iscporcentaje;
+
+        return $this;
+    }
+
+    /**
+     * Get iscporcentaje
+     *
+     * @return float
+     */
+    public function getIscporcentaje()
+    {
+        return $this->iscporcentaje;
+    }
+
+    /**
+     * Set codigoretencion
+     *
+     * @param string $codigoretencion
+     *
+     * @return Docsaptipo
+     */
+    public function setCodigoretencion($codigoretencion)
+    {
+        $this->codigoretencion = $codigoretencion;
+
+        return $this;
+    }
+
+    /**
+     * Get codigoretencion
+     *
+     * @return string
+     */
+    public function getCodigoretencion()
+    {
+        return $this->codigoretencion;
     }
 
     /**

@@ -15,9 +15,10 @@ file that was distributed with this source code.
     <div id="login">
         <div id="loginError">
             {% if error %}
-                <div class="loginErrorItem">{{ error|trans({}, 'FOSUserBundle') }}</div>
+                <div class="loginErrorItem">{{ error.messageKey|trans({}, 'FOSUserBundle') }}</div>
             {% endif %}
         </div>
+
         <div id="loginForm">
             <form action="{{ path("fos_user_security_check") }}" method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />

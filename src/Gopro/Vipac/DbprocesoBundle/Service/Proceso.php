@@ -348,6 +348,34 @@ class Proceso implements ContainerAwareInterface
         return $statement;
     }
 
+    private function getPartesWhere($columna, $valor, $tiposProceso){
+
+        $partes[0]='';
+        $partes[1]='';
+        $partes[2]='';
+        $partes[3]='';
+        $partes[4]= $columna;
+        $partes[5]= $valor;
+
+        if(!isset($tiposProceso[$columna])){
+            return $partes;
+        }
+
+        //pdo_sqlsrv
+        if ($tiposProceso[$columna] == 'exceldate'){
+            $partes[5] = $this->container->get('gopro_main_variableproceso')->exceldate($valor);
+
+            if($this->getConexion()->getDriver()->getName() == 'oci8') {
+                $partes[0] = 'trunc(';
+                $partes[1] = ')';
+                $partes[2] = 'to_date(';
+                $partes[3] = ",'yyyy-mm-dd')";
+            }
+        }
+
+        return $partes;
+    }
+
     public function setQueryVariables($informacion, $tipo = 'whereSelect', $parametros = array())
     {
         if (empty($informacion)) {
@@ -361,18 +389,18 @@ class Proceso implements ContainerAwareInterface
         foreach ($informacion as $key => $valor):
             if (is_array($valor) && ($tipo != 'valoresUpdate' || $tipo != 'valoresInsert' || $tipo != 'camposInsert' || $tipo == 'camposselect')) {
                 foreach ($valor as $subKey => $subValor):
+                    $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
                     if (isset($parametros[$subKey])) {
                         if ($parametros[$subKey] == 'exceldate') {
-                            $modif[0] = 'trunc(';
-                            $modif[1] = ')';
-                            $modif[2] = 'to_date(';
-                            $modif[3] = ",'yyyy-mm-dd')";
                             $subValor = $this->container->get('gopro_main_variableproceso')->exceldate($subValor);
-                        } else {
-                            $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
+                            if($this->getConexion()->getDriver()->getName() == 'oci8') {
+                                $modif[0] = 'trunc(';
+                                $modif[1] = ')';
+                                $modif[2] = 'to_date(';
+                                $modif[3] = ",'yyyy-mm-dd')";
+
+                            }
                         }
-                    } else {
-                        $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
                     }
                     $procesoPh[$key][] = $modif[0] . $subKey . $modif[1] . ' = ' . $modif[2] . ':' . 'v' . substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($subKey . $subValor)), 0, 28) . $modif[3];
                     $procesoValor[$key]['v' . substr(sha1($this->container->get('gopro_main_variableproceso')->sanitizeString($subKey . $subValor)), 0, 28)] = $subValor;
@@ -388,18 +416,17 @@ class Proceso implements ContainerAwareInterface
                     $procesoPh[] = $key . '= :' . $key;
                     $procesoValor[$key] = $valor;
                 } elseif ($tipo == 'whereUpdate') { //todo quitar el whereupdate para el generico (comparacion con substr/sha)
+                    $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
                     if (isset($parametros[$key])) {
                         if ($parametros[$key] == 'exceldate') {
-                            $modif[0] = 'trunc(';
-                            $modif[1] = ')';
-                            $modif[2] = 'to_date(';
-                            $modif[3] = ",'yyyy-mm-dd')";
                             $valor = $this->container->get('gopro_main_variableproceso')->exceldate($valor);
-                        } else {
-                            $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
+                            if($this->getConexion()->getDriver()->getName() == 'oci8') {
+                                $modif[0] = 'trunc(';
+                                $modif[1] = ')';
+                                $modif[2] = 'to_date(';
+                                $modif[3] = ",'yyyy-mm-dd')";
+                            }
                         }
-                    } else {
-                        $modif[0] = $modif[1] = $modif[2] = $modif[3] = '';
                     }
                     $procesoPh[] = $modif[0] . $key . $modif[1] . ' = ' . $modif[2] . ':' . $key . $modif[3];
                     $procesoValor[$key] = $valor;
@@ -450,6 +477,7 @@ class Proceso implements ContainerAwareInterface
             return false;
         }
         $selectQuery = 'SELECT ' . implode(', ', $this->getCamposSelect()) . ' FROM ' . $this->getSchema() . '.' . $this->getTabla() . ' WHERE ' . $this->getSerializedPhString($this->getWhereSelectPh());
+
         if (!empty($this->getWhereCustom())) {
             $selectQuery = $selectQuery . ' AND ' . $this->getWhereCustom();
         }

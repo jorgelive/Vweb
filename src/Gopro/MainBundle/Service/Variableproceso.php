@@ -84,7 +84,7 @@ class Variableproceso implements ContainerAwareInterface{
         if($tipo=='from'){
             return date('Y-m-d', mktime(0,0,0,1,$variable-1,1900));
         }else{
-            return unixtojd(strtotime($variable)) - gregoriantojd(1, 1, 1900) + 2;
+            return unixtojd(strtotime($variable)) - gregoriantojd(1, 1, 1900) + 3;
         }
 
     }

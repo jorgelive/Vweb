@@ -151,7 +151,7 @@ class ProcesosapController extends BaseController
             //fecha del servicio necesario para diferidos
             $preproceso[$i]['ServicioDate'] = $linea['FEC_SERVICIO'];
             //Cabecera
-            $preproceso[$i]['DocTotal'] = $linea['VALOR_TOTAL'];
+            $preproceso[$i]['MontoTotal'] = $linea['VALOR_TOTAL'];
             //$preproceso[$i]['DocTaxTotal'] = $linea['VALOR_IGV'];
 
             $preproceso[$i]['ruc'] = $linea['COD_PROVEEDOR'];
@@ -188,7 +188,6 @@ class ProcesosapController extends BaseController
      */
     public function perurailAction(Request $request, $archivoEjecutar)
     {
-
         $operacion = 'vipac_dbproceso_procesosap_perurail';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
@@ -308,7 +307,7 @@ class ProcesosapController extends BaseController
                 }
 
                 //forzamos codigo de igv
-                $preproceso[$i]['ForceTaxCode'] = 'IGV';
+                $preproceso[$i]['TaxCode'] = 'IGV';
             }
 
             //predefinimos el tipo.
@@ -321,8 +320,8 @@ class ProcesosapController extends BaseController
             //fecha del servicio necesario para diferidos
             $preproceso[$i]['ServicioDate'] = $linea['FEC_VIAJE'];
             //Cabecera
-            $preproceso[$i]['DocTotal'] = $linea['VALOR_TOTAL'];
-            $preproceso[$i]['DocTaxTotal'] = $linea['VALOR_IGV'];
+            $preproceso[$i]['MontoTotal'] = $linea['VALOR_TOTAL'];
+            $preproceso[$i]['TaxTotal'] = $linea['VALOR_IGV'];
 
             $preproceso[$i]['ruc'] = '20431871808'; //peruRail
             $preproceso[$i]['DocDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($now->format('Y-m-d'), 'to');
@@ -335,6 +334,7 @@ class ProcesosapController extends BaseController
 
             //fecha de recepcion es la fecha de documento para este caso
             $preproceso[$i]['u_syp_fecrec'] = $preproceso[$i]['DocDate'];
+            $preproceso[$i]['U_SYP_TIPOBOLETO'] = 1;
 
             //detalle
             $preproceso[$i]['excelRowNumber'] = $linea['excelRowNumber'];
@@ -364,16 +364,15 @@ class ProcesosapController extends BaseController
             return 'FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($value)));
         };
 
-        $this->seekAndStack($preproceso, ['emisionFechas', 'files', 'series', 'rucs'], ['TaxDate', 'Files', 'TaxDate', 'ruc'], ['FECHA', 'NUM_FILE', 'SeriesName', 'LicTradNum'], [NULL, NULL, $seriesFormater, NULL]);
+        $this->seekAndStack($preproceso, ['emisionFechas', 'files', 'series', 'rucs'], ['TaxDate', 'Files', 'TaxDate', 'ruc'], ['RateDate', 'NUM_FILE', 'SeriesName', 'LicTradNum'], [NULL, NULL, $seriesFormater, NULL]);
 
         $tcInfo = $this->container->get('gopro_dbproceso_proceso');
-        $tcInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
-        $tcInfo->setTabla('TIPO_CAMBIO_EXACTUS');
-        $tcInfo->setSchema('RESERVAS');
+        $tcInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
+        $tcInfo->setTabla('ORTT');
+        $tcInfo->setSchema('dbo');
         $tcInfo->setCamposSelect([
-            'TIPO_CAMBIO',
-            'FECHA',
-            'MONTO',
+            'RateDate',
+            'Rate',
         ]);
 
         $tcInfoFormateado = array();
@@ -381,8 +380,8 @@ class ProcesosapController extends BaseController
         if (empty($this->getStack('emisionFechas'))) {
             $this->setMensajes('No hay fechas para procesar el tipo de cambio');
         } else{
-            $tcInfo->setQueryVariables($this->getStack('emisionFechas'), 'whereSelect', ['FECHA' => 'exceldate']);
-            $tcInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
+            $tcInfo->setQueryVariables($this->getStack('emisionFechas'), 'whereSelect', ['RateDate' => 'exceldate']);
+            $tcInfo->setWhereCustom("Currency = 'US$'");
 
             if (!$tcInfo->ejecutarSelectQuery() || empty($tcInfo->getExistentesRaw())) {
                 $this->setMensajes($tcInfo->getMensajes());
@@ -460,7 +459,9 @@ class ProcesosapController extends BaseController
         $proveedoresInfo->setCamposSelect([
             'CardCode',
             'LicTradNum',
-            'ExtraDays'
+            'ExtraDays',
+            'U_SYP_AGENRE',
+            'u_SYP_SNBUEN'
         ]);
 
         $proveedoresInfoIndizado = array();
@@ -479,8 +480,6 @@ class ProcesosapController extends BaseController
 
             $proveedoresInfoIndizado = $proveedoresInfo->getExistentesIndizados();
         }
-
-        //print_r($proveedoresInfoIndizado); die;
 
         $resultadoCab = array();
 
@@ -517,14 +516,19 @@ class ProcesosapController extends BaseController
                 $appendDetalle = '';
             }
 
-            if (!isset($linea['DocTaxTotal'])) {
-                $linea['DocTaxTotal'] = round(doubleval($linea['DocTotal']) / 1.18, 2);
+
+
+            if (!isset($linea['TaxTotal'])) {
+                $linea['NetoTotal'] = round(doubleval($linea['MontoTotal']) / (1 + 18/100), 2);
+                $linea['TaxTotal'] = round($linea['MontoTotal'] - $linea['NetoTotal'], 2);
+            }else{
+                $linea['NetoTotal'] = round(doubleval($linea['MontoTotal']) - $linea['TaxTotal'], 2);
             }
 
             $linea['CantFiles'] = count($linea['Files']);
 
-            $linea['DividedDocTotal'] = round($linea['DocTotal'] / $linea['CantFiles'], 2);
-            $linea['DividedDocTaxTotal'] = round($linea['DocTaxTotal'] / $linea['CantFiles'], 2);
+            $linea['DividedNetoTotal'] = round($linea['NetoTotal'] / $linea['CantFiles'], 2);
+            $linea['DividedTaxTotal'] = round($linea['TaxTotal'] / $linea['CantFiles'], 2);
 
             $resultadoCab[$nroLinea]['DocNum'] = $i;
             $resultadoCab[$nroLinea]['CardCode'] = $proveedoresInfoIndizado{$linea['ruc']}['CardCode'];
@@ -540,8 +544,9 @@ class ProcesosapController extends BaseController
                 $resultadoCab[$nroLinea]['ControlAccount'] = 421201;
             }
 
+
             if (isset($tcInfoFormateado[$linea['TaxDate']])) {
-                $resultadoCab[$nroLinea]['DocRate'] = $tcInfoFormateado[$linea['TaxDate']]['MONTO'];
+                $resultadoCab[$nroLinea]['DocRate'] = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
             } else {
                 $resultadoCab[$nroLinea]['DocRate'] = 'TC no ingresado';
             }
@@ -565,7 +570,8 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['u_syp_biesrvadq'] = '5';
             //fecha rige
             $resultadoCab[$nroLinea]['u_syp_fecrec'] = $linea['u_syp_fecrec'];
-            $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = '';
+
+            isset($linea['U_SYP_TIPOBOLETO']) ? $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = $linea['U_SYP_TIPOBOLETO'] : $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDTO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDSO'] = '';
@@ -576,7 +582,7 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = '';
 
             $j = 1;
-            //print_r($linea['Files']);
+
             foreach ($linea['Files'] as $file):
                 $numFileFormat = str_replace('-', '0', $file);
                 $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
@@ -590,21 +596,21 @@ class ProcesosapController extends BaseController
 
                 if ($j < $linea['CantFiles']) {
                     //echo 'cant:' . $linea['CantFiles'] . ' ' . $j .'<br>';
-                    $resultadoDet[$nroLineaDet]['LineTotal'] = $linea['DividedDocTotal'];
-                    $resultadoDet[$nroLineaDet]['TaxTotal'] = $linea['DividedDocTaxTotal'];
+                    $resultadoDet[$nroLineaDet]['LineNetoTotal'] = $linea['DividedNetoTotal'];
+                    $resultadoDet[$nroLineaDet]['LineTaxTotal'] = $linea['DividedTaxTotal'];
 
-                    $this->setCantidadTotal($linea['DividedDocTotal'], null, ['valor', null]);
-                    $this->setCantidadTotal($linea['DividedDocTaxTotal'], null, ['impuesto', null]);
+                    $this->setCantidadTotal($linea['DividedNetoTotal'], null, ['neto', null]);
+                    $this->setCantidadTotal($linea['DividedTaxTotal'], null, ['impuesto', null]);
 
                 } else {
-                    $resultadoDet[$nroLineaDet]['LineTotal'] = $linea['DocTotal'] - $this->getCantidadTotal('valor');
-                    $resultadoDet[$nroLineaDet]['TaxTotal'] = $linea['DocTaxTotal'] - $this->getCantidadTotal('impuesto');
+                    $resultadoDet[$nroLineaDet]['LineNetoTotal'] = $linea['NetoTotal'] - $this->getCantidadTotal('neto');
+                    $resultadoDet[$nroLineaDet]['LineTaxTotal'] = $linea['TaxTotal'] - $this->getCantidadTotal('impuesto');
                 }
-                //print_r($fileInfoIndizado);
+
                 if (empty($docSapTipos[$linea['TipoProceso']]['exoneradoigv'])) {
-                    if (isset($linea['ForceTaxCode'])) {
-                        $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['ForceTaxCode'];
-                        $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['ForceTaxCode'];
+                    if (isset($linea['TaxCode'])) {
+                        $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['TaxCode'];
+                        $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['TaxCode'];
                     } elseif ($fileInfoIndizado[$file]['COD_PAIS'] == 'PE') {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = 'IGV';
                         $resultadoDet[$nroLineaDet]['TaxCode'] = 'IGV';
@@ -641,19 +647,23 @@ class ProcesosapController extends BaseController
                 }
                 $resultadoDet[$nroLineaDet]['OcrCode4'] = $docSapTipos[$linea['TipoProceso']]['tiposervicio'];
                 $resultadoDet[$nroLineaDet]['OcrCode5'] = '100';
-                $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
+                if($resultadoDet[$nroLineaDet]['VatGroup'] == 'EXE_IGV' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y'){
+                    $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
+                }else{
+                    $resultadoDet[$nroLineaDet]['WtLiable'] = 'Y';
+                }
 
-                $resultadoDet[$nroLineaDet]['excelRowNumber'] = $linea['excelRowNumber'];
+                //$resultadoDet[$nroLineaDet]['excelRowNumber'] = $linea['excelRowNumber'];
 
                 $j++;
                 $nroLineaDet++;
 
             endforeach;
 
-            $this->resetCantidadTotal('valor');
+            $this->resetCantidadTotal('neto');
             $this->resetCantidadTotal('impuesto');
 
-            $resultadoCab[$nroLinea]['excelRowNumber'] = $linea['excelRowNumber'];
+            //$resultadoCab[$nroLinea]['excelRowNumber'] = $linea['excelRowNumber'];
 
             $i++;
 
@@ -693,7 +703,59 @@ class ProcesosapController extends BaseController
             'excelRowNumber'
         ];
 
+        $encabezadosCabSec = [
+            'DocNum',
+            'CardCode', //proveedor
+            'DocType',
+            'DocDate',
+            'TaxDate',
+            'DocDueDate',
+            'DocCur',
+            'CtlAccount',
+            'DocRate',
+            'Series',
+            'U_SYP_MDTD',
+            'U_SYP_MDSD',
+            'U_SYP_MDCD',
+            'U_SYP_STATUS',
+            'JrnlMemo',
+            'NumAtCard',
+            'Comments',
+            'u_syp_tcompra',
+            'u_syp_tpoper',
+            'u_syp_biesrvadq',
+            'u_syp_fecrec',
+            'U_SYP_TIPOBOLETO',
+            'U_SYP_MDTO',
+            'U_SYP_FECHAREF',
+            'U_SYP_MDSO',
+            'U_SYP_MDCO',
+            'U_SYP_DET_RET',
+            'U_SYP_COD_DET',
+            'U_SYP_NOM_DETR',
+            'U_SYP_PORC_DETR'
+        ];
+
         $encabezadosDet = [
+            'ParentKey',
+            'LineNum',
+            'u_syp_tipoServ',
+            'ItemDescription',
+            'AccountCode',
+            'Currency',
+            'LineTotal',
+            'TaxTotal',
+            'VatGroup',
+            'TaxCode',
+            'CostingCode',
+            'CostingCode2',
+            'CostingCode3',
+            'CostingCode4',
+            'CostingCode5',
+            'WtLiable'
+        ];
+
+        $encabezadosDetSec = [
             'DocNum',
             'LineNum',
             'u_syp_tipoServ',
@@ -709,8 +771,7 @@ class ProcesosapController extends BaseController
             'OcrCode3',
             'OcrCode4',
             'OcrCode5',
-            'WtLiable',
-            'excelRowNumber'
+            'WtLiable'
         ];
 
         $archivoGenerado = $this->get('gopro_main_archivoexcel');
@@ -718,11 +779,13 @@ class ProcesosapController extends BaseController
         return $archivoGenerado
             ->setArchivo()
             ->setParametrosWriter("SAP-" . $nombreArchivo)
-            ->setFila($encabezadosCab, 'A1')
-            ->setTabla($resultadoCab, 'A2')
+            ->setFila($encabezadosCab, 'A4')
+            ->setFila($encabezadosCabSec, 'A5')
+            ->setTabla($resultadoCab, 'A6')
             ->setHoja(2)
-            ->setFila($encabezadosDet, 'A1')
-            ->setTabla($resultadoDet, 'A2')
+            ->setFila($encabezadosDet, 'A4')
+            ->setFila($encabezadosDetSec, 'A5')
+            ->setTabla($resultadoDet, 'A6')
             ->setHoja(3)
             ->setColumna($this->getMensajes(), 'A1')
             ->setHoja(1)

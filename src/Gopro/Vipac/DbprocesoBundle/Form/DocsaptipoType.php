@@ -4,11 +4,11 @@ namespace Gopro\Vipac\DbprocesoBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DocsaptipoType extends AbstractType
 {
-        /**
+    /**
      * @param FormBuilderInterface $builder
      * @param array $options
      */
@@ -19,20 +19,17 @@ class DocsaptipoType extends AbstractType
             ->add('tiposunat',null, array('label' => 'Tipo Sunat'))
             ->add('tiposap',null, array('label' => 'Tipo Sap'))
             ->add('exoneradoigv',null, array('label' => 'Exonerado IGV'))
+            ->add('iscporcentaje',null, array('label' => 'Porcentaje ISC', 'required' => false))
+            ->add('codigoretencion',null, array('label' => 'Código de Retención', 'required' => false))
             ->add('cuenta',null, array('label' => 'Cuenta'))
-            //->add('impuesto2',null, array('label' => 'Impuesto 2','required' => false))
             ->add('tiposervicio',null, array('label' => 'Tipo de servicio'))
-            //->add('rubro2',null, array('label' => 'Rubro 2'))
-            //->add('rubro2porcentaje',null, array('label' => 'Rubro 2 %'))
-            //->add('retencion',null, array('label' => 'Retención'))
-            //->add('codretencion',null, array('label' => 'Código de Retención'))
         ;
     }
     
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Gopro\Vipac\DbprocesoBundle\Entity\Docsaptipo'
