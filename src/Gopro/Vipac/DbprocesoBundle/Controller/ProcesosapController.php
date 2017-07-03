@@ -581,11 +581,18 @@ class ProcesosapController extends BaseController
                 $resultadoCab[$nroLinea]['ControlAccount'] = 421201;
             }
 
+            $coeficienteMoneda = 1;
+
             if (isset($tcInfoFormateado[$linea['TaxDate']])) {
+                if($linea['Currency'] == 'US$'){
+                    $coeficienteMoneda = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
+                }
                 $resultadoCab[$nroLinea]['DocRate'] = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
             } else {
                 $resultadoCab[$nroLinea]['DocRate'] = 'TC no ingresado';
             }
+            $resultadoCab[$nroLinea]['DocTotal'] = $linea['MontoTotal'];
+
             if (isset($seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])))])){
                 $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($linea['TaxDate']))]['Series'];
             } else {
@@ -612,10 +619,32 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDSO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDCO'] = '';
+
             $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = 'N';
             $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = '';
             $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = '';
             $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = '';
+
+            //sobrescribimos la retencion
+
+
+            if(!empty($docSapTipos[$linea['TipoProceso']]['codigoretencion']) && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montoretencion']
+                && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
+                $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigoretencion'], 0, 1);
+                $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigoretencion'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $docSapTipos[$linea['TipoProceso']]['codigoretencion'];
+                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = $docSapTipos[$linea['TipoProceso']]['porcentajeretencion'];
+            }
+
+            //sobrescribimos la detraccion
+            if(!empty($docSapTipos[$linea['TipoProceso']]['codigodetraccion'])&& $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montodetraccion']
+                && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
+                $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigodetraccion'], 0, 1);
+                $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
+                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = $docSapTipos[$linea['TipoProceso']]['porcentajedetraccion'];
+            }
+
 
             $j = 1;
             $k = 1;
@@ -687,6 +716,7 @@ class ProcesosapController extends BaseController
                 if($resultadoDet[$nroLineaDet]['VatGroup'] == 'EXE_IGV' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y'){
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
                 }else{
+
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'Y';
                 }
 
@@ -737,6 +767,7 @@ class ProcesosapController extends BaseController
             'DocCurrency',
             'ControlAccount',
             'DocRate',
+            'DocTotal',
             'Series',
             'U_SYP_MDTD',
             'U_SYP_MDSD',
@@ -770,6 +801,7 @@ class ProcesosapController extends BaseController
             'DocCur',
             'CtlAccount',
             'DocRate',
+            'DocTotal',
             'Series',
             'U_SYP_MDTD',
             'U_SYP_MDSD',
