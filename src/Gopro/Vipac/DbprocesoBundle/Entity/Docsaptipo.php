@@ -74,13 +74,6 @@ class Docsaptipo
     private $codigoretencion;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     */
-    private $forzarretencion;
-
-    /**
      * @var string
      *
      * @ORM\Column(type="integer")
@@ -310,30 +303,6 @@ class Docsaptipo
     public function getCodigoretencion()
     {
         return $this->codigoretencion;
-    }
-
-    /**
-     * Set forzarretencion
-     *
-     * @param boolean $forzarretencion
-     *
-     * @return Docsaptipo
-     */
-    public function setForzarretencion($forzarretencion)
-    {
-        $this->forzarretencion = $forzarretencion;
-
-        return $this;
-    }
-
-    /**
-     * Get forzarretencion
-     *
-     * @return boolean
-     */
-    public function getForzarretencion()
-    {
-        return $this->forzarretencion;
     }
 
     /**

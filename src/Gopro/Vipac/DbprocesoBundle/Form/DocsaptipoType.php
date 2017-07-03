@@ -22,7 +22,6 @@ class DocsaptipoType extends AbstractType
             ->add('montoretencion',null, array('label' => 'Monto de Retención', 'required' => false))
             ->add('porcentajeretencion',null, array('label' => 'Porcentaje de Retención', 'required' => false))
             ->add('codigoretencion',null, array('label' => 'Código de Retención', 'required' => false))
-            ->add('forzarretencion',null, array('label' => 'Forzar Retención'))
             ->add('montodetraccion',null, array('label' => 'Monto de Detracción', 'required' => false))
             ->add('porcentajedetraccion',null, array('label' => 'Porcentaje de Detracción', 'required' => false))
             ->add('codigodetraccion',null, array('label' => 'Código de Detracción', 'required' => false))
