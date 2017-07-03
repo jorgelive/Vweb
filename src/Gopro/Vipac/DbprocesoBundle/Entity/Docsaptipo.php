@@ -53,11 +53,18 @@ class Docsaptipo
     private $exoneradoigv;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $montoretencion;
+
+    /**
      * @var float
      *
      * @ORM\Column(type="float")
      */
-    private $iscporcentaje;
+    private $porcentajeretencion;
 
     /**
      * @var string
@@ -65,6 +72,35 @@ class Docsaptipo
      * @ORM\Column(type="string", length=4, nullable=true)
      */
     private $codigoretencion;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $forzarretencion;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $montodetraccion;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(type="float")
+     */
+    private $porcentajedetraccion;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=4, nullable=true)
+     */
+    private $codigodetraccion;
+
 
     /**
      * @var string
@@ -96,7 +132,7 @@ class Docsaptipo
      */
     private $modificado;
 
-    
+
 
     /**
      * Get id
@@ -205,27 +241,51 @@ class Docsaptipo
     }
 
     /**
-     * Set iscporcentaje
+     * Set montoretencion
      *
-     * @param float $iscporcentaje
+     * @param integer $montoretencion
      *
      * @return Docsaptipo
      */
-    public function setIscporcentaje($iscporcentaje)
+    public function setMontoretencion($montoretencion)
     {
-        $this->iscporcentaje = $iscporcentaje;
+        $this->montoretencion = $montoretencion;
 
         return $this;
     }
 
     /**
-     * Get iscporcentaje
+     * Get montoretencion
+     *
+     * @return integer
+     */
+    public function getMontoretencion()
+    {
+        return $this->montoretencion;
+    }
+
+    /**
+     * Set porcentajeretencion
+     *
+     * @param float $porcentajeretencion
+     *
+     * @return Docsaptipo
+     */
+    public function setPorcentajeretencion($porcentajeretencion)
+    {
+        $this->porcentajeretencion = $porcentajeretencion;
+
+        return $this;
+    }
+
+    /**
+     * Get porcentajeretencion
      *
      * @return float
      */
-    public function getIscporcentaje()
+    public function getPorcentajeretencion()
     {
-        return $this->iscporcentaje;
+        return $this->porcentajeretencion;
     }
 
     /**
@@ -250,6 +310,102 @@ class Docsaptipo
     public function getCodigoretencion()
     {
         return $this->codigoretencion;
+    }
+
+    /**
+     * Set forzarretencion
+     *
+     * @param boolean $forzarretencion
+     *
+     * @return Docsaptipo
+     */
+    public function setForzarretencion($forzarretencion)
+    {
+        $this->forzarretencion = $forzarretencion;
+
+        return $this;
+    }
+
+    /**
+     * Get forzarretencion
+     *
+     * @return boolean
+     */
+    public function getForzarretencion()
+    {
+        return $this->forzarretencion;
+    }
+
+    /**
+     * Set montodetraccion
+     *
+     * @param integer $montodetraccion
+     *
+     * @return Docsaptipo
+     */
+    public function setMontodetraccion($montodetraccion)
+    {
+        $this->montodetraccion = $montodetraccion;
+
+        return $this;
+    }
+
+    /**
+     * Get montodetraccion
+     *
+     * @return integer
+     */
+    public function getMontodetraccion()
+    {
+        return $this->montodetraccion;
+    }
+
+    /**
+     * Set porcentajedetraccion
+     *
+     * @param float $porcentajedetraccion
+     *
+     * @return Docsaptipo
+     */
+    public function setPorcentajedetraccion($porcentajedetraccion)
+    {
+        $this->porcentajedetraccion = $porcentajedetraccion;
+
+        return $this;
+    }
+
+    /**
+     * Get porcentajedetraccion
+     *
+     * @return float
+     */
+    public function getPorcentajedetraccion()
+    {
+        return $this->porcentajedetraccion;
+    }
+
+    /**
+     * Set codigodetraccion
+     *
+     * @param string $codigodetraccion
+     *
+     * @return Docsaptipo
+     */
+    public function setCodigodetraccion($codigodetraccion)
+    {
+        $this->codigodetraccion = $codigodetraccion;
+
+        return $this;
+    }
+
+    /**
+     * Get codigodetraccion
+     *
+     * @return string
+     */
+    public function getCodigodetraccion()
+    {
+        return $this->codigodetraccion;
     }
 
     /**

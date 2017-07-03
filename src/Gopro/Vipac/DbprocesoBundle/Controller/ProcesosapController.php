@@ -328,7 +328,7 @@ class ProcesosapController extends BaseController
             //fecha del servicio necesario para diferidos
             $preproceso[$i]['ServicioDate'] = $linea['FEC_VIAJE'];
             //Cabecera
-            $preproceso[$i]['MontoTotal'] = $linea['VALOR_TOTAL'];
+            $preproceso[$i]['NetoTotal'] = $linea['VALOR_NETO'];
             $preproceso[$i]['TaxTotal'] = $linea['VALOR_IGV'];
 
             $preproceso[$i]['ruc'] = '20431871808'; //peruRail
@@ -512,7 +512,7 @@ class ProcesosapController extends BaseController
             }
 
             if (!isset($docSapTipos[$linea['TipoProceso']])) {
-                $this->setMensajes('El tipo de proceso no puede ser encontrado en la DB');
+                $this->setMensajes('El tipo de proceso no puede ser encontrado en la DB para la fila '. $linea['excelRowNumber']);
                 continue;
             }
 
@@ -525,12 +525,21 @@ class ProcesosapController extends BaseController
             }
 
 
+            if (!isset($linea['NetoTotal'])) {
+                if(!isset($linea['MontoTotal'])){
+                    $this->setMensajes('No se puede calcular el neto para la fila '. $linea['excelRowNumber']);
+                    continue;
+                }
+                $linea['NetoTotal'] = round(doubleval($linea['MontoTotal']) / (1 + 18/100), 2);
+
+            }
 
             if (!isset($linea['TaxTotal'])) {
-                $linea['NetoTotal'] = round(doubleval($linea['MontoTotal']) / (1 + 18/100), 2);
+                if(!isset($linea['MontoTotal']) || !isset($linea['NetoTotal'])){
+                    $this->setMensajes('No se puede calcular el IGV para la fila '. $linea['excelRowNumber']);
+                    continue;
+                }
                 $linea['TaxTotal'] = round($linea['MontoTotal'] - $linea['NetoTotal'], 2);
-            }else{
-                $linea['NetoTotal'] = round(doubleval($linea['MontoTotal']) - $linea['TaxTotal'], 2);
             }
 
             $linea['CantFiles'] = count($linea['Files']);

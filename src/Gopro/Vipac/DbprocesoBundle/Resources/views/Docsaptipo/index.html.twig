@@ -10,8 +10,13 @@
                 <th>Tipo Sunat</th>
                 <th>Tipo Sap</th>
                 <th>Exonerado IGV</th>
-                <th>Porcentaje ISC</th>
+                <th>Monto de retención</th>
+                <th>Porcentaje de retención</th>
                 <th>Código de retención</th>
+                <th>Forzar retención</th>
+                <th>Monto de detracción</th>
+                <th>Porcentaje de detracción</th>
+                <th>Código de detracción</th>
                 <th>Cuenta</th>
                 <th>Tipo servicio</th>
                 <th>Creado</th>
@@ -27,8 +32,13 @@
                 <td>{{ entity.tiposunat }}</td>
                 <td>{{ entity.tiposap }}</td>
                 <td>{{ entity.exoneradoigv ? 'Si' : 'No' }}</td>
-                <td>{{ entity.iscporcentaje }}</td>
+                <td>{{ entity.montoretencion }}</td>
+                <td>{{ entity.porcentajeretencion }}</td>
                 <td>{{ entity.codigoretencion }}</td>
+                <td>{{ entity.forzarretencion ? 'Si' : 'No' }}</td>
+                <td>{{ entity.montodetraccion }}</td>
+                <td>{{ entity.porcentajedetraccion }}</td>
+                <td>{{ entity.codigodetraccion }}</td>
                 <td>{{ entity.cuenta }}</td>
                 <td>{{ entity.tiposervicio }}</td>
                 <td>{% if entity.creado %}{{ entity.creado|date('Y-m-d H:i:s') }}{% endif %}</td>
