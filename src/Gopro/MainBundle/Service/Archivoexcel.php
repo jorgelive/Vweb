@@ -315,13 +315,14 @@ class Archivoexcel implements ContainerAwareInterface
                             $columnName = array($columnName);
                         }
                         foreach ($value as $key => $parteValor):
-                            if (isset($this->columnaSpecs[$columnName[$key]]['tipo']) && $this->columnaSpecs[$columnName[$key]]['tipo'] == 'exceldate') {
-                                $parteValor = $this->container->get('gopro_main_variableproceso')->exceldate($parteValor);
-                            }
-                            if (isset($this->columnaSpecs[$columnName[$key]]['tipo']) && $this->columnaSpecs[$columnName[$key]]['tipo'] == 'file' && $key == 1) {
-                                $parteValor = str_pad($parteValor, 10, 0, STR_PAD_LEFT);
-                            }
+
                             if (trim(str_replace(chr(194) . chr(160), "", $parteValor)) != '' || empty($this->getDescartarBlanco())) {
+                                if (isset($this->columnaSpecs[$columnName[$key]]['tipo']) && $this->columnaSpecs[$columnName[$key]]['tipo'] == 'exceldate') {
+                                    $parteValor = $this->container->get('gopro_main_variableproceso')->exceldate($parteValor);
+                                }
+                                if (isset($this->columnaSpecs[$columnName[$key]]['tipo']) && $this->columnaSpecs[$columnName[$key]]['tipo'] == 'file' && $key == 1) {
+                                    $parteValor = str_pad($parteValor, 10, 0, STR_PAD_LEFT);
+                                }
                                 if (!empty($this->getTrimEspacios())) {
                                     $parteValor = trim(str_replace(chr(194) . chr(160), "", $parteValor));
                                 }

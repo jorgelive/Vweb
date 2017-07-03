@@ -49,10 +49,10 @@ class ProcesosapController extends BaseController
         $columnaspecs[] = array('nombre' => 'NRO_DOCUMENTO');
         $columnaspecs[] = array('nombre' => 'VALOR_TOTAL');
         $columnaspecs[] = array('nombre' => 'MONEDA');
-        $columnaspecs[] = array('nombre' => 'FEC_SERVICIO');
-        $columnaspecs[] = array('nombre' => 'FEC_EMISION');
-        $columnaspecs[] = array('nombre' => 'FEC_RECEPCION');
-        $columnaspecs[] = array('nombre' => 'FEC_CONTABLE');
+        $columnaspecs[] = array('nombre' => 'FEC_SERVICIO', 'tipo' => 'exceldate');
+        $columnaspecs[] = array('nombre' => 'FEC_EMISION', 'tipo' => 'exceldate');
+        $columnaspecs[] = array('nombre' => 'FEC_RECEPCION', 'tipo' => 'exceldate');
+        $columnaspecs[] = array('nombre' => 'FEC_CONTABLE', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'DESCRIPCION');
         $columnaspecs[] = array('nombre' => 'FILE_1');
         $columnaspecs[] = array('nombre' => 'FILE_2');
@@ -206,8 +206,8 @@ class ProcesosapController extends BaseController
 
         $tablaSpecs = array('filasDescartar' => 1);
         $columnaspecs[] = array('nombre' => 'noProcess');
-        $columnaspecs[] = array('nombre' => 'FEC_EMISION');
-        $columnaspecs[] = array('nombre' => 'FEC_VIAJE');
+        $columnaspecs[] = array('nombre' => 'FEC_EMISION', 'tipo' => 'exceldate');
+        $columnaspecs[] = array('nombre' => 'FEC_VIAJE', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'noProcess');
         $columnaspecs[] = array('nombre' => 'noProcess');
         $columnaspecs[] = array('nombre' => 'NRO_DOCUMENTO');
@@ -245,7 +245,7 @@ class ProcesosapController extends BaseController
 
             if (isset($linea['NOMBRE_PAX']) && strpos($linea['NOMBRE_PAX'], '-') === false) {
 
-                $fechaGuiaArray[]['FECHA_GUIA'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['FEC_VIAJE']) . '-' . $linea['NOMBRE_PAX'];
+                $fechaGuiaArray[]['FECHA_GUIA'] = $linea['FEC_VIAJE'] . '-' . $linea['NOMBRE_PAX'];
 
             }
 
@@ -280,18 +280,26 @@ class ProcesosapController extends BaseController
 
         $i = 0;
 
+
+
         foreach ($archivoInfo->getExistentesRaw() as $linea):
+
+            //print_r($linea); die;
 
             if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
                 $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
                 continue;
             }
 
+            if (!isset($linea['NOMBRE_PAX'])){
+                print_r($linea); die;
+            }
+
             if (strpos($linea['NOMBRE_PAX'], '-') == 4 && substr($linea['NOMBRE_PAX'], 0, 2) == '20'){
                 $preproceso[$i]['Files'][] = substr($linea['NOMBRE_PAX'], 0, 10);
                 $linea['NOMBRE_PAX'] = substr($linea['NOMBRE_PAX'], 11, strlen($linea['NOMBRE_PAX']) - 11);
             }else{
-                $fechaGuiaCadena = $this->container->get('gopro_main_variableproceso')->exceldate($linea['FEC_VIAJE']) . '-' . $linea['NOMBRE_PAX'];
+                $fechaGuiaCadena = $linea['FEC_VIAJE'] . '-' . $linea['NOMBRE_PAX'];
                 if (!isset($fileGuiaIndizadoMulti) || !isset($fileGuiaIndizadoMulti[$fechaGuiaCadena])) {
                     $this->setMensajes('Los files del guia en la linea ' . $linea['excelRowNumber'] . ' no pudieron ser obtenidos.');
                     continue;
@@ -324,7 +332,7 @@ class ProcesosapController extends BaseController
             $preproceso[$i]['TaxTotal'] = $linea['VALOR_IGV'];
 
             $preproceso[$i]['ruc'] = '20431871808'; //peruRail
-            $preproceso[$i]['DocDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($now->format('Y-m-d'), 'to');
+            $preproceso[$i]['DocDate'] = $now->format('Y-m-d');
             $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
             $preproceso[$i]['Currency'] = 'US$'; //siempre dolares
 
@@ -361,7 +369,7 @@ class ProcesosapController extends BaseController
         $docSapTipos = $query->getArrayResult();
 
         $seriesFormater = function($value){
-            return 'FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($value)));
+            return 'FCP' . date('ym', strtotime($value));
         };
 
         $this->seekAndStack($preproceso, ['emisionFechas', 'files', 'series', 'rucs'], ['TaxDate', 'Files', 'TaxDate', 'ruc'], ['RateDate', 'NUM_FILE', 'SeriesName', 'LicTradNum'], [NULL, NULL, $seriesFormater, NULL]);
@@ -391,7 +399,7 @@ class ProcesosapController extends BaseController
             }
 
             foreach ($tcInfo->getExistentesIndizados() as $key => $value) {
-                $tcInfoFormateado[$this->get('gopro_main_variableproceso')->exceldate($key, 'to')] = $value;
+                $tcInfoFormateado[date('Y-m-d', strtotime($key))] = $value;
             }
         }
 
@@ -494,10 +502,10 @@ class ProcesosapController extends BaseController
             $anoServicio = '';
 
             if (isset($linea['ServicioDate'])) {
-                $mesServicio = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
-                $anoServicio = date('y', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['ServicioDate'])));
-                $mesDocumento = date('m', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
-                $anoDocumento = date('y', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])));
+                $mesServicio = date('m', strtotime($linea['ServicioDate']));
+                $anoServicio = date('y', strtotime($linea['ServicioDate']));
+                $mesDocumento = date('m', strtotime($linea['TaxDate']));
+                $anoDocumento = date('y', strtotime($linea['TaxDate']));
                 if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoDocumento) * 12 + intval($mesDocumento)) {
                     $esDiferido = true;
                 }
@@ -533,10 +541,10 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['DocNum'] = $i;
             $resultadoCab[$nroLinea]['CardCode'] = $proveedoresInfoIndizado{$linea['ruc']}['CardCode'];
             $resultadoCab[$nroLinea]['DocType'] = 'dDocument_Service';
-            $resultadoCab[$nroLinea]['DocDate'] = $linea['DocDate'];
-            $resultadoCab[$nroLinea]['TaxDate'] = $linea['TaxDate'];
+            $resultadoCab[$nroLinea]['DocDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['DocDate'], 'to');
+            $resultadoCab[$nroLinea]['TaxDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'], 'to');
             //todo tabla para credito
-            $resultadoCab[$nroLinea]['DocDueDate'] = strval(intval($linea['u_syp_fecrec']) + filter_var($proveedoresInfoIndizado{$linea['ruc']}['ExtraDays'], FILTER_VALIDATE_INT, ['options' => ['default' => 0, 'min_range' => 0]]));
+            $resultadoCab[$nroLinea]['DocDueDate'] = strval(intval($this->container->get('gopro_main_variableproceso')->exceldate($linea['u_syp_fecrec'], 'to')) + filter_var($proveedoresInfoIndizado{$linea['ruc']}['ExtraDays'], FILTER_VALIDATE_INT, ['options' => ['default' => 0, 'min_range' => 0]]));
             $resultadoCab[$nroLinea]['Currency'] = $linea['Currency'];
             if ($linea['Currency'] == 'US$') {
                 $resultadoCab[$nroLinea]['ControlAccount'] = 421202;
@@ -551,9 +559,9 @@ class ProcesosapController extends BaseController
                 $resultadoCab[$nroLinea]['DocRate'] = 'TC no ingresado';
             }
             if (isset($seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])))])){
-                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])))]['Series'];
+                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($linea['TaxDate']))]['Series'];
             } else {
-                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate']))) . ' no existe.';
+                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP FCP' . date('ym', strtotime($linea['TaxDate'])) . ' no existe.';
             }
 
             $resultadoCab[$nroLinea]['U_SYP_MDTD'] = $docSapTipos[$linea['TipoProceso']]['tiposunat'];
@@ -569,7 +577,7 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['u_syp_tpoper'] = '02';
             $resultadoCab[$nroLinea]['u_syp_biesrvadq'] = '5';
             //fecha rige
-            $resultadoCab[$nroLinea]['u_syp_fecrec'] = $linea['u_syp_fecrec'];
+            $resultadoCab[$nroLinea]['u_syp_fecrec'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['u_syp_fecrec'], 'to');
 
             isset($linea['U_SYP_TIPOBOLETO']) ? $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = $linea['U_SYP_TIPOBOLETO'] : $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDTO'] = '';
