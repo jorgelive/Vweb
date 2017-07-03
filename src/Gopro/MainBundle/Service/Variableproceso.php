@@ -87,7 +87,8 @@ class Variableproceso implements ContainerAwareInterface{
         if($tipo=='from'){
 
             if(!is_numeric($variable) && (strpos($variable, '-') > 0 || strpos($variable, '/') > 0)){
-                return date('Y-m-d', strtotime($variable));
+
+                return date('Y-m-d', strtotime(str_replace('/', '-', $variable)));
             }elseif(is_numeric($variable)){
                 return date('Y-m-d', mktime(0,0,0,1,$variable-1,1900));
             }else{
