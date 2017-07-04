@@ -568,8 +568,12 @@ class ProcesosapController extends BaseController
 
             empty($docSapTipos[$linea['TipoProceso']]['exoneradoigv']) ? $igv = 18 : $igv = 0;
 
-            if(!isset($linea['ImpuestoExtraTotal'])){
+            $linea['MontoTotal'] = doubleval(str_replace(',', '', $linea['MontoTotal']));
+
+            if(!isset($linea['ImpuestoExtraTotal'])) {
                 $linea['ImpuestoExtraTotal'] = 0;
+            }else{
+                $linea['ImpuestoExtraTotal'] = doubleval(str_replace(',', '', $linea['ImpuestoExtraTotal']));
             }
 
             if (!isset($linea['NetoTotal'])) {
@@ -577,9 +581,9 @@ class ProcesosapController extends BaseController
                     $this->setMensajes('No se puede calcular el neto para la fila '. $linea['excelRowNumber']);
                     continue;
                 }
-
                 $linea['NetoTotal'] = round(doubleval($linea['MontoTotal'] - $linea['ImpuestoExtraTotal']) / (1 + $igv / 100), 2);
-
+            }else{
+                $linea['NetoTotal'] = doubleval(str_replace(',', '', $linea['NetoTotal']));
             }
 
             if (!isset($linea['TaxTotal'])) {
@@ -592,7 +596,8 @@ class ProcesosapController extends BaseController
                     }
                     $linea['TaxTotal'] = round($linea['MontoTotal'] - $linea['ImpuestoExtraTotal'] - $linea['NetoTotal'], 2);
                 }
-
+            }else{
+                $linea['TaxTotal'] = doubleval(str_replace(',', '', $linea['TaxTotal']));
             }
 
             if($linea['MontoTotal'] != $linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal']){
@@ -632,10 +637,12 @@ class ProcesosapController extends BaseController
             }
             $resultadoCab[$nroLinea]['DocTotal'] = $linea['MontoTotal'];
 
-            if (isset($seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'])))])){
-                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($linea['TaxDate']))]['Series'];
+            //print_r($seriesInfoIndizado); die;
+
+            if (isset($seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['DocDate'])))])){
+                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($linea['DocDate']))]['Series'];
             } else {
-                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP FCP' . date('ym', strtotime($linea['TaxDate'])) . ' no existe.';
+                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP FCP' . date('ym', strtotime($linea['DocDate'])) . ' no existe.';
             }
 
             $resultadoCab[$nroLinea]['U_SYP_MDTD'] = $docSapTipos[$linea['TipoProceso']]['tiposunat'];
@@ -700,7 +707,6 @@ class ProcesosapController extends BaseController
                 $resultadoDet[$nroLineaDet]['Currency'] = $linea['Currency'];
 
                 if ($k < $linea['CantFiles']) {
-                    //echo 'cant:' . $linea['CantFiles'] . ' ' . $j .'<br>';
                     $resultadoDet[$nroLineaDet]['LineNetoTotal'] = $linea['DividedNetoTotal'];
                     $resultadoDet[$nroLineaDet]['LineTaxTotal'] = $linea['DividedTaxTotal'];
 
