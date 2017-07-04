@@ -204,7 +204,7 @@ class BaseController extends Controller
                     if (is_array($v)) {
                         foreach ($v as $subkey => $subv) {
                             if (is_numeric($subkey)) {
-                                if (!isset($this->stack[$nombreStack . 'Aux']) || !in_array($subv, $this->stack[$nombreStack . 'Aux'])) {
+                                if ($subv !== null && (!isset($this->stack[$nombreStack . 'Aux']) || !in_array($subv, $this->stack[$nombreStack . 'Aux']))) {
                                     $this->setStack($nombreStack, $formaters[$nroStack]($subv), $newKeyNames[$nroStack]);
                                     $this->setStack($nombreStack . 'Aux', $formaters[$nroStack]($subv));
                                     $i++;
@@ -212,7 +212,7 @@ class BaseController extends Controller
                             }
                         }
                     } else {
-                        if (!isset($this->stack[$nombreStack . 'Aux']) || !in_array($formaters[$nroStack]($v), $this->stack[$nombreStack . 'Aux'])) {
+                        if ($v !== null && (!isset($this->stack[$nombreStack . 'Aux']) || !in_array($formaters[$nroStack]($v), $this->stack[$nombreStack . 'Aux']))) {
                             $this->setStack($nombreStack, $formaters[$nroStack]($v), $newKeyNames[$nroStack]);
                             $this->setStack($nombreStack . 'Aux', $formaters[$nroStack]($v));
                             $i++;

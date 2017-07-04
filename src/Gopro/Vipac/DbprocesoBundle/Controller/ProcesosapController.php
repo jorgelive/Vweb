@@ -371,6 +371,45 @@ class ProcesosapController extends BaseController
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Docsaptipo tipo INDEX BY tipo.id");
         $docSapTipos = $query->getArrayResult();
 
+        $codigosRetencionDetraccionFormater = function($value){
+            if(empty($value)){
+                return null;
+            }
+
+            return $value;
+        };
+
+        $this->seekAndStack($docSapTipos, ['codigosretencion','codigosretencion'], ['codigoretencion','codigodetraccion'], ['WTCode','WTCode'], [$codigosRetencionDetraccionFormater, $codigosRetencionDetraccionFormater]);
+
+        $retencionInfo = $this->container->get('gopro_dbproceso_proceso');
+        $retencionInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
+        $retencionInfo->setTabla('OWHT');
+        $retencionInfo->setSchema('dbo');
+        $retencionInfo->setCamposSelect([
+            'WTCode',
+            'WTName',
+            'U_SYP_PORC'
+        ]);
+
+        $retencionInfoIndizado = array();
+
+        if (empty($this->getStack('codigosretencion'))) {
+            $this->setMensajes('No hay codigos de retencion para procesar');
+        } else{
+            $retencionInfo->setQueryVariables($this->getStack('codigosretencion'));
+            $retencionInfo->setWhereCustom("Inactive = 'N'");
+
+            if (!$retencionInfo->ejecutarSelectQuery() || empty($retencionInfo->getExistentesRaw())) {
+                $this->setMensajes($retencionInfo->getMensajes());
+                $this->setMensajes('No existe ninguno de los tipos de cambio');
+            } else {
+                $this->setMensajes($retencionInfo->getMensajes());
+            }
+
+            $retencionInfoIndizado = $retencionInfo->getExistentesIndizados();
+        }
+
+
         $seriesFormater = function($value){
             return 'FCP' . date('ym', strtotime($value));
         };
@@ -383,7 +422,7 @@ class ProcesosapController extends BaseController
         $tcInfo->setSchema('dbo');
         $tcInfo->setCamposSelect([
             'RateDate',
-            'Rate',
+            'Rate'
         ]);
 
         $tcInfoFormateado = array();
@@ -472,7 +511,7 @@ class ProcesosapController extends BaseController
             'LicTradNum',
             'ExtraDays',
             'U_SYP_AGENRE',
-            'u_SYP_SNBUEN'
+            'U_SYP_SNBUEN'
         ]);
 
         $proveedoresInfoIndizado = array();
@@ -632,8 +671,8 @@ class ProcesosapController extends BaseController
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigoretencion'], 0, 1);
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigoretencion'];
-                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $docSapTipos[$linea['TipoProceso']]['codigoretencion'];
-                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = $docSapTipos[$linea['TipoProceso']]['porcentajeretencion'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigoretencion']]['WTName'];
+                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = intval($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigoretencion']]['U_SYP_PORC']);
             }
 
             //sobrescribimos la detraccion
@@ -641,8 +680,8 @@ class ProcesosapController extends BaseController
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigodetraccion'], 0, 1);
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
-                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
-                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = $docSapTipos[$linea['TipoProceso']]['porcentajedetraccion'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['WTName'];
+                $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = intval($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['U_SYP_PORC']);
             }
 
 

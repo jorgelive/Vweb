@@ -60,13 +60,6 @@ class Docsaptipo
     private $montoretencion;
 
     /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $porcentajeretencion;
-
-    /**
      * @var string
      *
      * @ORM\Column(type="string", length=4, nullable=true)
@@ -79,13 +72,6 @@ class Docsaptipo
      * @ORM\Column(type="integer")
      */
     private $montodetraccion;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(type="float")
-     */
-    private $porcentajedetraccion;
 
     /**
      * @var string
@@ -258,30 +244,6 @@ class Docsaptipo
     }
 
     /**
-     * Set porcentajeretencion
-     *
-     * @param float $porcentajeretencion
-     *
-     * @return Docsaptipo
-     */
-    public function setPorcentajeretencion($porcentajeretencion)
-    {
-        $this->porcentajeretencion = $porcentajeretencion;
-
-        return $this;
-    }
-
-    /**
-     * Get porcentajeretencion
-     *
-     * @return float
-     */
-    public function getPorcentajeretencion()
-    {
-        return $this->porcentajeretencion;
-    }
-
-    /**
      * Set codigoretencion
      *
      * @param string $codigoretencion
@@ -327,30 +289,6 @@ class Docsaptipo
     public function getMontodetraccion()
     {
         return $this->montodetraccion;
-    }
-
-    /**
-     * Set porcentajedetraccion
-     *
-     * @param float $porcentajedetraccion
-     *
-     * @return Docsaptipo
-     */
-    public function setPorcentajedetraccion($porcentajedetraccion)
-    {
-        $this->porcentajedetraccion = $porcentajedetraccion;
-
-        return $this;
-    }
-
-    /**
-     * Get porcentajedetraccion
-     *
-     * @return float
-     */
-    public function getPorcentajedetraccion()
-    {
-        return $this->porcentajedetraccion;
     }
 
     /**
