@@ -218,6 +218,7 @@ class ProcesosapController extends BaseController
         $columnaspecs[] = array('nombre' => 'noProcess');
         $columnaspecs[] = array('nombre' => 'FEC_EMISION', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'FEC_VIAJE', 'tipo' => 'exceldate');
+        $columnaspecs[] = array('nombre' => 'FEC_CONTABLE', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'noProcess');
         $columnaspecs[] = array('nombre' => 'noProcess');
         $columnaspecs[] = array('nombre' => 'NRO_DOCUMENTO');
@@ -334,6 +335,8 @@ class ProcesosapController extends BaseController
 
             $preproceso[$i]['ruc'] = '20431871808'; //peruRail
             $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
+            $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
+            $preproceso[$i]['u_syp_fecrec'] = $preproceso[$i]['TaxDate'];
             $preproceso[$i]['Currency'] = 'US$'; //siempre dolares
 
             $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
@@ -709,8 +712,6 @@ class ProcesosapController extends BaseController
         foreach ($preproceso as $nroLinea => $linea):
 
             $esDiferido = false;
-            $mesServicio = '';
-            $anoServicio = '';
 
             if(!isset($linea['DocDate']) && empty($linea['DocDate'])){
                 $linea['DocDate'] = $nowString;
@@ -1109,7 +1110,7 @@ class ProcesosapController extends BaseController
             ->setHoja(3)
             ->setColumna($this->getMensajes(), 'A1')
             ->setHoja(1)
-            ->setFormatoColumna(['yyyy-mm-dd' => ['d', 'e', 'f', 'u'], '@' => ['sz']])
+            ->setFormatoColumna(['yyyy-mm-dd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
             ->getArchivo();
     }
 
