@@ -135,7 +135,7 @@ class ProcesosapController extends BaseController
         foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
 
             if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
-                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+                //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
                 continue;
             }
 
@@ -291,7 +291,7 @@ class ProcesosapController extends BaseController
         foreach ($archivoInfo->getExistentesRaw() as $linea):
 
             if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
-                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+                //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
                 continue;
             }
 
@@ -474,7 +474,7 @@ class ProcesosapController extends BaseController
         foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
 
             if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
-                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+                //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
                 continue;
             }
 
@@ -533,6 +533,11 @@ class ProcesosapController extends BaseController
 
     private function generarExcel($nombreArchivo, $preproceso)
     {
+
+
+        $now = new \DateTime('now');
+        $nowString = $now->format('Y-m-d');
+
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Docsaptipo tipo INDEX BY tipo.id");
         $docSapTipos = $query->getArrayResult();
 
@@ -651,21 +656,20 @@ class ProcesosapController extends BaseController
             'Series'
         ]);
 
-        $seriesInfoIndizado = array();
-
         if (empty($this->getStack('series'))) {
-            $this->setMensajes('La pila de series esta vacia');
-        } else {
-            $seriesInfo->setQueryVariables($this->getStack('series'));
-            if (!$seriesInfo->ejecutarSelectQuery() || empty($seriesInfo->getExistentesRaw())) {
-                $this->setMensajes($seriesInfo->getMensajes());
-                $this->setMensajes('No existe ninguno de las series en la lista');
-            } else {
-                $this->setMensajes($seriesInfo->getMensajes());
-            }
-
-            $seriesInfoIndizado = $seriesInfo->getExistentesIndizados();
+            $this->setStack('series', $seriesFormater($nowString), 'SeriesName');
         }
+
+        $seriesInfo->setQueryVariables($this->getStack('series'));
+        if (!$seriesInfo->ejecutarSelectQuery() || empty($seriesInfo->getExistentesRaw())) {
+            $this->setMensajes($seriesInfo->getMensajes());
+            $this->setMensajes('No existe ninguno de las series en la lista');
+        } else {
+            $this->setMensajes($seriesInfo->getMensajes());
+        }
+
+        $seriesInfoIndizado = $seriesInfo->getExistentesIndizados();
+
 
         $proveedoresInfo = $this->container->get('gopro_dbproceso_proceso');
         $proveedoresInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
@@ -699,10 +703,6 @@ class ProcesosapController extends BaseController
         $resultadoCab = array();
 
         $resultadoDet = array();
-
-
-        $now = new \DateTime('now');
-        $nowString = $now->format('Y-m-d');
 
         $nroLineaDet = 0;
         $i = 1;
