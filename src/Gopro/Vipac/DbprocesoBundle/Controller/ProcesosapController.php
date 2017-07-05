@@ -168,7 +168,7 @@ class ProcesosapController extends BaseController
             $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
             $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
             $preproceso[$i]['DocDueDate'] = $preproceso[$i]['DocDate'];
-            $preproceso[$i]['Currency'] = str_replace('SD', 'S$', $linea['MONEDA']);
+            $preproceso[$i]['Currency'] = str_replace(['SD', 'SOL'], ['S$', 'S/'], $linea['MONEDA']);
 
             $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
             $preproceso[$i]['U_SYP_MDCD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[1];
@@ -692,7 +692,7 @@ class ProcesosapController extends BaseController
             $this->setMensajes('La pila de rucs esta vacia');
         } else {
             $proveedoresInfo->setQueryVariables($this->getStack('rucs'));
-            $proveedoresInfo->setWhereCustom("validFor = 'Y'");
+            $proveedoresInfo->setWhereCustom("frozenFor = 'N'");
             if (!$proveedoresInfo->ejecutarSelectQuery() || empty($proveedoresInfo->getExistentesRaw())) {
                 $this->setMensajes($proveedoresInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los proveedores en la lista');
@@ -865,7 +865,7 @@ class ProcesosapController extends BaseController
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigoretencion'], 0, 1);
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigoretencion'];
-                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigoretencion']]['WTName'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = substr($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigoretencion']]['WTName'], 0, 31);
                 $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = intval($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigoretencion']]['U_SYP_PORC']);
             }
 
@@ -874,7 +874,7 @@ class ProcesosapController extends BaseController
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')){
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigodetraccion'], 0, 1);
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
-                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = $retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['WTName'];
+                $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = substr($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['WTName'], 0, 31);
                 $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = intval($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['U_SYP_PORC']);
             }
 
@@ -1110,7 +1110,7 @@ class ProcesosapController extends BaseController
             ->setHoja(3)
             ->setColumna($this->getMensajes(), 'A1')
             ->setHoja(1)
-            ->setFormatoColumna(['yyyy-mm-dd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
+            ->setFormatoColumna(['yyyymmdd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
             ->getArchivo();
     }
 
