@@ -32,6 +32,7 @@ class DefaultController extends Controller
             array('nombre'=>'Reclasificador de CC','route'=>'gopro_vipac_dbproceso_proceso_calcc'),
             array('nombre'=>'Genérico SAP','route'=>'gopro_vipac_dbproceso_procesosap_generico'),
             array('nombre'=>'Perurail SAP','route'=>'gopro_vipac_dbproceso_procesosap_perurail'),
+            array('nombre'=>'Incarail SAP','route'=>'gopro_vipac_dbproceso_procesosap_incarail'),
             array('nombre'=>'Tipos de documentos Sap','route'=>'gopro_vipac_dbproceso_docsaptipo'),
             array('nombre'=>'Cargador de CP','route'=>'gopro_vipac_dbproceso_proceso_cargadorcp'),
             array('nombre'=>'Tipos de documentos CP','route'=>'gopro_vipac_dbproceso_doccptipo'),
