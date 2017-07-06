@@ -814,13 +814,17 @@ class ProcesosapController extends BaseController
 
             $coeficienteMoneda = 1;
 
-            if (isset($tcInfoFormateado[$linea['TaxDate']])) {
-                if($linea['Currency'] == 'US$'){
+            if($linea['Currency'] == 'US$'){
+                if (isset($tcInfoFormateado[$linea['TaxDate']])) {
+
                     $coeficienteMoneda = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
+                    $resultadoCab[$nroLinea]['DocRate'] = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
+                }else{
+                    $resultadoCab[$nroLinea]['DocRate'] = 'TC no ingresado';
                 }
-                $resultadoCab[$nroLinea]['DocRate'] = $tcInfoFormateado[$linea['TaxDate']]['Rate'];
+
             } else {
-                $resultadoCab[$nroLinea]['DocRate'] = 'TC no ingresado';
+                $resultadoCab[$nroLinea]['DocRate'] = '';
             }
             $resultadoCab[$nroLinea]['DocTotal'] = $linea['MontoTotal'];
 
@@ -945,11 +949,10 @@ class ProcesosapController extends BaseController
                 }
                 $resultadoDet[$nroLineaDet]['OcrCode4'] = $docSapTipos[$linea['TipoProceso']]['tiposervicio'];
                 $resultadoDet[$nroLineaDet]['OcrCode5'] = '100';
-                if($resultadoDet[$nroLineaDet]['VatGroup'] == 'EXE_IGV' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y'){
-                    $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
-                }else{
-
+                if(!empty($resultadoCab[$nroLinea]['U_SYP_COD_DET'])){
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'Y';
+                }else{
+                    $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
                 }
 
                 //$resultadoDet[$nroLineaDet]['excelRowNumber'] = $linea['excelRowNumber'];
