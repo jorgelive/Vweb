@@ -139,6 +139,11 @@ class ProcesosapController extends BaseController
                 continue;
             }
 
+            if (!isset($linea['TIPO_PROCESO'])) {//sumatoria de formato peru rail
+                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el tipo de proceso definido.');
+                continue;
+            }
+
             if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
                 $preproceso[$i]['Files']=array_unique($archivoInfo->getExistentesCustomRaw()[$nroLinea]);
             } else {
@@ -165,16 +170,19 @@ class ProcesosapController extends BaseController
             }
 
             $preproceso[$i]['ruc'] = $linea['COD_PROVEEDOR'];
-            $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
+            if(isset($linea['FEC_CONTABLE'])){
+                $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
+            }
             $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
-            $preproceso[$i]['DocDueDate'] = $preproceso[$i]['DocDate'];
             $preproceso[$i]['Currency'] = str_replace(['SD', 'SOL'], ['S$', 'S/'], $linea['MONEDA']);
 
             $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
             $preproceso[$i]['U_SYP_MDCD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[1];
             $preproceso[$i]['Comments'] = $linea['DESCRIPCION'];
 
-            $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            if(isset($linea['FEC_RECEPCION'])){
+                $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            }
 
             //detalle
             $preproceso[$i]['excelRowNumber'] = $linea['excelRowNumber'];
@@ -507,16 +515,19 @@ class ProcesosapController extends BaseController
             }
 
             $preproceso[$i]['ruc'] = $linea['COD_PROVEEDOR'];
-            $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
+            if(isset($linea['FEC_CONTABLE'])){
+                $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
+            }
             $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
-            $preproceso[$i]['DocDueDate'] = $preproceso[$i]['DocDate'];
             $preproceso[$i]['Currency'] = str_replace('SD', 'S$', $linea['MONEDA']);
 
             $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
             $preproceso[$i]['U_SYP_MDCD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[1];
             $preproceso[$i]['Comments'] = $linea['DESCRIPCION'];
 
-            $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            if(isset($linea['FEC_RECEPCION'])){
+                $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            }
 
             //detalle
             $preproceso[$i]['excelRowNumber'] = $linea['excelRowNumber'];
@@ -707,6 +718,8 @@ class ProcesosapController extends BaseController
 
         $resultadoDet = array();
 
+        $resultadoRet = array();
+
         $nroLineaDet = 0;
         $i = 1;
         foreach ($preproceso as $nroLinea => $linea):
@@ -880,7 +893,9 @@ class ProcesosapController extends BaseController
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
                 $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = substr($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['WTName'], 0, 31);
                 $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = intval($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['U_SYP_PORC']);
+
             }
+
 
 
             $j = 1;
@@ -951,6 +966,24 @@ class ProcesosapController extends BaseController
                 $resultadoDet[$nroLineaDet]['OcrCode5'] = '100';
                 if(!empty($resultadoCab[$nroLinea]['U_SYP_COD_DET'])){
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'Y';
+
+                    $resultadoRet[$nroLineaDet]['DocNum'] = $i;
+                    $resultadoRet[$nroLineaDet]['LineNum'] = $j;
+                    $resultadoRet[$nroLineaDet]['WTCode'] = $resultadoCab[$nroLinea]['U_SYP_COD_DET'];
+
+                    if($linea['Currency'] == 'US$'){
+                        $resultadoRet[$nroLineaDet]['TaxbleAmnt'] = '';
+                        $resultadoRet[$nroLineaDet]['WTAmnt'] = '';
+                        $resultadoRet[$nroLineaDet]['TxblAmntFC'] = $resultadoDet[$nroLineaDet]['LineNetoTotal'];
+                        $resultadoRet[$nroLineaDet]['WTAmntFC'] = round($resultadoDet[$nroLineaDet]['LineNetoTotal'] * $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] / 100, 2);
+
+                    } else {
+                        $resultadoRet[$nroLineaDet]['TaxbleAmnt'] = $resultadoDet[$nroLineaDet]['LineNetoTotal'];
+                        $resultadoRet[$nroLineaDet]['WTAmnt'] = round($resultadoDet[$nroLineaDet]['LineNetoTotal'] * $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] / 100, 2);
+                        $resultadoRet[$nroLineaDet]['TxblAmntFC'] = '';
+                        $resultadoRet[$nroLineaDet]['WTAmntFC'] = '';
+                    }
+
                 }else{
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'N';
                 }
@@ -1098,23 +1131,55 @@ class ProcesosapController extends BaseController
             'WtLiable'
         ];
 
+        $encabezadosRet = [
+            'ParentKey',
+            'LineNum',
+            'WTCode',
+            'TaxableAmount',
+            'WTAmount',
+            'TaxableAmountFC',
+            'WTAmountFC'
+        ];
+
+        $encabezadosRetSec = [
+            'DocNum',
+            'LineNum',
+            'WTCode',
+            'TaxbleAmnt',
+            'WTAmnt',
+            'TxblAmntFC',
+            'WTAmntFC'
+        ];
+
         $archivoGenerado = $this->get('gopro_main_archivoexcel');
 
-        return $archivoGenerado
+        $archivoGenerado
             ->setArchivo()
             ->setParametrosWriter("SAP-" . $nombreArchivo)
             ->setFila($encabezadosCab, 'A4')
             ->setFila($encabezadosCabSec, 'A5')
             ->setTabla($resultadoCab, 'A6')
+            ->setFormatoColumna(['yyyymmdd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
             ->setHoja(2)
             ->setFila($encabezadosDet, 'A4')
             ->setFila($encabezadosDetSec, 'A5')
             ->setTabla($resultadoDet, 'A6')
-            ->setHoja(3)
+            ->setHoja(3);
+
+        if(!empty($resultadoRet)){
+            $archivoGenerado
+                ->setFila($encabezadosRet, 'A4')
+                ->setFila($encabezadosRetSec, 'A5')
+                ->setTabla($resultadoRet, 'A6')
+                ->setHoja(4);
+        }
+
+        $archivoGenerado
             ->setColumna($this->getMensajes(), 'A1')
-            ->setHoja(1)
-            ->setFormatoColumna(['yyyymmdd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
-            ->getArchivo();
+            ->setHoja(1);
+
+
+        return $archivoGenerado->getArchivo();
     }
 
     /*

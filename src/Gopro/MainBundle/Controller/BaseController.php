@@ -101,7 +101,12 @@ class BaseController extends Controller
      */
     protected function getStack($id)
     {
-        return $this->stack[$id];
+        if(isset($this->stack[$id])){
+            return $this->stack[$id];
+        }else{
+            return array();
+        }
+
     }
 
     /**
