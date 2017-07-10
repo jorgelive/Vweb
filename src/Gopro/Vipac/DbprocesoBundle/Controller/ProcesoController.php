@@ -24,186 +24,184 @@ class ProcesoController extends BaseController
      * @Route("/cheque/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cheque", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function chequeAction(Request $request,$archivoEjecutar)
+    public function chequeAction(Request $request, $archivoEjecutar)
     {
-        $operacion='vipac_dbproceso_proceso_cheque';
+        $operacion = 'vipac_dbproceso_proceso_cheque';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CHEQUE_FILE');
-        $columnaspecs[0]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
-        $columnaspecs[1]=null;
-        $columnaspecs[2]=array('nombre'=>'ANO-NUM_FILE','llave'=>'si','tipo'=>'file');
-        $columnaspecs[3]=null;
-        $columnaspecs[4]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[5]=array('nombre'=>'CENTRO_COSTO_PAIS','llave'=>'no');
+        $tablaSpecs = array('schema' => 'VWEB', "nombre" => 'DBP_PROCESO_CHEQUE_FILE');
+        $columnaspecs[0] = array('nombre' => 'FECHA', 'llave' => 'no', 'tipo' => 'exceldate', 'proceso' => 'no');
+        $columnaspecs[1] = null;
+        $columnaspecs[2] = array('nombre' => 'ANO-NUM_FILE', 'llave' => 'si', 'tipo' => 'file');
+        $columnaspecs[3] = null;
+        $columnaspecs[4] = array('nombre' => 'MONTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[5] = array('nombre' => 'CENTRO_COSTO_PAIS', 'llave' => 'no');
 
-        $procesoArchivo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $procesoArchivo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader($tablaSpecs,$columnaspecs)
-        ;
+            ->setParametrosReader($tablaSpecs, $columnaspecs);
 
-        if(!$procesoArchivo->parseExcel()){
+        if (!$procesoArchivo->parseExcel()) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga = $this->get('gopro_dbproceso_cargador');
+        if (!$carga->setParametros($procesoArchivo->getTablaSpecs(), $procesoArchivo->getColumnaSpecs(), $procesoArchivo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente = $this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
-        if(empty($existente)){
+        if (empty($existente)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
-        $fusion=array();
-        foreach($procesoArchivo->getExistentesIndizadosMulti() as $key=>$valores):
+        $fusion = array();
+        foreach ($procesoArchivo->getExistentesIndizadosMulti() as $key => $valores):
             if (!array_key_exists($key, $existente)) {
                 $this->setMensajes($procesoArchivo->getMensajes());
                 $this->setMensajes($carga->getMensajes());
-                $this->setMensajes('El valor '.$key.' no se encuentra en la base de datos');
-                return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
-            }else{
-                foreach($valores as $valor):
-                    $fusion[]=array_replace_recursive($valor,$existente[$key]);
+                $this->setMensajes('El valor ' . $key . ' no se encuentra en la base de datos');
+                return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            } else {
+                foreach ($valores as $valor):
+                    $fusion[] = array_replace_recursive($valor, $existente[$key]);
                 endforeach;
             }
         endforeach;
 
-        $resultados=array();
-        foreach($fusion as $fusionPart):
-            if(!isset($resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)])){
+        $resultados = array();
+        foreach ($fusion as $fusionPart):
+            if (!isset($resultados[$fusionPart['CENTRO_COSTO_PAIS'] . ' | ' . substr($fusionPart['FECHA'], 0, 7)])) {
 
-                $resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]=0;
+                $resultados[$fusionPart['CENTRO_COSTO_PAIS'] . ' | ' . substr($fusionPart['FECHA'], 0, 7)] = 0;
             }
-            $resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]=$resultados[$fusionPart['CENTRO_COSTO_PAIS'].' | '.substr($fusionPart['FECHA'],0,7)]+$fusionPart['MONTO'];
+            $resultados[$fusionPart['CENTRO_COSTO_PAIS'] . ' | ' . substr($fusionPart['FECHA'], 0, 7)] = $resultados[$fusionPart['CENTRO_COSTO_PAIS'] . ' | ' . substr($fusionPart['FECHA'], 0, 7)] + $fusionPart['MONTO'];
         endforeach;
 
         $this->setMensajes($procesoArchivo->getMensajes());
         $this->setMensajes($carga->getMensajes());
-        return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'resultados'=>$resultados ,'mensajes' => $this->getMensajes());
+        return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'resultados' => $resultados, 'mensajes' => $this->getMensajes());
     }
 
     /**
      * @Route("/cargadorcp/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_cargadorcp", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function cargadorcpAction(Request $request,$archivoEjecutar)
+    public function cargadorcpAction(Request $request, $archivoEjecutar)
     {
 
-        $operacion='vipac_dbproceso_proceso_cargadorcp';
+        $operacion = 'vipac_dbproceso_proceso_cargadorcp';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VIAPAC',"nombre"=>'PROVEEDOR','tipo'=>'S');
-        $columnaspecs[]=array('nombre'=>'TIPO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'DIFERIDO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'PROVEEDOR','llave'=>'si');
-        $columnaspecs[]=array('nombre'=>'DOCUMENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'MONTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'MONEDA','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FECHA_RIGE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FECHA_DOCUMENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FECHA_CONTABLE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'APLICACION','llave'=>'no','proceso'=>'no');
+        $tablaSpecs = array('schema' => 'VIAPAC', "nombre" => 'PROVEEDOR', 'tipo' => 'S');
+        $columnaspecs[] = array('nombre' => 'TIPO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'DIFERIDO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'PROVEEDOR', 'llave' => 'si');
+        $columnaspecs[] = array('nombre' => 'DOCUMENTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'MONTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'MONEDA', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FECHA_RIGE', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FECHA_DOCUMENTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FECHA_CONTABLE', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'APLICACION', 'llave' => 'no', 'proceso' => 'no');
         //$columnaspecs[]=array('nombre'=>'VOUCHER','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'DOCUMENTO_ASOCIADO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_1','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_2','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_3','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_4','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_5','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_6','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_7','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_8','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_9','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_10','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_11','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_12','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_13','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_14','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_15','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_16','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_17','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_18','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_19','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'FILE_20','llave'=>'no','proceso'=>'no');
-        $columnaspecs[]=array('nombre'=>'CONDICION_PAGO','llave'=>'no');
+        $columnaspecs[] = array('nombre' => 'DOCUMENTO_ASOCIADO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_1', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_2', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_3', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_4', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_5', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_6', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_7', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_8', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_9', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_10', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_11', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_12', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_13', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_14', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_15', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_16', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_17', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_18', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_19', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'FILE_20', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[] = array('nombre' => 'CONDICION_PAGO', 'llave' => 'no');
 
-        $archivoInfo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $archivoInfo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader($tablaSpecs,$columnaspecs)
-            ->setCamposCustom(['FILE_1','FILE_2','FILE_3','FILE_4','FILE_5','FILE_6','FILE_7','FILE_8','FILE_9','FILE_10','FILE_11','FILE_12','FILE_13','FILE_14','FILE_15','FILE_16','FILE_17','FILE_18','FILE_19','FILE_20'])
+            ->setParametrosReader($tablaSpecs, $columnaspecs)
+            ->setCamposCustom(['FILE_1', 'FILE_2', 'FILE_3', 'FILE_4', 'FILE_5', 'FILE_6', 'FILE_7', 'FILE_8', 'FILE_9', 'FILE_10', 'FILE_11', 'FILE_12', 'FILE_13', 'FILE_14', 'FILE_15', 'FILE_16', 'FILE_17', 'FILE_18', 'FILE_19', 'FILE_20'])
             ->setDescartarBlanco(true)
-            ->setTrimEspacios(true)
-        ;
+            ->setTrimEspacios(true);
 
-        if(!$archivoInfo->parseExcel()){
+        if (!$archivoInfo->parseExcel()) {
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        $datosProveedor=$this->get('gopro_dbproceso_cargador');
-        if(!$datosProveedor->setParametros($archivoInfo->getTablaSpecs(),$archivoInfo->getColumnaSpecs(),$archivoInfo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $datosProveedor = $this->get('gopro_dbproceso_cargador');
+        if (!$datosProveedor->setParametros($archivoInfo->getTablaSpecs(), $archivoInfo->getColumnaSpecs(), $archivoInfo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
         $datosProveedor->ejecutar();
-        if(empty($datosProveedor->getProceso()->getExistentesRaw())){
+        if (empty($datosProveedor->getProceso()->getExistentesRaw())) {
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('No existe ningun proveedor de los ingresados');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $archivoInfoRaw=$archivoInfo->getExistentesRaw();
+        $archivoInfoRaw = $archivoInfo->getExistentesRaw();
 
-        if(!empty($archivoInfoRaw)){
-            array_walk_recursive($archivoInfoRaw,[$this,'setStackForWalk'],['fechas','FECHA','FECHA_DOCUMENTO']);
+        if (!empty($archivoInfoRaw)) {
+            array_walk_recursive($archivoInfoRaw, [$this, 'setStackForWalk'], ['fechas', 'FECHA', 'FECHA_DOCUMENTO']);
         }
 
-        $tcInfo=$this->container->get('gopro_dbproceso_proceso');
+        $tcInfo = $this->container->get('gopro_dbproceso_proceso');
         $tcInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
         $tcInfo->setTabla('TIPO_CAMBIO_EXACTUS');
         $tcInfo->setSchema('RESERVAS');
@@ -213,29 +211,28 @@ class ProcesoController extends BaseController
             'MONTO',
         ]);
 
-        if(!empty($this->getStack('fechas'))){
-            $tcInfo->setQueryVariables($this->getStack('fechas'),'whereSelect',['FECHA'=>'exceldate']);
+        if (!empty($this->getStack('fechas'))) {
+            $tcInfo->setQueryVariables($this->getStack('fechas'), 'whereSelect', ['FECHA' => 'exceldate']);
             $tcInfo->setWhereCustom("TIPO_CAMBIO = 'TCV'");
-            if(!$tcInfo->ejecutarSelectQuery()||empty($tcInfo->getExistentesRaw())){
+            if (!$tcInfo->ejecutarSelectQuery() || empty($tcInfo->getExistentesRaw())) {
                 $this->setMensajes($archivoInfo->getMensajes());
                 $this->setMensajes($tcInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los files en la lista');
-                return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+                return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
             }
         }
 
-        foreach ($tcInfo->getExistentesIndizados() as $key => $value)
-        {
-            $tcInfoFormateado[$this->get('gopro_main_variableproceso')->exceldate($key,'to')] = $value;
+        foreach ($tcInfo->getExistentesIndizados() as $key => $value) {
+            $tcInfoFormateado[$this->get('gopro_main_variableproceso')->exceldate($key, 'to')] = $value;
         }
 
-        $filesMulti=$archivoInfo->getExistentesCustomRaw();
+        $filesMulti = $archivoInfo->getExistentesCustomRaw();
 
-        if(!empty($filesMulti)){
-            array_walk_recursive($filesMulti,[$this,'setStackForWalk'],['files','NUM_FILE']);
+        if (!empty($filesMulti)) {
+            array_walk_recursive($filesMulti, [$this, 'setStackForWalk'], ['files', 'NUM_FILE']);
         }
 
-        $filesInfo=$this->container->get('gopro_dbproceso_proceso');
+        $filesInfo = $this->container->get('gopro_dbproceso_proceso');
         $filesInfo->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
         $filesInfo->setTabla('DBP_PROCESO_CARGADORCP_FILE');
         $filesInfo->setSchema('VWEB');
@@ -248,200 +245,200 @@ class ProcesoController extends BaseController
             'PAIS_FILE'
         ]);
 
-        if(!empty($this->getStack('files'))){
+        if (!empty($this->getStack('files'))) {
             $filesInfo->setQueryVariables($this->getStack('files'));
 
-            if(!$filesInfo->ejecutarSelectQuery()||empty($filesInfo->getExistentesRaw())){
+            if (!$filesInfo->ejecutarSelectQuery() || empty($filesInfo->getExistentesRaw())) {
                 $this->setMensajes($archivoInfo->getMensajes());
                 $this->setMensajes($filesInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los files en la lista');
-                return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+                return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
             }
         }
-        $generarExcel=true;
+        $generarExcel = true;
         $query = $this->getDoctrine()->getManager()->createQuery("SELECT tipo FROM GoproVipacDbprocesoBundle:Doccptipo tipo INDEX BY tipo.id");
         $docCpTipos = $query->getArrayResult();
-        $resultado=array();
-        $celdas=array();
-        foreach($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
-            $dataCP[$nroLinea]=$linea;
-            if(!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])){
-                $dataCP[$nroLinea]['FILES']=array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
+        $resultado = array();
+        $celdas = array();
+        foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
+            $dataCP[$nroLinea] = $linea;
+            if (!empty($archivoInfo->getExistentesCustomRaw()[$nroLinea])) {
+                $dataCP[$nroLinea]['FILES'] = array_unique(array_flip($archivoInfo->getExistentesCustomRaw()[$nroLinea]));
             }
-            $dataCP[$nroLinea]['CONDICION_PAGO']=$this->container->get('gopro_main_variableproceso')->utf($datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO']);
-            if(isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])){
-                $dataCP[$nroLinea]['CONDICIONES']=$docCpTipos[$dataCP[$nroLinea]['TIPO']];
-            }else{
-                $this->setMensajes('El tipo de documento establecido para la linea: '.($nroLinea+1).', no existe');
-                $generarExcel=false;
+            $dataCP[$nroLinea]['CONDICION_PAGO'] = $this->container->get('gopro_main_variableproceso')->utf($datosProveedor->getProceso()->getExistentesIndizados()[$dataCP[$nroLinea]['PROVEEDOR']]['CONDICION_PAGO']);
+            if (isset($docCpTipos[$dataCP[$nroLinea]['TIPO']])) {
+                $dataCP[$nroLinea]['CONDICIONES'] = $docCpTipos[$dataCP[$nroLinea]['TIPO']];
+            } else {
+                $this->setMensajes('El tipo de documento establecido para la linea: ' . ($nroLinea + 1) . ', no existe');
+                $generarExcel = false;
             }
 
-            if(isset($dataCP[$nroLinea]['FILES'])){
-                foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
-                    if(isset($filesInfo->getExistentesIndizados()[$nroFile])){
-                        $dataCP[$nroLinea]['FILES'][$nroFile]=$filesInfo->getExistentesIndizados()[$nroFile];
-                    }else{
-                        $this->setMensajes('El numero de file: '.$nroFile.', de la linea: '.($nroLinea+1).', no existe');
-                        $generarExcel=false;
+            if (isset($dataCP[$nroLinea]['FILES'])) {
+                foreach ($dataCP[$nroLinea]['FILES'] as $nroFile => $posicion):
+                    if (isset($filesInfo->getExistentesIndizados()[$nroFile])) {
+                        $dataCP[$nroLinea]['FILES'][$nroFile] = $filesInfo->getExistentesIndizados()[$nroFile];
+                    } else {
+                        $this->setMensajes('El numero de file: ' . $nroFile . ', de la linea: ' . ($nroLinea + 1) . ', no existe');
+                        $generarExcel = false;
                     }
                 endforeach;
-            }else{
-                $dataCP[$nroLinea]['FILES']=['ND'=>['NOMBRE'=>'ND','CENTRO_COSTO'=>'0.00.00.00','MERCADO'=>'ND','PAIS_FILE'=>'ND','NUM_PAX'=>1]];
+            } else {
+                $dataCP[$nroLinea]['FILES'] = ['ND' => ['NOMBRE' => 'ND', 'CENTRO_COSTO' => '0.00.00.00', 'MERCADO' => 'ND', 'PAIS_FILE' => 'ND', 'NUM_PAX' => 1]];
             }
 
-            $dataCP[$nroLinea]['RUBROS']=$this->setRubros($dataCP[$nroLinea]['CONDICIONES'],$dataCP[$nroLinea]['MONTO']);
-            if(empty($dataCP[$nroLinea]['RUBROS'])){
-                $this->setMensajes('El tipo de documento establecido para la linea: '.($nroLinea+1).', no puede ser procesado');
-                $generarExcel=false;
+            $dataCP[$nroLinea]['RUBROS'] = $this->setRubros($dataCP[$nroLinea]['CONDICIONES'], $dataCP[$nroLinea]['MONTO']);
+            if (empty($dataCP[$nroLinea]['RUBROS'])) {
+                $this->setMensajes('El tipo de documento establecido para la linea: ' . ($nroLinea + 1) . ', no puede ser procesado');
+                $generarExcel = false;
             }
-            array_walk_recursive($dataCP[$nroLinea]['FILES'], [$this, 'setCantidadTotal'],['totalPax','NUM_PAX']);
-            $dataCP[$nroLinea]['TOTAL_PAX']=$this->getCantidadTotal('totalPax');
-            $this->resetCantidadTotal('totalPax');
+            array_walk_recursive($dataCP[$nroLinea]['FILES'], [$this, 'setSumaForWalk'], ['totalPax', 'NUM_PAX']);
+            $dataCP[$nroLinea]['TOTAL_PAX'] = $this->getSuma('totalPax');
+            $this->resetSuma('totalPax');
 
-            $resultado[$nroLinea]['PROVEEDOR']=$dataCP[$nroLinea]['PROVEEDOR'];
-            $resultado[$nroLinea]['TIPO']=$dataCP[$nroLinea]['CONDICIONES']['tipo'];
-            $resultado[$nroLinea]['DOCUMENTO']=$dataCP[$nroLinea]['DOCUMENTO'];
-            $resultado[$nroLinea]['FECHA_DOCUMENTO']=$dataCP[$nroLinea]['FECHA_DOCUMENTO'];
-            $resultado[$nroLinea]['FECHA_RIGE']=$dataCP[$nroLinea]['FECHA_RIGE'];
-            if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
-                $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'].' '.$dataCP[$nroLinea]['APLICACION'];
-            }else{
-                $resultado[$nroLinea]['APLICACION']=$dataCP[$nroLinea]['APLICACION'];
+            $resultado[$nroLinea]['PROVEEDOR'] = $dataCP[$nroLinea]['PROVEEDOR'];
+            $resultado[$nroLinea]['TIPO'] = $dataCP[$nroLinea]['CONDICIONES']['tipo'];
+            $resultado[$nroLinea]['DOCUMENTO'] = $dataCP[$nroLinea]['DOCUMENTO'];
+            $resultado[$nroLinea]['FECHA_DOCUMENTO'] = $dataCP[$nroLinea]['FECHA_DOCUMENTO'];
+            $resultado[$nroLinea]['FECHA_RIGE'] = $dataCP[$nroLinea]['FECHA_RIGE'];
+            if (!empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                $resultado[$nroLinea]['APLICACION'] = $dataCP[$nroLinea]['CONDICIONES']['subtotal'] . ' ' . $dataCP[$nroLinea]['APLICACION'];
+            } else {
+                $resultado[$nroLinea]['APLICACION'] = $dataCP[$nroLinea]['APLICACION'];
             }
-            $resultado[$nroLinea]['SUBTOTAL']=$dataCP[$nroLinea]['RUBROS']['subtotal'];
-            if(empty($dataCP[$nroLinea]['DIFERIDO'])){
-                $resultado[$nroLinea]['SUBTOTAL_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['subtotal'];
-            }else{
-                $resultado[$nroLinea]['SUBTOTAL_CUENTA']='18.9.2.2.'.str_pad($dataCP[$nroLinea]['DIFERIDO'],2,0,STR_PAD_LEFT);
+            $resultado[$nroLinea]['SUBTOTAL'] = $dataCP[$nroLinea]['RUBROS']['subtotal'];
+            if (empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                $resultado[$nroLinea]['SUBTOTAL_CUENTA'] = $dataCP[$nroLinea]['CONDICIONES']['subtotal'];
+            } else {
+                $resultado[$nroLinea]['SUBTOTAL_CUENTA'] = '18.9.2.2.' . str_pad($dataCP[$nroLinea]['DIFERIDO'], 2, 0, STR_PAD_LEFT);
             }
-            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
-                $resultado[$nroLinea]['IMPUESTO1']=$dataCP[$nroLinea]['RUBROS']['impuesto1'];
-            }else{
-                $resultado[$nroLinea]['IMPUESTO1']='';
+            if (!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])) {
+                $resultado[$nroLinea]['IMPUESTO1'] = $dataCP[$nroLinea]['RUBROS']['impuesto1'];
+            } else {
+                $resultado[$nroLinea]['IMPUESTO1'] = '';
             }
-            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
-                $resultado[$nroLinea]['IMPUESTO2']=$dataCP[$nroLinea]['RUBROS']['impuesto2'];
-            }else{
-                $resultado[$nroLinea]['IMPUESTO2']='';
+            if (!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])) {
+                $resultado[$nroLinea]['IMPUESTO2'] = $dataCP[$nroLinea]['RUBROS']['impuesto2'];
+            } else {
+                $resultado[$nroLinea]['IMPUESTO2'] = '';
             }
-            if(!empty($dataCP[$nroLinea]['CONDICIONES']['impuesto2'])){
-                if(empty($dataCP[$nroLinea]['DIFERIDO'])){
-                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='64.1.1.1.01';
-                }else{
-                    $resultado[$nroLinea]['IMPUESTO2_CUENTA']='18.9.3.2.'.str_pad($dataCP[$nroLinea]['DIFERIDO'],2,0,STR_PAD_LEFT);
+            if (!empty($dataCP[$nroLinea]['CONDICIONES']['impuesto2'])) {
+                if (empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                    $resultado[$nroLinea]['IMPUESTO2_CUENTA'] = '64.1.1.1.01';
+                } else {
+                    $resultado[$nroLinea]['IMPUESTO2_CUENTA'] = '18.9.3.2.' . str_pad($dataCP[$nroLinea]['DIFERIDO'], 2, 0, STR_PAD_LEFT);
                 }
-            }else{
-                $resultado[$nroLinea]['IMPUESTO2_CUENTA']='';
+            } else {
+                $resultado[$nroLinea]['IMPUESTO2_CUENTA'] = '';
             }
-            if(!empty($dataCP[$nroLinea]['RUBROS']['rubro1'])){
-                $resultado[$nroLinea]['RUBRO1']=$dataCP[$nroLinea]['RUBROS']['rubro1'];
-            }else{
-                $resultado[$nroLinea]['RUBRO1']='';
+            if (!empty($dataCP[$nroLinea]['RUBROS']['rubro1'])) {
+                $resultado[$nroLinea]['RUBRO1'] = $dataCP[$nroLinea]['RUBROS']['rubro1'];
+            } else {
+                $resultado[$nroLinea]['RUBRO1'] = '';
             }
-            $resultado[$nroLinea]['RUBRO1_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro1'];
-            if(!empty($dataCP[$nroLinea]['RUBROS']['rubro2'])){
-                $resultado[$nroLinea]['RUBRO2']=$dataCP[$nroLinea]['RUBROS']['rubro2'];
-            }else{
-                $resultado[$nroLinea]['RUBRO2']='';
+            $resultado[$nroLinea]['RUBRO1_CUENTA'] = $dataCP[$nroLinea]['CONDICIONES']['rubro1'];
+            if (!empty($dataCP[$nroLinea]['RUBROS']['rubro2'])) {
+                $resultado[$nroLinea]['RUBRO2'] = $dataCP[$nroLinea]['RUBROS']['rubro2'];
+            } else {
+                $resultado[$nroLinea]['RUBRO2'] = '';
             }
-            $resultado[$nroLinea]['RUBRO2_CUENTA']=$dataCP[$nroLinea]['CONDICIONES']['rubro2'];
-            $resultado[$nroLinea]['MONTO']=$dataCP[$nroLinea]['MONTO'];
-            $resultado[$nroLinea]['MONEDA']=$dataCP[$nroLinea]['MONEDA'];
-            $resultado[$nroLinea]['CONDICION_PAGO']=$dataCP[$nroLinea]['CONDICION_PAGO'];
-            $resultado[$nroLinea]['SUBTIPO']=$dataCP[$nroLinea]['CONDICIONES']['subtipo'];
-            $resultado[$nroLinea]['FECHA_CONTABLE']=$dataCP[$nroLinea]['FECHA_CONTABLE'];
-            if(!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])){
-                $resultado[$nroLinea]['RUBRO6']='001';
-                $celdas['u'.($nroLinea+1)]='001';
-            }elseif(!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])){
-                $resultado[$nroLinea]['RUBRO6']='003';
-                $celdas['u'.($nroLinea+1)]='003';
-            }else{
-                $resultado[$nroLinea]['RUBRO6']='';
-            }
-
-            if($this->getUser()->getDependencia()->getId() == 3) {
-                $resultado[$nroLinea]['RUBRO7']='CUZCO';
-                $mercadoSufijo='.CU.OP';
-            }else{
-                $resultado[$nroLinea]['RUBRO7']='LIMA';
-                $mercadoSufijo='.LI.OP';
-            }
-            if(!empty($dataCP[$nroLinea]['VOUCHER'])) {
-                $resultado[$nroLinea]['RUBRO8']=$dataCP[$nroLinea]['VOUCHER'];
-            }else{
-                $resultado[$nroLinea]['RUBRO8']='N';
+            $resultado[$nroLinea]['RUBRO2_CUENTA'] = $dataCP[$nroLinea]['CONDICIONES']['rubro2'];
+            $resultado[$nroLinea]['MONTO'] = $dataCP[$nroLinea]['MONTO'];
+            $resultado[$nroLinea]['MONEDA'] = $dataCP[$nroLinea]['MONEDA'];
+            $resultado[$nroLinea]['CONDICION_PAGO'] = $dataCP[$nroLinea]['CONDICION_PAGO'];
+            $resultado[$nroLinea]['SUBTIPO'] = $dataCP[$nroLinea]['CONDICIONES']['subtipo'];
+            $resultado[$nroLinea]['FECHA_CONTABLE'] = $dataCP[$nroLinea]['FECHA_CONTABLE'];
+            if (!empty($dataCP[$nroLinea]['RUBROS']['impuesto1'])) {
+                $resultado[$nroLinea]['RUBRO6'] = '001';
+                $celdas['u' . ($nroLinea + 1)] = '001';
+            } elseif (!empty($dataCP[$nroLinea]['RUBROS']['impuesto2'])) {
+                $resultado[$nroLinea]['RUBRO6'] = '003';
+                $celdas['u' . ($nroLinea + 1)] = '003';
+            } else {
+                $resultado[$nroLinea]['RUBRO6'] = '';
             }
 
-            if(!empty($tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']])&&$dataCP[$nroLinea]['MONEDA']=='USD'){
-                $montoSoles=$tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']]['MONTO']*$dataCP[$nroLinea]['MONTO'];
-            }elseif($dataCP[$nroLinea]['MONEDA']=='USD'){
-                $montoSoles=0;
-                $this->setMensajes('El tipo de cambio para la fecha contable '.$this->get('gopro_main_variableproceso')->exceldate($dataCP[$nroLinea]['FECHA_DOCUMENTO'],'from').' de la linea: '.($nroLinea+1).', no existe');
-                $generarExcel=false;
-            }else{
-                $montoSoles=$dataCP[$nroLinea]['MONTO'];
+            if ($this->getUser()->getDependencia()->getId() == 3) {
+                $resultado[$nroLinea]['RUBRO7'] = 'CUZCO';
+                $mercadoSufijo = '.CU.OP';
+            } else {
+                $resultado[$nroLinea]['RUBRO7'] = 'LIMA';
+                $mercadoSufijo = '.LI.OP';
             }
-            if(($montoSoles>=700&&$resultado[$nroLinea]['TIPO']!='RHP')||$montoSoles>1500) {
-                $resultado[$nroLinea]['RUBRO10']=$dataCP[$nroLinea]['CONDICIONES']['retencion'];
-                $resultado[$nroLinea]['RETENCION']=$dataCP[$nroLinea]['CONDICIONES']['codretencion'];
-            }else{
-                $resultado[$nroLinea]['RUBRO10']='';
-                $resultado[$nroLinea]['RETENCION']='';
+            if (!empty($dataCP[$nroLinea]['VOUCHER'])) {
+                $resultado[$nroLinea]['RUBRO8'] = $dataCP[$nroLinea]['VOUCHER'];
+            } else {
+                $resultado[$nroLinea]['RUBRO8'] = 'N';
             }
-            if(!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
-                $resultado[$nroLinea]['TIPO_REFERENCIA']='FAC';
-                $resultado[$nroLinea]['DOC_REFERENCIA']=$dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
-            }else{
-                $resultado[$nroLinea]['TIPO_REFERENCIA']='';
-                $resultado[$nroLinea]['DOC_REFERENCIA']='';
+
+            if (!empty($tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']]) && $dataCP[$nroLinea]['MONEDA'] == 'USD') {
+                $montoSoles = $tcInfoFormateado[$dataCP[$nroLinea]['FECHA_DOCUMENTO']]['MONTO'] * $dataCP[$nroLinea]['MONTO'];
+            } elseif ($dataCP[$nroLinea]['MONEDA'] == 'USD') {
+                $montoSoles = 0;
+                $this->setMensajes('El tipo de cambio para la fecha contable ' . $this->get('gopro_main_variableproceso')->exceldate($dataCP[$nroLinea]['FECHA_DOCUMENTO'], 'from') . ' de la linea: ' . ($nroLinea + 1) . ', no existe');
+                $generarExcel = false;
+            } else {
+                $montoSoles = $dataCP[$nroLinea]['MONTO'];
             }
-            $i=1;
-            foreach($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
-                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
-                    $resultado[$nroLinea]['APLICACION']=$file['CENTRO_COSTO'].' '.$resultado[$nroLinea]['APLICACION'];
+            if (($montoSoles >= 700 && $resultado[$nroLinea]['TIPO'] != 'RHP') || $montoSoles > 1500) {
+                $resultado[$nroLinea]['RUBRO10'] = $dataCP[$nroLinea]['CONDICIONES']['retencion'];
+                $resultado[$nroLinea]['RETENCION'] = $dataCP[$nroLinea]['CONDICIONES']['codretencion'];
+            } else {
+                $resultado[$nroLinea]['RUBRO10'] = '';
+                $resultado[$nroLinea]['RETENCION'] = '';
+            }
+            if (!empty($dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'])) {
+                $resultado[$nroLinea]['TIPO_REFERENCIA'] = 'FAC';
+                $resultado[$nroLinea]['DOC_REFERENCIA'] = $dataCP[$nroLinea]['DOCUMENTO_ASOCIADO'];
+            } else {
+                $resultado[$nroLinea]['TIPO_REFERENCIA'] = '';
+                $resultado[$nroLinea]['DOC_REFERENCIA'] = '';
+            }
+            $i = 1;
+            foreach ($dataCP[$nroLinea]['FILES'] as $nroFile => $file):
+                if (!empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                    $resultado[$nroLinea]['APLICACION'] = $file['CENTRO_COSTO'] . ' ' . $resultado[$nroLinea]['APLICACION'];
                 }
-                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
-                    $resultado[$nroLinea]['FILE'.$i]=$file['CENTRO_COSTO'].' '.$dataCP[$nroLinea]['CONDICIONES']['subtotal'].' '.$nroFile;
-                }else{
-                    $resultado[$nroLinea]['FILE'.$i]=$nroFile;
+                if (!empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                    $resultado[$nroLinea]['FILE' . $i] = $file['CENTRO_COSTO'] . ' ' . $dataCP[$nroLinea]['CONDICIONES']['subtotal'] . ' ' . $nroFile;
+                } else {
+                    $resultado[$nroLinea]['FILE' . $i] = $nroFile;
                 }
 
-                if(!empty($dataCP[$nroLinea]['DIFERIDO'])){
-                    $file['CENTRO_COSTO']='0.00.00.00';
+                if (!empty($dataCP[$nroLinea]['DIFERIDO'])) {
+                    $file['CENTRO_COSTO'] = '0.00.00.00';
                 }
-                if(empty($file['CENTRO_COSTO'])&&!empty($file['PAIS_FILE'])){
-                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['PAIS_FILE'];
-                }elseif(!empty($file['CENTRO_COSTO'])&&$file['CENTRO_COSTO']=='0.00.00.00'){
-                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'];
-                }elseif(!empty($file['CENTRO_COSTO'])){
-                    $resultado[$nroLinea]['FILE'.$i.'_CC']=$file['CENTRO_COSTO'].$mercadoSufijo;
-                }else{
-                    $resultado[$nroLinea]['FILE'.$i.'_CC']='';
+                if (empty($file['CENTRO_COSTO']) && !empty($file['PAIS_FILE'])) {
+                    $resultado[$nroLinea]['FILE' . $i . '_CC'] = $file['PAIS_FILE'];
+                } elseif (!empty($file['CENTRO_COSTO']) && $file['CENTRO_COSTO'] == '0.00.00.00') {
+                    $resultado[$nroLinea]['FILE' . $i . '_CC'] = $file['CENTRO_COSTO'];
+                } elseif (!empty($file['CENTRO_COSTO'])) {
+                    $resultado[$nroLinea]['FILE' . $i . '_CC'] = $file['CENTRO_COSTO'] . $mercadoSufijo;
+                } else {
+                    $resultado[$nroLinea]['FILE' . $i . '_CC'] = '';
                 }
-                foreach($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
-                    $montoProcesado=0;
-                    if($i<count($dataCP[$nroLinea]['FILES'])){
-                        if(!empty($file['NUM_PAX'])&&!empty($montoRubro)&&!empty($dataCP[$nroLinea]['TOTAL_PAX'])){
-                            $montoProcesado=round($montoRubro/$dataCP[$nroLinea]['TOTAL_PAX']*$file['NUM_PAX'],2);
-                            $this->setCantidadTotal($montoProcesado,null,[$nombreRubro,null]);
-                        }elseif(empty($file['NUM_PAX'])){
-                            $this->setMensajes('El numero de pasajeros del file : '.$nroFile.', en la linea: '.($nroLinea+1).', tiene un error.');
-                            $generarExcel=false;
+                foreach ($dataCP[$nroLinea]['RUBROS'] as $nombreRubro => $montoRubro):
+                    $montoProcesado = 0;
+                    if ($i < count($dataCP[$nroLinea]['FILES'])) {
+                        if (!empty($file['NUM_PAX']) && !empty($montoRubro) && !empty($dataCP[$nroLinea]['TOTAL_PAX'])) {
+                            $montoProcesado = round($montoRubro / $dataCP[$nroLinea]['TOTAL_PAX'] * $file['NUM_PAX'], 2);
+                            $this->setSuma($nombreRubro, $montoProcesado);
+                        } elseif (empty($file['NUM_PAX'])) {
+                            $this->setMensajes('El numero de pasajeros del file : ' . $nroFile . ', en la linea: ' . ($nroLinea + 1) . ', tiene un error.');
+                            $generarExcel = false;
                         }
-                    }else{
-                        $montoProcesado=$montoRubro-$this->getCantidadTotal($nombreRubro);
+                    } else {
+                        $montoProcesado = $montoRubro - $this->getSuma($nombreRubro);
                     }
-                    if(isset($dataCP[$nroLinea]['FILES'][$nroFile]['montos'])){
-                        $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro]=$montoProcesado;
+                    if (isset($dataCP[$nroLinea]['FILES'][$nroFile]['montos'])) {
+                        $dataCP[$nroLinea]['FILES'][$nroFile]['montos'][$nombreRubro] = $montoProcesado;
                     }
 
-                    if($nombreRubro!='impuesto1'){
-                        if(!empty($montoProcesado)){
-                            $resultado[$nroLinea]['FILE'.$i.'_'.$nombreRubro]=$montoProcesado;
-                        }else{
-                            $resultado[$nroLinea]['FILE'.$i.'_'.$nombreRubro]='';
+                    if ($nombreRubro != 'impuesto1') {
+                        if (!empty($montoProcesado)) {
+                            $resultado[$nroLinea]['FILE' . $i . '_' . $nombreRubro] = $montoProcesado;
+                        } else {
+                            $resultado[$nroLinea]['FILE' . $i . '_' . $nombreRubro] = '';
                         }
 
                     }
@@ -449,18 +446,18 @@ class ProcesoController extends BaseController
                 endforeach;
                 $i++;
             endforeach;
-            $this->resetCantidadTotal('subtotal');
-            $this->resetCantidadTotal('impuesto1');
-            $this->resetCantidadTotal('impuesto2');
-            $this->resetCantidadTotal('rubro1');
-            $this->resetCantidadTotal('rubro2');
+            $this->resetSuma('subtotal');
+            $this->resetSuma('impuesto1');
+            $this->resetSuma('impuesto2');
+            $this->resetSuma('rubro1');
+            $this->resetSuma('rubro2');
         endforeach;
 
-        if($generarExcel===false){
+        if ($generarExcel === false) {
             $this->setMensajes($archivoInfo->getMensajes());
             $this->setMensajes($datosProveedor->getMensajes());
             $this->setMensajes('No se general el achivo, existen observaciones');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
         $encabezados = ['PROVEEDOR',
@@ -492,23 +489,22 @@ class ProcesoController extends BaseController
             'DOC REFERENCIA',
 
         ];
-        for ($i=1;$i<=20;$i++){
-            $encabezados[]='FILE '.$i;
-            $encabezados[]='CENTRO DE COSTO  '.$i;
-            $encabezados[]='DISTRIBUCION MONTO '.$i;
-            $encabezados[]='DISTRIBUCION EXONERADO '.$i;
-            $encabezados[]='DISTRIBUCION IMPUESTO NO GRAVADO '.$i;
-            $encabezados[]='DISTRIBUCION INAFECTO '.$i;
+        for ($i = 1; $i <= 20; $i++) {
+            $encabezados[] = 'FILE ' . $i;
+            $encabezados[] = 'CENTRO DE COSTO  ' . $i;
+            $encabezados[] = 'DISTRIBUCION MONTO ' . $i;
+            $encabezados[] = 'DISTRIBUCION EXONERADO ' . $i;
+            $encabezados[] = 'DISTRIBUCION IMPUESTO NO GRAVADO ' . $i;
+            $encabezados[] = 'DISTRIBUCION INAFECTO ' . $i;
         }
 
-        $archivoGenerado=$this->get('gopro_main_archivoexcel');
+        $archivoGenerado = $this->get('gopro_main_archivoexcel');
         return $archivoGenerado
             ->setArchivo()
-            ->setParametrosWriter($archivoInfo->getArchivoBase()->getNombre(),$resultado,$encabezados)
-            ->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']])
+            ->setParametrosWriter($archivoInfo->getArchivoBase()->getNombre(), $resultado, $encabezados)
+            ->setFormatoColumna(['yyyy-mm-dd' => ['d', 'e', 't'], '@' => ['u']])
             ->setCeldas($celdas)
-            ->getArchivo()
-        ;
+            ->getArchivo();
         //$archivoGenerado->setFormatoColumna(['yyyy-mm-dd'=>['d','e','t'],'@'=>['u']]);
         //$archivoGenerado->setCeldas($celdas);
         //return $archivoGenerado->getArchivo();
@@ -519,99 +515,100 @@ class ProcesoController extends BaseController
      * @param double $monto
      * @return array
      */
-    private function setRubros($condiciones,$monto){
-        $igv=18;
-        if(
+    private function setRubros($condiciones, $monto)
+    {
+        $igv = 18;
+        if (
             !empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&empty($condiciones['rubro2'])
-        ){
-            $rubros['subtotal']=round($monto,2);
-            $rubros['impuesto1']=0;
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=0;
-            $rubros['rubro2']=0;
-        }elseif(
+            && empty($condiciones['impuesto1'])
+            && empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && empty($condiciones['rubro2'])
+        ) {
+            $rubros['subtotal'] = round($monto, 2);
+            $rubros['impuesto1'] = 0;
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = 0;
+            $rubros['rubro2'] = 0;
+        } elseif (
             !empty($condiciones['subtotal'])
-            &&!empty($condiciones['impuesto1'])
-            &&empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&empty($condiciones['rubro2'])
-        ){
-            $rubros['subtotal']=round($monto/(1+$igv/100),2);
-            $rubros['impuesto1']=round($monto-$rubros['subtotal'],2);
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=0;
-            $rubros['rubro2']=0;
-        }elseif(
+            && !empty($condiciones['impuesto1'])
+            && empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && empty($condiciones['rubro2'])
+        ) {
+            $rubros['subtotal'] = round($monto / (1 + $igv / 100), 2);
+            $rubros['impuesto1'] = round($monto - $rubros['subtotal'], 2);
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = 0;
+            $rubros['rubro2'] = 0;
+        } elseif (
             !empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&!empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&empty($condiciones['rubro2'])
-        ){
-            $rubros['subtotal']=round($monto/(1+$igv/100),2);
-            $rubros['impuesto1']=0;
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=round($monto-$rubros['subtotal'],2);
-            $rubros['rubro2']=0;
-        }elseif(//solo rubro 1
+            && empty($condiciones['impuesto1'])
+            && !empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && empty($condiciones['rubro2'])
+        ) {
+            $rubros['subtotal'] = round($monto / (1 + $igv / 100), 2);
+            $rubros['impuesto1'] = 0;
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = round($monto - $rubros['subtotal'], 2);
+            $rubros['rubro2'] = 0;
+        } elseif (//solo rubro 1
             empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&empty($condiciones['impuesto2'])
-            &&!empty($condiciones['rubro1'])
-            &&empty($condiciones['rubro2'])
-        ){
-            $rubros['subtotal']=0;
-            $rubros['impuesto1']=0;
-            $rubros['rubro1']=round($monto,2);
-            $rubros['impuesto2']=0;
-            $rubros['rubro2']=0;
-        }elseif(
+            && empty($condiciones['impuesto1'])
+            && empty($condiciones['impuesto2'])
+            && !empty($condiciones['rubro1'])
+            && empty($condiciones['rubro2'])
+        ) {
+            $rubros['subtotal'] = 0;
+            $rubros['impuesto1'] = 0;
+            $rubros['rubro1'] = round($monto, 2);
+            $rubros['impuesto2'] = 0;
+            $rubros['rubro2'] = 0;
+        } elseif (
             empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&!empty($condiciones['rubro2'])
-        ){
-            $rubros['subtotal']=0;
-            $rubros['impuesto1']=0;
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=0;
-            $rubros['rubro2']=round($monto,2);
-        }elseif(//restaurantes nacional
+            && empty($condiciones['impuesto1'])
+            && empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && !empty($condiciones['rubro2'])
+        ) {
+            $rubros['subtotal'] = 0;
+            $rubros['impuesto1'] = 0;
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = 0;
+            $rubros['rubro2'] = round($monto, 2);
+        } elseif (//restaurantes nacional
             !empty($condiciones['subtotal'])
-            &&!empty($condiciones['impuesto1'])
-            &&empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&!empty($condiciones['rubro2'])
-            &&!empty($condiciones['rubro2porcentaje'])
-        ){
-            $rubros['subtotal']=round($monto/((100+$igv+$condiciones['rubro2porcentaje'])/100),2);
-            $rubros['impuesto1']=round($rubros['subtotal']*$igv/100,2);
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=0;
-            $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto1'],2);
-        }elseif(//restaurantes extranjero
+            && !empty($condiciones['impuesto1'])
+            && empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && !empty($condiciones['rubro2'])
+            && !empty($condiciones['rubro2porcentaje'])
+        ) {
+            $rubros['subtotal'] = round($monto / ((100 + $igv + $condiciones['rubro2porcentaje']) / 100), 2);
+            $rubros['impuesto1'] = round($rubros['subtotal'] * $igv / 100, 2);
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = 0;
+            $rubros['rubro2'] = round($monto - $rubros['subtotal'] - $rubros['impuesto1'], 2);
+        } elseif (//restaurantes extranjero
             !empty($condiciones['subtotal'])
-            &&empty($condiciones['impuesto1'])
-            &&!empty($condiciones['impuesto2'])
-            &&empty($condiciones['rubro1'])
-            &&!empty($condiciones['rubro2'])
-            &&!empty($condiciones['rubro2porcentaje'])
-        ){
-            $rubros['subtotal']=round($monto/((100+$igv+$condiciones['rubro2porcentaje'])/100),2);
-            $rubros['impuesto1']=0;
-            $rubros['rubro1']=0;
-            $rubros['impuesto2']=round($rubros['subtotal']*$igv/100,2);
-            $rubros['rubro2']=round($monto-$rubros['subtotal']-$rubros['impuesto2'],2);
+            && empty($condiciones['impuesto1'])
+            && !empty($condiciones['impuesto2'])
+            && empty($condiciones['rubro1'])
+            && !empty($condiciones['rubro2'])
+            && !empty($condiciones['rubro2porcentaje'])
+        ) {
+            $rubros['subtotal'] = round($monto / ((100 + $igv + $condiciones['rubro2porcentaje']) / 100), 2);
+            $rubros['impuesto1'] = 0;
+            $rubros['rubro1'] = 0;
+            $rubros['impuesto2'] = round($rubros['subtotal'] * $igv / 100, 2);
+            $rubros['rubro2'] = round($monto - $rubros['subtotal'] - $rubros['impuesto2'], 2);
         }
 
-        if(isset($rubros)){
+        if (isset($rubros)) {
             return $rubros;
-        }else{
+        } else {
             return array();
         }
     }
@@ -620,83 +617,82 @@ class ProcesoController extends BaseController
      * @Route("/calcc/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calcc", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function calccAction(Request $request,$archivoEjecutar)
+    public function calccAction(Request $request, $archivoEjecutar)
     {
-        $operacion='vipac_dbproceso_proceso_calcc';
+        $operacion = 'vipac_dbproceso_proceso_calcc';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALCC_DOCCC','tipo'=>'S');
-        $columnaspecs[0]=array('nombre'=>'CUENTA_CONTABLE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[1]=array('nombre'=>'DESCRIPCION','llave'=>'no','proceso'=>'no');
-        $columnaspecs[2]=array('nombre'=>'ASIENTO_ARCHIVO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[3]=array('nombre'=>'TIPO_DE_DOCUMENTO','llave'=>'si');
-        $columnaspecs[4]=array('nombre'=>'DOCUMENTO','llave'=>'si');
-        $columnaspecs[5]=array('nombre'=>'REFERENCIA','llave'=>'no','proceso'=>'no');
-        $columnaspecs[6]=array('nombre'=>'DEBITO_LOCAL','llave'=>'no','proceso'=>'no');
-        $columnaspecs[7]=array('nombre'=>'DEBITO_DOLAR','llave'=>'no','proceso'=>'no');
-        $columnaspecs[8]=array('nombre'=>'CREDITO_LOCAL','llave'=>'no','proceso'=>'no');
-        $columnaspecs[9]=array('nombre'=>'CREDITO_DOLAR','llave'=>'no','proceso'=>'no');
-        $columnaspecs[10]=array('nombre'=>'CENTRO_COSTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[11]=array('nombre'=>'TIPO_ASIENTO','llave'=>'no','proceso'=>'no');
-        $columnaspecs[12]=array('nombre'=>'FECHA','llave'=>'no','tipo'=>'exceldate','proceso'=>'no');
-        $columnaspecs[13]=array('nombre'=>'DESCRIPCION','llave'=>'no','proceso'=>'no');
-        $columnaspecs[14]=array('nombre'=>'NIT','llave'=>'no','proceso'=>'no');
-        $columnaspecs[15]=array('nombre'=>'NOMBRE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[16]=array('nombre'=>'FUENTE','llave'=>'no','proceso'=>'no');
-        $columnaspecs[17]=array('nombre'=>'NOTAS','llave'=>'no','proceso'=>'no');
-        $columnaspecs[18]=array('nombre'=>'DEBITO_UNIDADES','llave'=>'no','proceso'=>'no');
-        $columnaspecs[19]=array('nombre'=>'CREDITO_UNIDADES','llave'=>'no','proceso'=>'no');
-        $columnaspecs[20]=array('nombre'=>'ANO','llave'=>'no');
-        $columnaspecs[21]=array('nombre'=>'NUM_FILE_FISICO','llave'=>'no');
-        $columnaspecs[22]=array('nombre'=>'CLIENTE','llave'=>'no');
-        $columnaspecs[23]=array('nombre'=>'MONTO_DOLAR','llave'=>'no');
-        $columnaspecs[24]=array('nombre'=>'ASIENTO','llave'=>'no');
+        $tablaSpecs = array('schema' => 'VWEB', "nombre" => 'DBP_PROCESO_CALCC_DOCCC', 'tipo' => 'S');
+        $columnaspecs[0] = array('nombre' => 'CUENTA_CONTABLE', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[1] = array('nombre' => 'DESCRIPCION', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[2] = array('nombre' => 'ASIENTO_ARCHIVO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[3] = array('nombre' => 'TIPO_DE_DOCUMENTO', 'llave' => 'si');
+        $columnaspecs[4] = array('nombre' => 'DOCUMENTO', 'llave' => 'si');
+        $columnaspecs[5] = array('nombre' => 'REFERENCIA', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[6] = array('nombre' => 'DEBITO_LOCAL', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[7] = array('nombre' => 'DEBITO_DOLAR', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[8] = array('nombre' => 'CREDITO_LOCAL', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[9] = array('nombre' => 'CREDITO_DOLAR', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[10] = array('nombre' => 'CENTRO_COSTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[11] = array('nombre' => 'TIPO_ASIENTO', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[12] = array('nombre' => 'FECHA', 'llave' => 'no', 'tipo' => 'exceldate', 'proceso' => 'no');
+        $columnaspecs[13] = array('nombre' => 'DESCRIPCION', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[14] = array('nombre' => 'NIT', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[15] = array('nombre' => 'NOMBRE', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[16] = array('nombre' => 'FUENTE', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[17] = array('nombre' => 'NOTAS', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[18] = array('nombre' => 'DEBITO_UNIDADES', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[19] = array('nombre' => 'CREDITO_UNIDADES', 'llave' => 'no', 'proceso' => 'no');
+        $columnaspecs[20] = array('nombre' => 'ANO', 'llave' => 'no');
+        $columnaspecs[21] = array('nombre' => 'NUM_FILE_FISICO', 'llave' => 'no');
+        $columnaspecs[22] = array('nombre' => 'CLIENTE', 'llave' => 'no');
+        $columnaspecs[23] = array('nombre' => 'MONTO_DOLAR', 'llave' => 'no');
+        $columnaspecs[24] = array('nombre' => 'ASIENTO', 'llave' => 'no');
 
-        $procesoArchivo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $procesoArchivo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader($tablaSpecs,$columnaspecs)
-            ->setCamposCustom(['CREDITO_LOCAL','CREDITO_DOLAR','DEBITO_LOCAL','DEBITO_DOLAR','DOCUMENTO','ASIENTO_ARCHIVO','TIPO_DE_DOCUMENTO'])
-        ;
+            ->setParametrosReader($tablaSpecs, $columnaspecs)
+            ->setCamposCustom(['CREDITO_LOCAL', 'CREDITO_DOLAR', 'DEBITO_LOCAL', 'DEBITO_DOLAR', 'DOCUMENTO', 'ASIENTO_ARCHIVO', 'TIPO_DE_DOCUMENTO']);
 
-        if(!$procesoArchivo->parseExcel()){
+        if (!$procesoArchivo->parseExcel()) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga = $this->get('gopro_dbproceso_cargador');
+        if (!$carga->setParametros($procesoArchivo->getTablaSpecs(), $procesoArchivo->getColumnaSpecs(), $procesoArchivo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        $carga->getProceso()->setCamposCustom(['ANO','NUM_FILE_FISICO']);
+        $carga->getProceso()->setCamposCustom(['ANO', 'NUM_FILE_FISICO']);
         $carga->ejecutar();
 
-        if(empty($carga->getProceso()->getExistentesCustomRaw())){
+        if (empty($carga->getProceso()->getExistentesCustomRaw())) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $serviciosHoteles=$this->container->get('gopro_dbproceso_proceso');
+        $serviciosHoteles = $this->container->get('gopro_dbproceso_proceso');
         $serviciosHoteles->setConexion($this->container->get('doctrine.dbal.vipac_connection'));
         $serviciosHoteles->setTabla('DBP_PROCESO_CALCC_UNION');
         $serviciosHoteles->setSchema('VWEB');
@@ -721,167 +717,166 @@ class ProcesoController extends BaseController
             'FEC_INICIO',
             'FEC_FIN',
             //'ESTADO',
-	        'MONTO',
-	        'CUENTA'
+            'MONTO',
+            'CUENTA'
         ]);
         $serviciosHoteles->setQueryVariables($carga->getProceso()->getExistentesCustomRaw());
-        if(!$serviciosHoteles->ejecutarSelectQuery()||empty($serviciosHoteles->getExistentesRaw())){
+        if (!$serviciosHoteles->ejecutarSelectQuery() || empty($serviciosHoteles->getExistentesRaw())) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        foreach($this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
-            if(
-                isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']])
-            ){
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=$valor;
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]=array_merge($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']],$procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]);
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items']=$this->container->get('gopro_main_variableproceso')->utf($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]);
-                array_walk_recursive($preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['items'], [$this, 'setCantidadTotal'],['montoTotal','MONTO']);
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['sumaMonto']=$this->getCantidadTotal('montoTotal');
+        foreach ($this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesRaw()) as $valor):
+            if (
+            isset($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']])
+            ) {
+                $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']] = $valor;
+                $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']] = array_merge($preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']], $procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'] . '|' . $valor['DOCUMENTO']]);
+                $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['items'] = $this->container->get('gopro_main_variableproceso')->utf($serviciosHoteles->getExistentesIndizadosMulti()[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]);
+                array_walk_recursive($preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['items'], [$this, 'setSumaForWalk'], ['montoTotal', 'MONTO']);
+                $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['sumaMonto'] = $this->getSuma('montoTotal');
 
-                if($this->getCantidadTotal('montoTotal')!=0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]['CREDITO_DOLAR'])){
-                    $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['CREDITO_DOLAR']/$this->getCantidadTotal('montoTotal');
-                }elseif($this->getCantidadTotal('montoTotal')!=0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'].'|'.$valor['DOCUMENTO']]['DEBITO_DOLAR'])){
-                    $coeficiente=$preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['DEBITO_DOLAR']/$this->getCantidadTotal('montoTotal');
-                }else{
-                    $coeficiente=0;
+                if ($this->getSuma('montoTotal') != 0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'] . '|' . $valor['DOCUMENTO']]['CREDITO_DOLAR'])) {
+                    $coeficiente = $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['CREDITO_DOLAR'] / $this->getSuma('montoTotal');
+                } elseif ($this->getSuma('montoTotal') != 0 && !empty($procesoArchivo->getExistentesCustomIndizados()[$valor['TIPO_DE_DOCUMENTO'] . '|' . $valor['DOCUMENTO']]['DEBITO_DOLAR'])) {
+                    $coeficiente = $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['DEBITO_DOLAR'] / $this->getSuma('montoTotal');
+                } else {
+                    $coeficiente = 0;
                 }
-                $preResultado[$valor['ANO'].'|'.$valor['NUM_FILE_FISICO']]['coeficiente']=$coeficiente;
-                $this->resetCantidadTotal('montoTotal');
-            }else{
-                if(empty($valor['ANO'])||empty($valor['NUM_FILE_FISICO'])){
-                    $this->setMensajes('No hay resultados para la factura: '.$valor['TIPO_DE_DOCUMENTO'].'-'.$valor['DOCUMENTO']);
-                }else{
-                    $this->setMensajes('No hay resultados para la factura: '.$valor['TIPO_DE_DOCUMENTO'].'-'.$valor['DOCUMENTO'].', con file:'.$valor['ANO'].'-'.$valor['NUM_FILE_FISICO']);
+                $preResultado[$valor['ANO'] . '|' . $valor['NUM_FILE_FISICO']]['coeficiente'] = $coeficiente;
+                $this->resetSuma('montoTotal');
+            } else {
+                if (empty($valor['ANO']) || empty($valor['NUM_FILE_FISICO'])) {
+                    $this->setMensajes('No hay resultados para la factura: ' . $valor['TIPO_DE_DOCUMENTO'] . '-' . $valor['DOCUMENTO']);
+                } else {
+                    $this->setMensajes('No hay resultados para la factura: ' . $valor['TIPO_DE_DOCUMENTO'] . '-' . $valor['DOCUMENTO'] . ', con file:' . $valor['ANO'] . '-' . $valor['NUM_FILE_FISICO']);
                 }
             }
         endforeach;
-        if(empty($preResultado)){
+        if (empty($preResultado)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No hay datos para procesar los resultados');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
-        $i=0;
-        foreach($preResultado as $valor):
-            $j=0;
-            foreach($valor['items'] as $item):
+        $i = 0;
+        foreach ($preResultado as $valor):
+            $j = 0;
+            foreach ($valor['items'] as $item):
                 $j++;
 
-                $resultado[$i]=$item;
-                $resultado[$i]['NUM_FILE_FISICO']=$valor['NUM_FILE_FISICO'];
-                $resultado[$i]['ANO']=$valor['ANO'];
-                $resultado[$i]['ASIENTO']=$valor['ASIENTO'];
-                if(!empty($valor['ASIENTO_ARCHIVO'])){
-                    $resultado[$i]['ASIENTO_RELACIONADO']=$valor['ASIENTO_ARCHIVO'];
-                }else{
-                    $resultado[$i]['ASIENTO_RELACIONADO']='';
+                $resultado[$i] = $item;
+                $resultado[$i]['NUM_FILE_FISICO'] = $valor['NUM_FILE_FISICO'];
+                $resultado[$i]['ANO'] = $valor['ANO'];
+                $resultado[$i]['ASIENTO'] = $valor['ASIENTO'];
+                if (!empty($valor['ASIENTO_ARCHIVO'])) {
+                    $resultado[$i]['ASIENTO_RELACIONADO'] = $valor['ASIENTO_ARCHIVO'];
+                } else {
+                    $resultado[$i]['ASIENTO_RELACIONADO'] = '';
                 }
-                $resultado[$i]['CLIENTE']=$valor['CLIENTE'];
-                $resultado[$i]['MONTO_DOLAR']=$valor['MONTO_DOLAR'];
-                if(!empty($valor['DEBITO_LOCAL'])){
-                    $resultado[$i]['DEBITO_LOCAL']=$valor['DEBITO_LOCAL'];
-                }else{
-                    $resultado[$i]['DEBITO_LOCAL']='';
+                $resultado[$i]['CLIENTE'] = $valor['CLIENTE'];
+                $resultado[$i]['MONTO_DOLAR'] = $valor['MONTO_DOLAR'];
+                if (!empty($valor['DEBITO_LOCAL'])) {
+                    $resultado[$i]['DEBITO_LOCAL'] = $valor['DEBITO_LOCAL'];
+                } else {
+                    $resultado[$i]['DEBITO_LOCAL'] = '';
                 }
-                if(!empty($valor['DEBITO_DOLAR'])){
-                    $resultado[$i]['DEBITO_DOLAR']=$valor['DEBITO_DOLAR'];
-                }else{
-                    $resultado[$i]['DEBITO_DOLAR']='';
+                if (!empty($valor['DEBITO_DOLAR'])) {
+                    $resultado[$i]['DEBITO_DOLAR'] = $valor['DEBITO_DOLAR'];
+                } else {
+                    $resultado[$i]['DEBITO_DOLAR'] = '';
                 }
-                if(!empty($valor['CREDITO_LOCAL'])){
-                    $resultado[$i]['CREDITO_LOCAL']=$valor['CREDITO_LOCAL'];
-                }else{
-                    $resultado[$i]['CREDITO_LOCAL']='';
+                if (!empty($valor['CREDITO_LOCAL'])) {
+                    $resultado[$i]['CREDITO_LOCAL'] = $valor['CREDITO_LOCAL'];
+                } else {
+                    $resultado[$i]['CREDITO_LOCAL'] = '';
                 }
-                if(!empty($valor['CREDITO_DOLAR'])){
-                    $resultado[$i]['CREDITO_DOLAR']=$valor['CREDITO_DOLAR'];
-                }else{
-                    $resultado[$i]['CREDITO_DOLAR']='';
+                if (!empty($valor['CREDITO_DOLAR'])) {
+                    $resultado[$i]['CREDITO_DOLAR'] = $valor['CREDITO_DOLAR'];
+                } else {
+                    $resultado[$i]['CREDITO_DOLAR'] = '';
                 }
-                $resultado[$i]['DOCUMENTO']=$valor['DOCUMENTO'];
-                $resultado[$i]['TIPO_DE_DOCUMENTO']=$valor['TIPO_DE_DOCUMENTO'];
-                if( $j == count($valor['items']) && count($valor['items']) != 1 ){
-                    if(!empty($valor['CREDITO_DOLAR'])) {
+                $resultado[$i]['DOCUMENTO'] = $valor['DOCUMENTO'];
+                $resultado[$i]['TIPO_DE_DOCUMENTO'] = $valor['TIPO_DE_DOCUMENTO'];
+                if ($j == count($valor['items']) && count($valor['items']) != 1) {
+                    if (!empty($valor['CREDITO_DOLAR'])) {
                         $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
                         $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
                         if (!empty($valor['CREDITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($valor['CREDITO_LOCAL'] - $this->getCantidadTotal('sumaCreditoSoles'),2);
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($valor['CREDITO_LOCAL'] - $this->getSuma('sumaCreditoSoles'), 2);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] =round($valor['CREDITO_DOLAR'] - $this->getCantidadTotal('sumaCreditoDolares'),2);
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = round($valor['CREDITO_DOLAR'] - $this->getSuma('sumaCreditoDolares'), 2);
 
-                    }else{
+                    } else {
                         if (!empty($valor['DEBITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($valor['DEBITO_LOCAL'] - $this->getCantidadTotal('sumaDebitoSoles'),2);
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($valor['DEBITO_LOCAL'] - $this->getSuma('sumaDebitoSoles'), 2);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
                         }
-                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = round($valor['DEBITO_DOLAR'] - $this->getCantidadTotal('sumaDebitoDolares'),2);
+                        $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = round($valor['DEBITO_DOLAR'] - $this->getSuma('sumaDebitoDolares'), 2);
                         $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = '';
                     }
-                }else{
-                    if(!empty($valor['CREDITO_DOLAR'])) {
+                } else {
+                    if (!empty($valor['CREDITO_DOLAR'])) {
                         $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = '';
                         $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = '';
-                        $prorrateoDolarCredito = round($item['MONTO'] * $valor['coeficiente'],2);
+                        $prorrateoDolarCredito = round($item['MONTO'] * $valor['coeficiente'], 2);
                         if (!empty($valor['CREDITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($prorrateoDolarCredito * $valor['CREDITO_LOCAL'] / $valor['CREDITO_DOLAR'],2);
-                            $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_CREDITO'], null, ['sumaCreditoSoles', null]);
+                            $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = round($prorrateoDolarCredito * $valor['CREDITO_LOCAL'] / $valor['CREDITO_DOLAR'], 2);
+                            $this->setSuma('sumaCreditoSoles', $resultado[$i]['PRORRATEADO_LOCAL_CREDITO']);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
                         $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = $prorrateoDolarCredito;
-                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_CREDITO'], null, ['sumaCreditoDolares', null]);
-                    }else{
-                        $prorrateoDolarDebito = round($item['MONTO'] * $valor['coeficiente'],2);
+                        $this->setSuma('sumaCreditoDolares', $resultado[$i]['PRORRATEADO_DOLAR_CREDITO']);
+                    } else {
+                        $prorrateoDolarDebito = round($item['MONTO'] * $valor['coeficiente'], 2);
                         if (!empty($valor['DEBITO_LOCAL'])) {
-                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($prorrateoDolarDebito * $valor['DEBITO_LOCAL'] / $valor['DEBITO_DOLAR'],2);
-                            $this->setCantidadTotal($resultado[$i]['PRORRATEADO_LOCAL_DEBITO'], null, ['sumaDebitoSoles', null]);
+                            $resultado[$i]['PRORRATEADO_LOCAL_DEBITO'] = round($prorrateoDolarDebito * $valor['DEBITO_LOCAL'] / $valor['DEBITO_DOLAR'], 2);
+                            $this->setSuma('sumaDebitoSoles', $resultado[$i]['PRORRATEADO_LOCAL_DEBITO']);
                         } else {
                             $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
                         }
                         $resultado[$i]['PRORRATEADO_DOLAR_DEBITO'] = $prorrateoDolarDebito;
-                        $this->setCantidadTotal($resultado[$i]['PRORRATEADO_DOLAR_DEBITO'], null, ['sumaDebitoDolares', null]);
-                        $resultado[$i]['PRORRATEADO_LOCAL_CREDITO']='';
-                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO']='';
+                        $this->setSuma('sumaDebitoDolares', $resultado[$i]['PRORRATEADO_DOLAR_DEBITO']);
+                        $resultado[$i]['PRORRATEADO_LOCAL_CREDITO'] = '';
+                        $resultado[$i]['PRORRATEADO_DOLAR_CREDITO'] = '';
                     }
                 }
-                $resultado[$i]['COEFICIENTE']=$valor['coeficiente'];
+                $resultado[$i]['COEFICIENTE'] = $valor['coeficiente'];
                 //
                 $i++;
             endforeach;
-            $this->resetCantidadTotal('sumaDebitoSoles');
-            $this->resetCantidadTotal('sumaDebitoDolares');
-            $this->resetCantidadTotal('sumaCreditoSoles');
-            $this->resetCantidadTotal('sumaCreditoDolares');
+            $this->resetSuma('sumaDebitoSoles');
+            $this->resetSuma('sumaDebitoDolares');
+            $this->resetSuma('sumaCreditoSoles');
+            $this->resetSuma('sumaCreditoDolares');
         endforeach;
-        if(empty($resultado)){
+        if (empty($resultado)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No hay resultados');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
         $this->setMensajes($procesoArchivo->getMensajes());
         $this->setMensajes($carga->getMensajes());
-        foreach($this->getMensajes() as $mensaje):
-            $resultado[]['mensaje']=$mensaje;
+        foreach ($this->getMensajes() as $mensaje):
+            $resultado[]['mensaje'] = $mensaje;
         endforeach;
 
-        $encabezados=array_keys($resultado[0]);
-        $archivoGenerado=$this->get('gopro_main_archivoexcel');
+        $encabezados = array_keys($resultado[0]);
+        $archivoGenerado = $this->get('gopro_main_archivoexcel');
         return $archivoGenerado
             ->setArchivo()
-            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$resultado,$encabezados)
-            ->getArchivo()
-        ;
+            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(), $resultado, $encabezados)
+            ->getArchivo();
 
     }
 
@@ -889,68 +884,67 @@ class ProcesoController extends BaseController
      * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_generico", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function genericoAction(Request $request,$archivoEjecutar)
+    public function genericoAction(Request $request, $archivoEjecutar)
     {
-        $operacion='vipac_dbproceso_proceso_generico';
+        $operacion = 'vipac_dbproceso_proceso_generico';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $procesoArchivo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $procesoArchivo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader(null,null)
-        ;
+            ->setParametrosReader(null, null);
 
-        if(!$procesoArchivo->parseExcel()){
+        if (!$procesoArchivo->parseExcel()) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga = $this->get('gopro_dbproceso_cargador');
+        if (!$carga->setParametros($procesoArchivo->getTablaSpecs(), $procesoArchivo->getColumnaSpecs(), $procesoArchivo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente = $this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
-        if(empty($existente)){
+        if (empty($existente)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
+        foreach ($procesoArchivo->getExistentesIndizadosMultiKp() as $key => $valores):
             if (!array_key_exists($key, $existente)) {
-                $existente[$key]['mensaje']='No se encuentra en la BD';
+                $existente[$key]['mensaje'] = 'No se encuentra en la BD';
             }
-            foreach($valores as $valor):
-                $fusion[]=array_replace_recursive($valor,$existente[$key]);
+            foreach ($valores as $valor):
+                $fusion[] = array_replace_recursive($valor, $existente[$key]);
             endforeach;
         endforeach;
 
-        $encabezados=array_keys($fusion[0]);
-        $archivoGenerado=$this->get('gopro_main_archivoexcel');
+        $encabezados = array_keys($fusion[0]);
+        $archivoGenerado = $this->get('gopro_main_archivoexcel');
         return $archivoGenerado
             ->setArchivo()
-            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)
+            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(), $fusion, $encabezados)
             ->getArchivo();
     }
 
@@ -958,71 +952,70 @@ class ProcesoController extends BaseController
      * @Route("/calxfile/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxfile", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function calxfileAction(Request $request,$archivoEjecutar)
+    public function calxfileAction(Request $request, $archivoEjecutar)
     {
 
-        $operacion='vipac_dbproceso_proceso_calxfile';
+        $operacion = 'vipac_dbproceso_proceso_calxfile';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALXFILE_FILE');
+        $tablaSpecs = array('schema' => 'VWEB', "nombre" => 'DBP_PROCESO_CALXFILE_FILE');
 
-        $procesoArchivo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $procesoArchivo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader($tablaSpecs,null)
-        ;
+            ->setParametrosReader($tablaSpecs, null);
 
-        if(!$procesoArchivo->parseExcel()){
+        if (!$procesoArchivo->parseExcel()) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga = $this->get('gopro_dbproceso_cargador');
+        if (!$carga->setParametros($procesoArchivo->getTablaSpecs(), $procesoArchivo->getColumnaSpecs(), $procesoArchivo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('Los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente = $this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
-        if(empty($existente)){
+        if (empty($existente)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
+        foreach ($procesoArchivo->getExistentesIndizadosMultiKp() as $key => $valores):
             if (!array_key_exists($key, $existente)) {
-                $existente[$key]['mensaje']='No se encuentra en la BD';
+                $existente[$key]['mensaje'] = 'No se encuentra en la BD';
             }
-            foreach($valores as $valor):
-                $fusion[]=array_replace_recursive($valor,$existente[$key]);
+            foreach ($valores as $valor):
+                $fusion[] = array_replace_recursive($valor, $existente[$key]);
             endforeach;
         endforeach;
 
-        $encabezados=array_keys($fusion[0]);
-        $archivoGenerado=$this->get('gopro_main_archivoexcel');
+        $encabezados = array_keys($fusion[0]);
+        $archivoGenerado = $this->get('gopro_main_archivoexcel');
         return $archivoGenerado
             ->setArchivo()
-            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)
+            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(), $fusion, $encabezados)
             ->getArchivo();
     }
 
@@ -1030,70 +1023,70 @@ class ProcesoController extends BaseController
      * @Route("/calxreserva/{archivoEjecutar}", name="gopro_vipac_dbproceso_proceso_calxreserva", defaults={"archivoEjecutar" = null})
      * @Template()
      */
-    public function calxreservaAction(Request $request,$archivoEjecutar)
+    public function calxreservaAction(Request $request, $archivoEjecutar)
     {
-        $operacion='vipac_dbproceso_proceso_calxreserva';
+        $operacion = 'vipac_dbproceso_proceso_calxreserva';
         $repositorio = $this->getDoctrine()->getRepository('GoproMainBundle:Archivo');
-        $archivosAlmacenados=$repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion),array('creado' => 'DESC'));
+        $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
-        $opciones = array('operacion'=>$operacion);
+        $opciones = array('operacion' => $operacion);
         $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
         $formulario->handleRequest($request);
 
-        if(empty($archivoEjecutar)){
+        if (empty($archivoEjecutar)) {
             $this->setMensajes('No se ha definido ningun archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
         }
 
-        $tablaSpecs=array('schema'=>'VWEB',"nombre"=>'DBP_PROCESO_CALXRESERVA_FILE');
-        $procesoArchivo=$this->get('gopro_main_archivoexcel')
-            ->setArchivoBase($repositorio,$archivoEjecutar,$operacion)
+        $tablaSpecs = array('schema' => 'VWEB', "nombre" => 'DBP_PROCESO_CALXRESERVA_FILE');
+        $procesoArchivo = $this->get('gopro_main_archivoexcel')
+            ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
-            ->setParametrosReader($tablaSpecs,null);
+            ->setParametrosReader($tablaSpecs, null);
 
-        if(!$procesoArchivo->parseExcel()){
+        if (!$procesoArchivo->parseExcel()) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes('El archivo no se puede procesar');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
 
-        $carga=$this->get('gopro_dbproceso_cargador');
-        if(!$carga->setParametros($procesoArchivo->getTablaSpecs(),$procesoArchivo->getColumnaSpecs(),$procesoArchivo->getExistentesRaw(),$this->container->get('doctrine.dbal.vipac_connection'))){
+        $carga = $this->get('gopro_dbproceso_cargador');
+        if (!$carga->setParametros($procesoArchivo->getTablaSpecs(), $procesoArchivo->getColumnaSpecs(), $procesoArchivo->getExistentesRaw(), $this->container->get('doctrine.dbal.vipac_connection'))) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('los parametros de carga no son correctos');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
         $carga->ejecutar();
-        $existente=$this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
+        $existente = $this->container->get('gopro_main_variableproceso')->utf($carga->getProceso()->getExistentesIndizados());
 
-        if(empty($existente)){
+        if (empty($existente)) {
             $this->setMensajes($procesoArchivo->getMensajes());
             $this->setMensajes($carga->getMensajes());
             $this->setMensajes('No existen datos para generar archivo');
-            return array('formulario' => $formulario->createView(),'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
+            return array('formulario' => $formulario->createView(), 'archivosAlmacenados' => $archivosAlmacenados, 'mensajes' => $this->getMensajes());
 
         }
-        $fusion=array();
-        foreach($procesoArchivo->getExistentesIndizadosMultiKp() as $key=>$valores):
+        $fusion = array();
+        foreach ($procesoArchivo->getExistentesIndizadosMultiKp() as $key => $valores):
             if (!array_key_exists($key, $existente)) {
-                $existente[$key]['mensaje']='No se encuentra en la BD';
+                $existente[$key]['mensaje'] = 'No se encuentra en la BD';
             }
-            foreach($valores as $valor):
-                $fusion[]=array_replace_recursive($valor,$existente[$key]);
+            foreach ($valores as $valor):
+                $fusion[] = array_replace_recursive($valor, $existente[$key]);
             endforeach;
         endforeach;
 
-        $encabezados=array_keys($fusion[0]);
-        $archivoGenerado=$this->get('gopro_main_archivo_excel');
+        $encabezados = array_keys($fusion[0]);
+        $archivoGenerado = $this->get('gopro_main_archivo_excel');
         return $archivoGenerado
             ->setArchivo()
-            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(),$fusion,$encabezados)
+            ->setParametrosWriter($procesoArchivo->getArchivoBase()->getNombre(), $fusion, $encabezados)
             ->getArchivo();
     }
 }

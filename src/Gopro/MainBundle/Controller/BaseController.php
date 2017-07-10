@@ -10,7 +10,7 @@ class BaseController extends Controller
 
     private $stack;
 
-    private $cantidadTotal;
+    private $suma;
 
     /**
      * @param mixed $mensaje
@@ -56,28 +56,42 @@ class BaseController extends Controller
      * @param mixed $valor
      * @param mixed $key
      * @param array $vars
-     * @return boolean
+     * @return \Gopro\MainBundle\Controller\BaseController
      */
-    protected function setCantidadTotal($valor, $key, $vars)
+    protected function setSumaForWalk($valor, $key, $vars)
     {
-        if (empty($this->cantidadTotal[$vars[0]])) {
-            $this->cantidadTotal[$vars[0]] = 0;
-        }
+
         if (empty($vars[1]) || $key == $vars[1]) {
-            $this->cantidadTotal[$vars[0]] = $this->cantidadTotal[$vars[0]] + $valor;
-            return true;
+            $this->setSuma($vars[0], $valor);
         }
 
-        return false;
+        return $this;
     }
+
+    /**
+     * @param string $id
+     * @param number $monto
+     * @return \Gopro\MainBundle\Controller\BaseController
+     */
+    protected function setSuma($id, $monto)
+    {
+        if(!isset($this->suma[$id])){
+            $this->suma[$id] = $monto;
+        }else{
+            $this->suma[$id] = $this->suma[$id] + $monto;
+        }
+
+        return $this;
+    }
+
 
     /**
      * @param string $id
      * @return \Gopro\MainBundle\Controller\BaseController
      */
-    protected function resetCantidadTotal($id)
+    protected function resetSuma($id)
     {
-        $this->cantidadTotal[$id] = 0;
+        $this->suma[$id] = 0;
 
         return $this;
     }
@@ -86,13 +100,13 @@ class BaseController extends Controller
      * @param string $id
      * @return integer
      */
-    protected function getCantidadTotal($id)
+    protected function getSuma($id)
     {
-        if (empty($this->cantidadTotal[$id])) {
+        if (empty($this->suma[$id])) {
             return 0;
         }
 
-        return $this->cantidadTotal[$id];
+        return $this->suma[$id];
     }
 
     /**
