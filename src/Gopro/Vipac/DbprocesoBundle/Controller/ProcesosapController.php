@@ -585,6 +585,9 @@ class ProcesosapController extends BaseController
 
         $fileInfoIndizado = array();
 
+        //print_r($linea['Files']);
+        //
+
         if (empty($this->getStack('files'))) {
             $this->setMensajes('La pila de files esta vacia');
         } else {
@@ -829,6 +832,7 @@ class ProcesosapController extends BaseController
 
             $j = 1;
             $k = 1;
+
 
             foreach ($linea['Files'] as $file):
                 $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);

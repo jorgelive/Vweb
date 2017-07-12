@@ -222,12 +222,13 @@ class BaseController extends Controller
                 if ($keys[$nroStack] === $k) {
                     if (is_array($v)) {
                         foreach ($v as $subkey => $subv) {
-                            if (is_numeric($subkey)) {
+                            //se descarta la infoirmacion de la llave
+                            if (!is_array($subv)) {
                                 if ($subv !== null && (!isset($this->stack[$nombreStack . 'Aux']) || !in_array($subv, $this->stack[$nombreStack . 'Aux']))) {
                                     $this->setStack($nombreStack, $formaters[$nroStack]($subv), $newKeyNames[$nroStack]);
                                     $this->setStack($nombreStack . 'Aux', $formaters[$nroStack]($subv));
                                     $i++;
-                                  }
+                                }
                             }
                         }
                     } else {
