@@ -585,8 +585,7 @@ class ProcesosapController extends BaseController
 
         $fileInfoIndizado = array();
 
-        //print_r($linea['Files']);
-        //
+        //print_r($linea['Files'])
 
         if (empty($this->getStack('files'))) {
             $this->setMensajes('La pila de files esta vacia');
@@ -742,7 +741,10 @@ class ProcesosapController extends BaseController
                 $linea['TaxTotal'] = doubleval(str_replace(',', '', $linea['TaxTotal']));
             }
 
-            if ($linea['MontoTotal'] != $linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal']) {
+            if (intval(round(1000 * $linea['MontoTotal'])) != intval(round(1000 * ($linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal'])))) {
+                //var_dump(intval(round(1000 * ($linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal']))));
+                //var_dump(intval(round(1000 * $linea['MontoTotal'])));
+                //die;
                 $this->setMensajes('La suma de los montos parciales no es igual al monto total en la linea ' . $linea['excelRowNumber']);
                 continue;
             }
