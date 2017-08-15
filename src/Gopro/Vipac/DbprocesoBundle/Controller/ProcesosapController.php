@@ -20,6 +20,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class ProcesosapController extends BaseController
 {
 
+    private $igvRate = 18;
+    private $cuentaDiferido = '189011';
+
     /**
      * @Route("/generico/{archivoEjecutar}", name="gopro_vipac_dbproceso_procesosap_generico", defaults={"archivoEjecutar" = null})
      * @Template()
@@ -57,6 +60,7 @@ class ProcesosapController extends BaseController
         $columnaspecs[] = array('nombre' => 'FEC_RECEPCION', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'FEC_CONTABLE', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'DESCRIPCION');
+        $columnaspecs[] = array('nombre' => 'NRO_DOCUMENTO_ASOC');
         $columnaspecs[] = array('nombre' => 'FILE_1');
         $columnaspecs[] = array('nombre' => 'FILE_2');
         $columnaspecs[] = array('nombre' => 'FILE_3');
@@ -105,13 +109,18 @@ class ProcesosapController extends BaseController
 
         foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
 
-            if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
+            if (!isset($linea['FEC_EMISION']) || empty($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
                 //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
                 continue;
             }
 
-            if (!isset($linea['TIPO_PROCESO'])) {//sumatoria de formato peru rail
+            if (!isset($linea['TIPO_PROCESO']) || empty($linea['TIPO_PROCESO'])) {//sumatoria de formato peru rail
                 $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el tipo de proceso definido.');
+                continue;
+            }
+
+            if (!isset($linea['MONEDA']) || empty($linea['MONEDA'])) {//sumatoria de formato peru rail
+                $this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene la moneda definida.');
                 continue;
             }
 
@@ -124,8 +133,7 @@ class ProcesosapController extends BaseController
 
             //predefinimos el tipo, si vacio se toma fecha de documento.
             $preproceso[$i]['TipoProceso'] = $linea['TIPO_PROCESO'];
-            //fecha del servicio necesario para diferidos
-            $preproceso[$i]['ServicioDate'] = $linea['FEC_SERVICIO'];
+
             //Cabecera
             if (isset($linea['VALOR_NETO'])) {
                 $preproceso[$i]['NetoTotal'] = $linea['VALOR_NETO'];
@@ -141,18 +149,24 @@ class ProcesosapController extends BaseController
             }
 
             $preproceso[$i]['ruc'] = $linea['COD_PROVEEDOR'];
+            $preproceso[$i]['ServicioDate'] = $linea['FEC_SERVICIO'];
+            $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
+            if (isset($linea['FEC_RECEPCION'])) {
+                $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            }
+
             if (isset($linea['FEC_CONTABLE'])) {
                 $preproceso[$i]['DocDate'] = $linea['FEC_CONTABLE'];
             }
-            $preproceso[$i]['TaxDate'] = $linea['FEC_EMISION'];
             $preproceso[$i]['Currency'] = str_replace(['SD', 'SOL'], ['S$', 'S/'], $linea['MONEDA']);
 
             $preproceso[$i]['U_SYP_MDSD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[0];
             $preproceso[$i]['U_SYP_MDCD'] = $this->parseDocNum($linea['NRO_DOCUMENTO'])[1];
             $preproceso[$i]['Comments'] = $linea['DESCRIPCION'];
 
-            if (isset($linea['FEC_RECEPCION'])) {
-                $preproceso[$i]['u_syp_fecrec'] = $linea['FEC_RECEPCION'];
+            if(isset($linea['NRO_DOCUMENTO_ASOC']) && !empty($linea['NRO_DOCUMENTO_ASOC'])){
+                $preproceso[$i]['U_SYP_MDSO'] = $this->parseDocNum($linea['NRO_DOCUMENTO_ASOC'])[0];
+                $preproceso[$i]['U_SYP_MDCO'] = $this->parseDocNum($linea['NRO_DOCUMENTO_ASOC'])[1];
             }
 
             //detalle
@@ -216,7 +230,6 @@ class ProcesosapController extends BaseController
             ->setArchivo()
             ->setSkipRows(1)
             ->setParametrosReader($tablaSpecs, $columnaspecs)
-            //->setCamposCustom(['NUM_FILE'])
             ->setDescartarBlanco(true)
             ->setTrimEspacios(true);
 
@@ -228,7 +241,6 @@ class ProcesosapController extends BaseController
         } else {
             $this->setMensajes($archivoInfo->getMensajes());
         }
-
 
         foreach ($archivoInfo->getExistentesRaw() as $linea):
 
@@ -269,8 +281,8 @@ class ProcesosapController extends BaseController
 
         foreach ($archivoInfo->getExistentesRaw() as $linea):
 
-            if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
-                //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+            //sumatoria de formato peru rail o deteccion de filas vacias
+            if (!isset($linea['FEC_EMISION'])) {
                 continue;
             }
 
@@ -378,32 +390,14 @@ class ProcesosapController extends BaseController
         $columnaspecs[] = array('nombre' => 'FEC_CONTABLE', 'tipo' => 'exceldate');
         $columnaspecs[] = array('nombre' => 'DESCRIPCION');
         $columnaspecs[] = array('nombre' => 'FILE_1');
-        $columnaspecs[] = array('nombre' => 'FILE_2');
-        $columnaspecs[] = array('nombre' => 'FILE_3');
-        $columnaspecs[] = array('nombre' => 'FILE_4');
-        $columnaspecs[] = array('nombre' => 'FILE_5');
-        $columnaspecs[] = array('nombre' => 'FILE_6');
-        $columnaspecs[] = array('nombre' => 'FILE_7');
-        $columnaspecs[] = array('nombre' => 'FILE_8');
-        $columnaspecs[] = array('nombre' => 'FILE_9');
-        $columnaspecs[] = array('nombre' => 'FILE_10');
-        $columnaspecs[] = array('nombre' => 'FILE_11');
-        $columnaspecs[] = array('nombre' => 'FILE_12');
-        $columnaspecs[] = array('nombre' => 'FILE_13');
-        $columnaspecs[] = array('nombre' => 'FILE_14');
-        $columnaspecs[] = array('nombre' => 'FILE_15');
-        $columnaspecs[] = array('nombre' => 'FILE_16');
-        $columnaspecs[] = array('nombre' => 'FILE_17');
-        $columnaspecs[] = array('nombre' => 'FILE_18');
-        $columnaspecs[] = array('nombre' => 'FILE_19');
-        $columnaspecs[] = array('nombre' => 'FILE_20');
+
 
         $archivoInfo = $this->get('gopro_main_archivoexcel')
             ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
             ->setSkipRows(1)
             ->setParametrosReader($tablaSpecs, $columnaspecs)
-            ->setCamposCustom(['FILE_1', 'FILE_2', 'FILE_3', 'FILE_4', 'FILE_5', 'FILE_6', 'FILE_7', 'FILE_8', 'FILE_9', 'FILE_10', 'FILE_11', 'FILE_12', 'FILE_13', 'FILE_14', 'FILE_15', 'FILE_16', 'FILE_17', 'FILE_18', 'FILE_19', 'FILE_20'])
+//            ->setCamposCustom(['FILE_1', 'FILE_2', 'FILE_3', 'FILE_4', 'FILE_5', 'FILE_6', 'FILE_7', 'FILE_8', 'FILE_9', 'FILE_10', 'FILE_11', 'FILE_12', 'FILE_13', 'FILE_14', 'FILE_15', 'FILE_16', 'FILE_17', 'FILE_18', 'FILE_19', 'FILE_20'])
             ->setDescartarBlanco(true)
             ->setTrimEspacios(true);
 
@@ -425,8 +419,8 @@ class ProcesosapController extends BaseController
 
         foreach ($archivoInfo->getExistentesRaw() as $nroLinea => $linea):
 
-            if (!isset($linea['FEC_EMISION'])) {//sumatoria de formato peru rail
-                //$this->setMensajes('La linea ' . $linea['excelRowNumber'] . ' no tiene el formato correcto en la columna fecha de emision, posiblemente es una fila de sumatoria.');
+            //deteccion de filas vacias
+            if (!isset($linea['FEC_EMISION'])) {
                 continue;
             }
 
@@ -483,13 +477,12 @@ class ProcesosapController extends BaseController
 
         }
 
+
         return $this->generarExcel($archivoInfo->getArchivoBase()->getNombre(), $preproceso);
     }
 
     private function generarExcel($nombreArchivo, $preproceso)
     {
-
-
         $now = new \DateTime('now');
         $nowString = $now->format('Y-m-d');
 
@@ -534,11 +527,63 @@ class ProcesosapController extends BaseController
             $retencionInfoIndizado = $retencionInfo->getExistentesIndizados();
         }
 
-        $seriesFormater = function ($value) {
-            return 'FCP' . date('ym', strtotime($value));
-        };
 
-        $this->seekAndStack($preproceso, ['emisionFechas', 'files', 'series', 'rucs'], ['TaxDate', 'Files', 'DocDate', 'ruc'], ['RateDate', 'NUM_FILE', 'SeriesName', 'LicTradNum'], [NULL, NULL, $seriesFormater, NULL]);
+        foreach ($preproceso as $nroLinea => $linea ) {
+
+            if (!isset($docSapTipos[$linea['TipoProceso']])) {
+                $this->setMensajes('El tipo de proceso no puede ser encontrado en la DB para la fila ' . $linea['excelRowNumber']);
+                unset($preproceso[$nroLinea]);
+                continue;
+            }
+
+            if(isset($linea['TaxDate']) && !empty($linea['TaxDate'])
+                && (empty($this->getStack('emisionFechasAux')) || !in_array($linea['TaxDate'], $this->getStack('emisionFechasAux')))
+            ) {
+                $this->setStack('emisionFechas', $linea['TaxDate'], 'RateDate');
+                $this->setStack('emisionFechasAux', $linea['TaxDate']);
+            }
+
+            if(isset($linea['Files']) && !empty($linea['Files'] && is_array($linea['Files']))) {
+                foreach($linea['Files'] as $file){
+                    if(empty($this->getStack('filesAux')) || !in_array($file, $this->getStack('filesAux'))){
+                        $this->setStack('files', $file, 'NUM_FILE');
+                        $this->setStack('filesAux', $file);
+                    }
+                }
+
+            }
+
+            if(isset($linea['ruc']) && !empty($linea['ruc'])
+                && (empty($this->getStack('rucsAux')) || !in_array($linea['ruc'], $this->getStack('rucsAux')))
+            ) {
+                $this->setStack('rucs', $linea['ruc'], 'LicTradNum');
+                $this->setStack('rucsAux', $linea['ruc']);
+            }
+
+            if(isset($linea['ruc']) && !empty($linea['ruc'])
+                && isset($linea['U_SYP_MDSO']) && !empty($linea['U_SYP_MDSO'])
+                && isset($linea['U_SYP_MDCO']) && !empty($linea['U_SYP_MDCO'])
+                && (empty($this->getStack('asociadosAux'))
+                    || !in_array($linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO'], $this->getStack('asociadosAux'))
+                )
+            ) {
+                $this->setStack('asociados', $linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO'], 'rucNumDoc');
+                $this->setStack('asociadosAux', $linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']);
+                $tipoCreditoDebito = 'credito';
+            }else{
+                $tipoCreditoDebito = 'debito';
+            }
+
+            if(!isset($linea['DocDate']) || empty($linea['DocDate'])){
+                $linea['DocDate'] = $nowString;
+                $preproceso[$nroLinea]['DocDate'] = $nowString;
+            }
+
+            if(empty($this->getStack('seriesAux')) || !in_array($docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($linea['DocDate'])), $this->getStack('seriesAux'))) {
+                $this->setStack('series', $docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($linea['DocDate'])), 'SeriesName');
+                $this->setStack('seriesAux', $docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($linea['DocDate'])));
+            }
+        }
 
         $tcInfo = $this->container->get('gopro_dbproceso_proceso');
         $tcInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
@@ -580,12 +625,11 @@ class ProcesosapController extends BaseController
             'MERCADO',
             'COD_SAP',
             'PAIS_FILE',
-            'COD_PAIS'
+            'COD_PAIS',
+            'DOMICILIADO'
         ]);
 
         $fileInfoIndizado = array();
-
-        //print_r($linea['Files'])
 
         if (empty($this->getStack('files'))) {
             $this->setMensajes('La pila de files esta vacia');
@@ -603,6 +647,37 @@ class ProcesosapController extends BaseController
             $fileInfoIndizado = $filesInfo->getExistentesIndizados();
         }
 
+        $asociadosInfo = $this->container->get('gopro_dbproceso_proceso');
+        $asociadosInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
+        $asociadosInfo->setTabla('VwebDocAsoc');
+        $asociadosInfo->setSchema('dbo');
+        $asociadosInfo->setCamposSelect([
+            'fechaDocumento',
+            'LicTradNum',
+            'rucNumDoc',
+            'U_SYP_MDTD',
+            'U_SYP_MDSD',
+            'U_SYP_MDCD'
+        ]);
+
+        $asociadosInfoIndizado = array();
+
+        if (empty($this->getStack('asociados'))) {
+            $this->setMensajes('La pila de documentos asociados esta vacia, esto es normal en el caso de que no se este ingresando ninguna nota de crédito');
+        } else {
+
+            $asociadosInfo->setQueryVariables($this->getStack('asociados'));
+
+            if (!$asociadosInfo->ejecutarSelectQuery() || empty($asociadosInfo->getExistentesRaw())) {
+                $this->setMensajes($asociadosInfo->getMensajes());
+                $this->setMensajes('No existe ninguno de los documentos asociados en la lista');
+            } else {
+                $this->setMensajes($asociadosInfo->getMensajes());
+            }
+
+            $asociadosInfoIndizado = $asociadosInfo->getExistentesIndizados();
+        }
+
         $seriesInfo = $this->container->get('gopro_dbproceso_proceso');
         $seriesInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
         $seriesInfo->setTabla('NNM1');
@@ -613,19 +688,18 @@ class ProcesosapController extends BaseController
         ]);
 
         if (empty($this->getStack('series'))) {
-            $this->setStack('series', $seriesFormater($nowString), 'SeriesName');
+            $this->setMensajes('La pila de series esta vacia');
+        }else{
+            $seriesInfo->setQueryVariables($this->getStack('series'));
+            if (!$seriesInfo->ejecutarSelectQuery() || empty($seriesInfo->getExistentesRaw())) {
+                $this->setMensajes($seriesInfo->getMensajes());
+                $this->setMensajes('No existe ninguno de las series en la lista');
+            } else {
+                $this->setMensajes($seriesInfo->getMensajes());
+            }
+
+            $seriesInfoIndizado = $seriesInfo->getExistentesIndizados();
         }
-
-        $seriesInfo->setQueryVariables($this->getStack('series'));
-        if (!$seriesInfo->ejecutarSelectQuery() || empty($seriesInfo->getExistentesRaw())) {
-            $this->setMensajes($seriesInfo->getMensajes());
-            $this->setMensajes('No existe ninguno de las series en la lista');
-        } else {
-            $this->setMensajes($seriesInfo->getMensajes());
-        }
-
-        $seriesInfoIndizado = $seriesInfo->getExistentesIndizados();
-
 
         $proveedoresInfo = $this->container->get('gopro_dbproceso_proceso');
         $proveedoresInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
@@ -635,6 +709,7 @@ class ProcesosapController extends BaseController
             'CardCode',
             'LicTradNum',
             'ExtraDays',
+            'DebPayAcct',
             'U_SYP_AGENRE',
             'U_SYP_SNBUEN'
         ]);
@@ -645,7 +720,6 @@ class ProcesosapController extends BaseController
             $this->setMensajes('La pila de rucs esta vacia');
         } else {
             $proveedoresInfo->setQueryVariables($this->getStack('rucs'));
-            $proveedoresInfo->setWhereCustom("frozenFor = 'N'");
             if (!$proveedoresInfo->ejecutarSelectQuery() || empty($proveedoresInfo->getExistentesRaw())) {
                 $this->setMensajes($proveedoresInfo->getMensajes());
                 $this->setMensajes('No existe ninguno de los proveedores en la lista');
@@ -663,14 +737,11 @@ class ProcesosapController extends BaseController
         $resultadoRet = array();
 
         $nroLineaDet = 0;
+
         $i = 1;
+
         foreach ($preproceso as $nroLinea => $linea):
 
-            $esDiferido = false;
-
-            if (!isset($linea['DocDate']) && empty($linea['DocDate'])) {
-                $linea['DocDate'] = $nowString;
-            }
 
             if (!isset($linea['u_syp_fecrec']) && empty($linea['u_syp_fecrec'])) {
                 $linea['u_syp_fecrec'] = $nowString;
@@ -690,24 +761,49 @@ class ProcesosapController extends BaseController
             $anoServicio = date('y', strtotime($linea['ServicioDate']));
             $mesContable = date('m', strtotime($linea['DocDate']));
             $anoContable = date('y', strtotime($linea['DocDate']));
-            if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)) {
+
+            $esDiferido = false;
+
+            $esGrabado = false;
+
+            if(!empty($docSapTipos[$linea['TipoProceso']]['forzargravado'])){
+                $esGrabado = true;
+            }
+
+            //deteccion de files domiciliados y calculo del total de pasajeros de todos los files
+            foreach ($linea['Files'] as $file):
+                $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);
+
+                if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1){
+                    $esGrabado = true;
+                }
+            endforeach;
+
+            $numPax = $this->getSuma('numeroPax');
+            $numFiles = count($linea['Files']);
+
+            if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)
+                && $esGrabado == false
+            ) {
                 $esDiferido = true;
             }
 
-            if (!isset($docSapTipos[$linea['TipoProceso']])) {
-                $this->setMensajes('El tipo de proceso no puede ser encontrado en la DB para la fila ' . $linea['excelRowNumber']);
-                continue;
-            }
-
             if (!empty($esDiferido)) {
-                $cuenta = '189011';
+                $cuenta = $this->cuentaDiferido;
                 $appendDetalle = $mesServicio . '/' . $anoServicio . '/' . $docSapTipos[$linea['TipoProceso']]['cuenta'] . ' ';
             } else {
                 $cuenta = $docSapTipos[$linea['TipoProceso']]['cuenta'];
                 $appendDetalle = '';
             }
 
-            empty($docSapTipos[$linea['TipoProceso']]['exoneradoigv']) ? $igv = 18 : $igv = 0;
+            if (!empty($docSapTipos[$linea['TipoProceso']]['codigoigvnogravado'])
+                && !empty($docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'])
+                && !empty($docSapTipos[$linea['TipoProceso']]['codigoigvgravado'])
+            ){
+                $igv = $this->igvRate;
+            }else{
+                $igv = 0;
+            }
 
             $linea['MontoTotal'] = doubleval(str_replace(',', '', $linea['MontoTotal']));
 
@@ -723,6 +819,7 @@ class ProcesosapController extends BaseController
                     continue;
                 }
                 $linea['NetoTotal'] = round(doubleval($linea['MontoTotal'] - $linea['ImpuestoExtraTotal']) / (1 + $igv / 100), 2);
+                $this->setMensajes('Se esta calculando el impuesto utilizando ' . $igv . '% en la linea: ' . $linea['excelRowNumber']);
             } else {
                 $linea['NetoTotal'] = doubleval(str_replace(',', '', $linea['NetoTotal']));
             }
@@ -741,10 +838,11 @@ class ProcesosapController extends BaseController
                 $linea['TaxTotal'] = doubleval(str_replace(',', '', $linea['TaxTotal']));
             }
 
+            $linea['DividedNetoTotal'] = round($linea['NetoTotal'] / $numPax, 2);
+            $linea['DividedTaxTotal'] = round($linea['TaxTotal'] / $numPax, 2);
+            $linea['DividedImpuestoExtraTotal'] = round($linea['ImpuestoExtraTotal'] / $numPax, 2);
+
             if (intval(round(1000 * $linea['MontoTotal'])) != intval(round(1000 * ($linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal'])))) {
-                //var_dump(intval(round(1000 * ($linea['NetoTotal'] + $linea['TaxTotal'] + $linea['ImpuestoExtraTotal']))));
-                //var_dump(intval(round(1000 * $linea['MontoTotal'])));
-                //die;
                 $this->setMensajes('La suma de los montos parciales no es igual al monto total en la linea ' . $linea['excelRowNumber']);
                 continue;
             }
@@ -754,13 +852,12 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['DocType'] = 'dDocument_Service';
             $resultadoCab[$nroLinea]['DocDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['DocDate'], 'to');
             $resultadoCab[$nroLinea]['TaxDate'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['TaxDate'], 'to');
-            //todo tabla para credito
             $resultadoCab[$nroLinea]['DocDueDate'] = strval(intval($this->container->get('gopro_main_variableproceso')->exceldate($linea['u_syp_fecrec'], 'to')) + filter_var($proveedoresInfoIndizado{$linea['ruc']}['ExtraDays'], FILTER_VALIDATE_INT, ['options' => ['default' => 0, 'min_range' => 0]]));
             $resultadoCab[$nroLinea]['Currency'] = $linea['Currency'];
             if ($linea['Currency'] == 'US$') {
-                $resultadoCab[$nroLinea]['ControlAccount'] = 421202;
+                $resultadoCab[$nroLinea]['ControlAccount'] = substr($proveedoresInfoIndizado{$linea['ruc']}['DebPayAcct'], 0, -1) . '2';
             } else {
-                $resultadoCab[$nroLinea]['ControlAccount'] = 421201;
+                $resultadoCab[$nroLinea]['ControlAccount'] = substr($proveedoresInfoIndizado{$linea['ruc']}['DebPayAcct'], 0, -1) . '1';
             }
 
             $coeficienteMoneda = 1;
@@ -779,10 +876,18 @@ class ProcesosapController extends BaseController
             }
             $resultadoCab[$nroLinea]['DocTotal'] = $linea['MontoTotal'];
 
-            if (isset($seriesInfoIndizado['FCP' . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['DocDate'])))])) {
-                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado['FCP' . date('ym', strtotime($linea['DocDate']))]['Series'];
+            if(isset($linea['U_SYP_MDSO']) && !empty($linea['U_SYP_MDSO'])
+                && isset($linea['U_SYP_MDCO']) && !empty($linea['U_SYP_MDCO'])
+            ){
+                $tipoCreditoDebito = 'credito';
+            }else{
+                $tipoCreditoDebito = 'debito';
+            }
+
+            if (isset($seriesInfoIndizado[$docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($this->container->get('gopro_main_variableproceso')->exceldate($linea['DocDate'])))])) {
+                $resultadoCab[$nroLinea]['Series'] = $seriesInfoIndizado[$docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($linea['DocDate']))]['Series'];
             } else {
-                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP FCP' . date('ym', strtotime($linea['DocDate'])) . ' no existe.';
+                $resultadoCab[$nroLinea]['Series'] = 'La serie SAP ' . $docSapTipos[$linea['TipoProceso']]['prefijoserie' . $tipoCreditoDebito] . date('ym', strtotime($linea['DocDate'])) . ' no existe.';
             }
 
             $resultadoCab[$nroLinea]['U_SYP_MDTD'] = $docSapTipos[$linea['TipoProceso']]['tiposunat'];
@@ -801,10 +906,21 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['u_syp_fecrec'] = $this->container->get('gopro_main_variableproceso')->exceldate($linea['u_syp_fecrec'], 'to');
 
             isset($linea['U_SYP_TIPOBOLETO']) ? $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = $linea['U_SYP_TIPOBOLETO'] : $resultadoCab[$nroLinea]['U_SYP_TIPOBOLETO'] = '';
+
             $resultadoCab[$nroLinea]['U_SYP_MDTO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDSO'] = '';
             $resultadoCab[$nroLinea]['U_SYP_MDCO'] = '';
+
+            if($tipoCreditoDebito == 'credito'
+                && isset($asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']])){
+                $resultadoCab[$nroLinea]['U_SYP_MDTO'] = $asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']]['U_SYP_MDTD'];
+                $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = $asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']]['fechaDocumento'];
+                $resultadoCab[$nroLinea]['U_SYP_MDSO'] = $linea['U_SYP_MDSO'];
+                $resultadoCab[$nroLinea]['U_SYP_MDCO'] = $linea['U_SYP_MDCO'];
+            }elseif($tipoCreditoDebito == 'credito'){
+                $this->setMensajes('El documento asociado no puede ser encontrado para la linea: ' . $linea['excelRowNumber']);
+            }
 
             $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = 'N';
             $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = '';
@@ -835,19 +951,6 @@ class ProcesosapController extends BaseController
             $j = 1;
             $k = 1;
 
-
-            foreach ($linea['Files'] as $file):
-                $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);
-            endforeach;
-
-            $numPax = $this->getSuma('numeroPax');
-            $numFiles = count($linea['Files']);
-
-
-            $linea['DividedNetoTotal'] = round($linea['NetoTotal'] / $numPax, 2);
-            $linea['DividedTaxTotal'] = round($linea['TaxTotal'] / $numPax, 2);
-            $linea['DividedImpuestoExtraTotal'] = round($linea['ImpuestoExtraTotal'] / $numPax, 2);
-
             foreach ($linea['Files'] as $file):
                 $numFileFormat = str_replace('-', '0', $file);
                 $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
@@ -858,7 +961,6 @@ class ProcesosapController extends BaseController
                 $resultadoDet[$nroLineaDet]['AcctCode'] = $cuenta;
 
                 $resultadoDet[$nroLineaDet]['Currency'] = $linea['Currency'];
-
 
                 if ($k < $numFiles) {
                     $resultadoDet[$nroLineaDet]['LineNetoTotal'] = $linea['DividedNetoTotal'] * $fileInfoIndizado[$file]['NUMERO_PAX'];
@@ -876,19 +978,18 @@ class ProcesosapController extends BaseController
                     if (isset($linea['TaxCode'])) {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['TaxCode'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['TaxCode'];
-                    } elseif ($fileInfoIndizado[$file]['COD_PAIS'] == 'PE') {
-                        $resultadoDet[$nroLineaDet]['VatGroup'] = 'IGV';
-                        $resultadoDet[$nroLineaDet]['TaxCode'] = 'IGV';
+                    } elseif ($esGrabado === true) {
+                        $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado'];
+                        $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado']; //IGV
                     } else {
                         if (!empty($esDiferido)) {
-                            $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGD_IGV';
-                            $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGD_IGV';
+                            $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif']; // DNGD_IGV
+                            $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'];
                         } else {
-                            $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGR_IGV';
-                            $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGR_IGV';
+                            $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //DNGR_IGV
+                            $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //'DNGR_IGV';
                         }
                     }
-
                 } else {
                     $resultadoDet[$nroLineaDet]['VatGroup'] = 'EXE_IGV';
                     $resultadoDet[$nroLineaDet]['TaxCode'] = 'EXE_IGV';
@@ -903,15 +1004,15 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['OcrCode2'] = '';
                 }
 
-                if ($this->getUser()->getDependencia()->getNombre() == 'Cusco') {
-                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'CUZ';
-                } elseif ($this->getUser()->getDependencia()->getNombre() == 'Reducto' || $this->getUser()->getDependencia()->getNombre() == 'La Mar') {
-                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'LIM';
+                if (!$this->getUser()->getDependencia() || empty($this->getUser()->getDependencia()->getAbreviatura())) {
+                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'VERIFIQUE LA ABREVIATURA DE LA DEPENDENCIA';
                 } else {
-                    $resultadoDet[$nroLineaDet]['OcrCode3'] = 'SELECCIONE LA DEPENDENCIA DEL USUARIO';
+                    $resultadoDet[$nroLineaDet]['OcrCode3'] = $this->getUser()->getDependencia()->getAbreviatura();
                 }
+
                 $resultadoDet[$nroLineaDet]['OcrCode4'] = $docSapTipos[$linea['TipoProceso']]['tiposervicio'];
                 $resultadoDet[$nroLineaDet]['OcrCode5'] = '100';
+
                 if (!empty($resultadoCab[$nroLinea]['U_SYP_COD_DET'])) {
                     $resultadoDet[$nroLineaDet]['WtLiable'] = 'Y';
 
@@ -947,7 +1048,6 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['TaxCode'] = 'EXE_IGV';
                     $resultadoDet[$nroLineaDet]['LineTaxTotal'] = 0;
                     if ($k < $numFiles) {
-                        //echo 'cant:' . $linea['CantFiles'] . ' ' . $j .'<br>';
                         $resultadoDet[$nroLineaDet]['LineNetoTotal'] = $linea['DividedImpuestoExtraTotal'] * $fileInfoIndizado[$file]['NUMERO_PAX'];
                         $this->setSuma('impuestoextra', $resultadoDet[$nroLineaDet]['LineNetoTotal']);
 

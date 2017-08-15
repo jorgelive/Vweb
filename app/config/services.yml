@@ -1,0 +1,5 @@
+services:
+    nls.set:
+        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
+        tags:
+            - { name: doctrine.event_listener, event: postConnect, connection: vipac }

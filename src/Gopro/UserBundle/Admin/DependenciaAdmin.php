@@ -18,6 +18,7 @@ class DependenciaAdmin extends Admin
         $datagridMapper
             ->add('id')
             ->add('nombre')
+            ->add('abreviatura')
             ->add('email')
             ->add('direccion')
         ;
@@ -31,6 +32,7 @@ class DependenciaAdmin extends Admin
         $listMapper
             ->add('id')
             ->add('nombre')
+            ->add('abreviatura')
             ->add('email')
             ->add('direccion')
             ->add('organizacion')
@@ -52,6 +54,7 @@ class DependenciaAdmin extends Admin
         $formMapper
             ->add('nombre')
             ->add('email')
+            ->add('abreviatura')
             ->add('direccion')
             ->add('organizacion', 'sonata_type_model', array(
                 'required' => false,
@@ -69,6 +72,7 @@ class DependenciaAdmin extends Admin
         $showMapper
             ->add('id')
             ->add('nombre')
+            ->add('abreviatura')
             ->add('email')
             ->add('direccion')
             ->add('organizacion')

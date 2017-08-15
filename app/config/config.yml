@@ -1,6 +1,7 @@
 imports:
     - { resource: parameters.yml }
-    - { resource: security.yml }      
+    - { resource: security.yml }
+    - { resource: services.yml }
 
 framework:
     #esi:             ~
@@ -249,8 +250,3 @@ sonata_user:
             controller:     SonataAdminBundle:CRUD
             translation:    SonataUserBundle
 
-services:
-    nls.set:
-        class: Doctrine\DBAL\Event\Listeners\OracleSessionInit
-        tags:
-            - { name: doctrine.event_listener, event: postConnect, connection: vipac }

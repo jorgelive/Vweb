@@ -46,11 +46,46 @@ class Docsaptipo
     private $tiposap;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=3)
+     */
+    private $prefijoseriedebito;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=3)
+     */
+    private $prefijoseriecredito;
+
+    /**
      * @var bool
      *
      * @ORM\Column(type="boolean")
      */
-    private $exoneradoigv;
+    private $forzargravado;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=15)
+     */
+    private $codigoigvnogravado;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=15)
+     */
+    private $codigoigvnogravadodif;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=15)
+     */
+    private $codigoigvgravado;
 
     /**
      * @var string
@@ -79,7 +114,6 @@ class Docsaptipo
      * @ORM\Column(type="string", length=4, nullable=true)
      */
     private $codigodetraccion;
-
 
     /**
      * @var string
@@ -110,7 +144,6 @@ class Docsaptipo
      * @ORM\Column(type="datetime")
      */
     private $modificado;
-
 
 
     /**
@@ -196,27 +229,147 @@ class Docsaptipo
     }
 
     /**
-     * Set exoneradoigv
+     * Set prefijoseriedebito
      *
-     * @param boolean $exoneradoigv
+     * @param string $prefijoseriedebito
      *
      * @return Docsaptipo
      */
-    public function setExoneradoigv($exoneradoigv)
+    public function setPrefijoseriedebito($prefijoseriedebito)
     {
-        $this->exoneradoigv = $exoneradoigv;
+        $this->prefijoseriedebito = $prefijoseriedebito;
 
         return $this;
     }
 
     /**
-     * Get exoneradoigv
+     * Get prefijoseriedebito
+     *
+     * @return string
+     */
+    public function getPrefijoseriedebito()
+    {
+        return $this->prefijoseriedebito;
+    }
+
+    /**
+     * Set prefijoseriecredito
+     *
+     * @param string $prefijoseriecredito
+     *
+     * @return Docsaptipo
+     */
+    public function setPrefijoseriecredito($prefijoseriecredito)
+    {
+        $this->prefijoseriecredito = $prefijoseriecredito;
+
+        return $this;
+    }
+
+    /**
+     * Get prefijoseriecredito
+     *
+     * @return string
+     */
+    public function getPrefijoseriecredito()
+    {
+        return $this->prefijoseriecredito;
+    }
+
+    /**
+     * Set forzargravado
+     *
+     * @param boolean $forzargravado
+     *
+     * @return Docsaptipo
+     */
+    public function setForzargravado($forzargravado)
+    {
+        $this->forzargravado = $forzargravado;
+
+        return $this;
+    }
+
+    /**
+     * Get forzargravado
      *
      * @return boolean
      */
-    public function getExoneradoigv()
+    public function getForzargravado()
     {
-        return $this->exoneradoigv;
+        return $this->forzargravado;
+    }
+
+    /**
+     * Set codigoigvnogravado
+     *
+     * @param string $codigoigvnogravado
+     *
+     * @return Docsaptipo
+     */
+    public function setCodigoigvnogravado($codigoigvnogravado)
+    {
+        $this->codigoigvnogravado = $codigoigvnogravado;
+
+        return $this;
+    }
+
+    /**
+     * Get codigoigvnogravado
+     *
+     * @return string
+     */
+    public function getCodigoigvnogravado()
+    {
+        return $this->codigoigvnogravado;
+    }
+
+    /**
+     * Set codigoigvnogravadodif
+     *
+     * @param string $codigoigvnogravadodif
+     *
+     * @return Docsaptipo
+     */
+    public function setCodigoigvnogravadodif($codigoigvnogravadodif)
+    {
+        $this->codigoigvnogravadodif = $codigoigvnogravadodif;
+
+        return $this;
+    }
+
+    /**
+     * Get codigoigvnogravadodif
+     *
+     * @return string
+     */
+    public function getCodigoigvnogravadodif()
+    {
+        return $this->codigoigvnogravadodif;
+    }
+
+    /**
+     * Set codigoigvgravado
+     *
+     * @param string $codigoigvgravado
+     *
+     * @return Docsaptipo
+     */
+    public function setCodigoigvgravado($codigoigvgravado)
+    {
+        $this->codigoigvgravado = $codigoigvgravado;
+
+        return $this;
+    }
+
+    /**
+     * Get codigoigvgravado
+     *
+     * @return string
+     */
+    public function getCodigoigvgravado()
+    {
+        return $this->codigoigvgravado;
     }
 
     /**

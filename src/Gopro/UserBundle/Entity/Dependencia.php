@@ -49,6 +49,14 @@ class Dependencia
     private $direccion;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=5, nullable=true)
+     */
+    private $abreviatura;
+
+
+    /**
      * @var \Gopro\UserBundle\Entity\Organizacion
      *
      * @ORM\ManyToOne(targetEntity="Organizacion", inversedBy="dependencias")
@@ -144,6 +152,29 @@ class Dependencia
     public function getDireccion()
     {
         return $this->direccion;
+    }
+
+    /**
+     * Set abreviatura
+     *
+     * @param string $abreviatura
+     * @return Dependencia
+     */
+    public function setAbreviatura($abreviatura)
+    {
+        $this->abreviatura = $abreviatura;
+
+        return $this;
+    }
+
+    /**
+     * Get abreviatura
+     *
+     * @return string
+     */
+    public function getAbreviatura()
+    {
+        return $this->abreviatura;
     }
 
     /**

@@ -9,7 +9,12 @@
                 <th>Nombre</th>
                 <th>Tipo Sunat</th>
                 <th>Tipo Sap</th>
-                <th>Exonerado IGV</th>
+                <th>Pref Deb</th>
+                <th>Pref Cred</th>
+                <th>Forzar Gravado</th>
+                <th>Cod No Gravado</th>
+                <th>Cod No Grav Dif</th>
+                <th>Cod Grab</th>
                 <th>Monto de retención</th>
                 <th>Código de retención</th>
                 <th>Monto de detracción</th>
@@ -28,7 +33,12 @@
                 <td>{{ entity.nombre }}</td>
                 <td>{{ entity.tiposunat }}</td>
                 <td>{{ entity.tiposap }}</td>
-                <td>{{ entity.exoneradoigv ? 'Si' : 'No' }}</td>
+                <td>{{ entity.prefijoseriedebito }}</td>
+                <td>{{ entity.prefijoseriecredito }}</td>
+                <td>{{ entity.forzargravado ? 'Si' : 'No' }}</td>
+                <td>{{ entity.codigoigvnogravado }}</td>
+                <td>{{ entity.codigoigvnogravadodif }}</td>
+                <td>{{ entity.codigoigvgravado }}</td>
                 <td>{{ entity.montoretencion }}</td>
                 <td>{{ entity.codigoretencion }}</td>
                 <td>{{ entity.montodetraccion }}</td>
