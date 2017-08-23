@@ -774,9 +774,11 @@ class ProcesosapController extends BaseController
             foreach ($linea['Files'] as $file):
                 $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);
 
-                if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1){
+                if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1 || $fileInfoIndizado[$file]['COD_SAP'] == 'SOP'){
                     $esGrabado = true;
                 }
+
+
             endforeach;
 
             $numPax = $this->getSuma('numeroPax');
