@@ -770,16 +770,24 @@ class ProcesosapController extends BaseController
                 $esGrabado = true;
             }
 
+            $razonGrabado = array();
             //deteccion de files domiciliados y calculo del total de pasajeros de todos los files
             foreach ($linea['Files'] as $file):
                 $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);
-
-                if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1 || $fileInfoIndizado[$file]['COD_SAP'] == 'SOP'){
+                //var_dump($fileInfoIndizado[$file]['DOMICILIADO']);
+                //var_dump($fileInfoIndizado[$file]['COD_SAP']);
+                if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1){
                     $esGrabado = true;
+                    $razonGrabado[] = $file . ' es domiciliado';
                 }
 
-
+                if ($fileInfoIndizado[$file]['COD_SAP'] == 'SOP'){
+                    $esGrabado = true;
+                    $razonGrabado[] = $file . ' es venta opcional';
+                }
             endforeach;
+
+            //die;
 
             $numPax = $this->getSuma('numeroPax');
             $numFiles = count($linea['Files']);
@@ -788,6 +796,8 @@ class ProcesosapController extends BaseController
                 && $esGrabado == false
             ) {
                 $esDiferido = true;
+            } elseif (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)){
+                $this->setMensajes('El documento de la fila ' . $linea['excelRowNumber'] . ' podria diferirse pero es gravado: ' . implode(', ', $razonGrabado). '.');
             }
 
             if (!empty($esDiferido)) {
@@ -943,6 +953,8 @@ class ProcesosapController extends BaseController
             if (!empty($docSapTipos[$linea['TipoProceso']]['codigodetraccion']) && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montodetraccion']
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')
             ) {
+                //limpiamos el valor total
+                $resultadoCab[$nroLinea]['DocTotal'] = '';
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigodetraccion'], 0, 1);
                 $resultadoCab[$nroLinea]['U_SYP_COD_DET'] = $docSapTipos[$linea['TipoProceso']]['codigodetraccion'];
                 $resultadoCab[$nroLinea]['U_SYP_NOM_DETR'] = substr($retencionInfoIndizado[$docSapTipos[$linea['TipoProceso']]['codigodetraccion']]['WTName'], 0, 31);
