@@ -630,6 +630,12 @@ class ProcesosapController extends BaseController
         ]);
 
         $fileInfoIndizado = array();
+        $fileInfoIndizado['GEDO']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['GEDO']['COD_SAP'] = 'SCT';
+        $fileInfoIndizado['GEDO']['DOMICILIADO'] = '1';
+        $fileInfoIndizado['GEND']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['GEND']['COD_SAP'] = 'SCT';
+        $fileInfoIndizado['GEND']['DOMICILIADO'] = '0';
 
         if (empty($this->getStack('files'))) {
             $this->setMensajes('La pila de files esta vacia');
