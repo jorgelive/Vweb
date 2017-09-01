@@ -81,13 +81,33 @@ class ProcesosapController extends BaseController
         $columnaspecs[] = array('nombre' => 'FILE_18');
         $columnaspecs[] = array('nombre' => 'FILE_19');
         $columnaspecs[] = array('nombre' => 'FILE_20');
+        $columnaspecs[] = array('nombre' => 'FILE_21');
+        $columnaspecs[] = array('nombre' => 'FILE_22');
+        $columnaspecs[] = array('nombre' => 'FILE_23');
+        $columnaspecs[] = array('nombre' => 'FILE_24');
+        $columnaspecs[] = array('nombre' => 'FILE_25');
+        $columnaspecs[] = array('nombre' => 'FILE_26');
+        $columnaspecs[] = array('nombre' => 'FILE_27');
+        $columnaspecs[] = array('nombre' => 'FILE_28');
+        $columnaspecs[] = array('nombre' => 'FILE_29');
+        $columnaspecs[] = array('nombre' => 'FILE_30');
+        $columnaspecs[] = array('nombre' => 'FILE_31');
+        $columnaspecs[] = array('nombre' => 'FILE_32');
+        $columnaspecs[] = array('nombre' => 'FILE_33');
+        $columnaspecs[] = array('nombre' => 'FILE_34');
+        $columnaspecs[] = array('nombre' => 'FILE_35');
+        $columnaspecs[] = array('nombre' => 'FILE_36');
+        $columnaspecs[] = array('nombre' => 'FILE_37');
+        $columnaspecs[] = array('nombre' => 'FILE_38');
+        $columnaspecs[] = array('nombre' => 'FILE_39');
+        $columnaspecs[] = array('nombre' => 'FILE_40');
 
         $archivoInfo = $this->get('gopro_main_archivoexcel')
             ->setArchivoBase($repositorio, $archivoEjecutar, $operacion)
             ->setArchivo()
             ->setSkipRows(1)
             ->setParametrosReader($tablaSpecs, $columnaspecs)
-            ->setCamposCustom(['FILE_1', 'FILE_2', 'FILE_3', 'FILE_4', 'FILE_5', 'FILE_6', 'FILE_7', 'FILE_8', 'FILE_9', 'FILE_10', 'FILE_11', 'FILE_12', 'FILE_13', 'FILE_14', 'FILE_15', 'FILE_16', 'FILE_17', 'FILE_18', 'FILE_19', 'FILE_20'])
+            ->setCamposCustom(['FILE_1', 'FILE_2', 'FILE_3', 'FILE_4', 'FILE_5', 'FILE_6', 'FILE_7', 'FILE_8', 'FILE_9', 'FILE_10', 'FILE_11', 'FILE_12', 'FILE_13', 'FILE_14', 'FILE_15', 'FILE_16', 'FILE_17', 'FILE_18', 'FILE_19', 'FILE_20', 'FILE_21', 'FILE_22', 'FILE_23', 'FILE_24', 'FILE_25', 'FILE_26', 'FILE_27', 'FILE_28', 'FILE_29', 'FILE_30', 'FILE_31', 'FILE_32', 'FILE_33', 'FILE_34', 'FILE_35', 'FILE_36', 'FILE_37', 'FILE_38', 'FILE_39', 'FILE_40'])
             ->setDescartarBlanco(true)
             ->setTrimEspacios(true);
 
@@ -1226,7 +1246,7 @@ class ProcesosapController extends BaseController
             ->setFila($encabezadosCab, 'A4')
             ->setFila($encabezadosCabSec, 'A5')
             ->setTabla($resultadoCab, 'A6')
-            ->setFormatoColumna(['yyyymmdd' => ['d', 'e', 'f', 'v'], '@' => ['sz']])
+            ->setFormatoColumna(['yyyymmdd' => ['d', 'e', 'f', 'v', 'y'], '@' => ['sz']])
             ->setHoja(2)
             ->setFila($encabezadosDet, 'A4')
             ->setFila($encabezadosDetSec, 'A5')
