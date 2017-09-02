@@ -953,7 +953,7 @@ class ProcesosapController extends BaseController
             if($tipoCreditoDebito == 'credito'
                 && isset($asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']])){
                 $resultadoCab[$nroLinea]['U_SYP_MDTO'] = $asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']]['U_SYP_MDTD'];
-                $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = $asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']]['fechaDocumento'];
+                $resultadoCab[$nroLinea]['U_SYP_FECHAREF'] = $this->container->get('gopro_main_variableproceso')->exceldate($asociadosInfoIndizado[$linea['ruc'] . '-' . $linea['U_SYP_MDSO'] . '-' . $linea['U_SYP_MDCO']]['fechaDocumento'], 'to');
                 $resultadoCab[$nroLinea]['U_SYP_MDSO'] = $linea['U_SYP_MDSO'];
                 $resultadoCab[$nroLinea]['U_SYP_MDCO'] = $linea['U_SYP_MDCO'];
             }elseif($tipoCreditoDebito == 'credito'){
