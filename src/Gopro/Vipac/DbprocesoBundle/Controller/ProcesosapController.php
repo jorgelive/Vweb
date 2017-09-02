@@ -650,12 +650,6 @@ class ProcesosapController extends BaseController
         ]);
 
         $fileInfoIndizado = array();
-        $fileInfoIndizado['GEDO']['NUMERO_PAX'] = 1;
-        $fileInfoIndizado['GEDO']['COD_SAP'] = 'SCT';
-        $fileInfoIndizado['GEDO']['DOMICILIADO'] = '1';
-        $fileInfoIndizado['GEND']['NUMERO_PAX'] = 1;
-        $fileInfoIndizado['GEND']['COD_SAP'] = 'SCT';
-        $fileInfoIndizado['GEND']['DOMICILIADO'] = '0';
 
         if (empty($this->getStack('files'))) {
             $this->setMensajes('La pila de files esta vacia');
@@ -672,6 +666,25 @@ class ProcesosapController extends BaseController
 
             $fileInfoIndizado = $filesInfo->getExistentesIndizados();
         }
+
+        $fileInfoIndizado['FSCT']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSCT']['COD_SAP'] = 'SCT';
+        $fileInfoIndizado['FSCT']['DOMICILIADO'] = 1;
+        $fileInfoIndizado['FSCP']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSCP']['COD_SAP'] = 'SCP';
+        $fileInfoIndizado['FSCP']['DOMICILIADO'] = 1;
+        $fileInfoIndizado['FSGH']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSGH']['COD_SAP'] = 'SGH';
+        $fileInfoIndizado['FSGH']['DOMICILIADO'] = 1;
+        $fileInfoIndizado['FSTF']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSTF']['COD_SAP'] = 'STF';
+        $fileInfoIndizado['FSTF']['DOMICILIADO'] = 1;
+        $fileInfoIndizado['FSGR']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSGR']['COD_SAP'] = 'SGR';
+        $fileInfoIndizado['FSGR']['DOMICILIADO'] = 1;
+        $fileInfoIndizado['FSCL']['NUMERO_PAX'] = 1;
+        $fileInfoIndizado['FSCL']['COD_SAP'] = 'SCL';
+        $fileInfoIndizado['FSCL']['DOMICILIADO'] = 1;
 
         $asociadosInfo = $this->container->get('gopro_dbproceso_proceso');
         $asociadosInfo->setConexion($this->container->get('doctrine.dbal.erp_connection'));
@@ -863,7 +876,7 @@ class ProcesosapController extends BaseController
             }
 
             if (!isset($linea['TaxTotal'])) {
-                if ($igv = 0) {
+                if ($igv == 0) {
                     $linea['TaxTotal'] = 0;
                 } else {
                     if (!isset($linea['MontoTotal']) || !isset($linea['NetoTotal'])) {
@@ -992,8 +1005,12 @@ class ProcesosapController extends BaseController
             $k = 1;
 
             foreach ($linea['Files'] as $file):
-                $numFileFormat = str_replace('-', '0', $file);
-                $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
+                $numFileFormat = $file;
+                if(strpos($file, '-') > 0){
+                    $numFileFormat = str_replace('-', '0', $file);
+                    $numFileFormat = substr($numFileFormat, 2, strlen($numFileFormat - 2));
+                }
+
                 $resultadoDet[$nroLineaDet]['DocNum'] = $i;
                 $resultadoDet[$nroLineaDet]['LineNum'] = $j;
                 $resultadoDet[$nroLineaDet]['u_syp_tipoServ'] = '';
