@@ -1012,7 +1012,6 @@ class ProcesosapController extends BaseController
                 if (!empty($docSapTipos[$linea['TipoProceso']]['forzargravado'])
                     || $fileInfoIndizado[$file]['DOMICILIADO'] == 1
                     || $fileInfoIndizado[$file]['COD_SAP'] == 'SOP'
-                    || $fileInfoIndizado[$file]['COD_SAP'] == 'MOT'
                 ){
                     $fileGrabado = true;
                 }else{
@@ -1049,13 +1048,16 @@ class ProcesosapController extends BaseController
                     if (isset($linea['TaxCode'])) { //forzado
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['TaxCode'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['TaxCode'];
-                    } elseif ($fileGrabado === true) {
+                    }elseif ($fileGrabado === true) {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado']; //IGV
                     } else {
                         if (!empty($esDiferido)) {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif']; // DNGD_IGV
                             $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'];
+                        }elseif($fileInfoIndizado[$file]['COD_SAP'] == 'MOT'){ //para  OTAS
+                            $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGR_IGV';
+                            $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGR_IGV';
                         } else {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //DNGR_IGV
                             $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //'DNGR_IGV';
