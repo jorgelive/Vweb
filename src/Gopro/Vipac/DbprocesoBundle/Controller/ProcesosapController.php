@@ -1044,6 +1044,7 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['LineTaxTotal'] = $linea['TaxTotal'] - $this->getSuma('impuesto');
                 }
 
+                
                 if ($igv > 0) {
                     if (isset($linea['TaxCode'])) { //forzado
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['TaxCode'];
