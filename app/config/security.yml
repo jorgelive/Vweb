@@ -3,8 +3,8 @@ security:
         fos_userbundle:
             id: fos_user.user_manager
 
-    acl:
-        connection: default
+    #acl:
+    #    connection: default
                
     encoders:
         FOS\UserBundle\Model\UserInterface: sha512
@@ -21,10 +21,17 @@ security:
 #            - ROLE_SONATA_ADMIN_DEMO_FOO_DELETE
 #            - ROLE_SONATA_ADMIN_DEMO_FOO_EXPORT
         # those are the roles I will use (less verbose)
-        ROLE_ADMINISTRACION_JEFE: [ROLE_ADMINISTRACION_USUARIO]
-        ROLE_OPERACIONES_JEFE:  [ROLE_OPERACIONES_USUARIO]
-        ROLE_ADMIN:             [ROLE_STAFF, ROLE_ADMINISTRACION_JEFE, ROLE_OPERACIONES_JEFE, ROLE_SONATA_FOO_EDITOR, ROLE_SONATA_FOO_ADMIN]
-        ROLE_SUPER_ADMIN:       [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_STAFF:                     [ROLE_SONATA_ADMIN]
+        ROLE_ADMINISTRACION_USUARIO:    [ROLE_STAFF]
+        ROLE_OPERACIONES_USUARIO:       [ROLE_STAFF]
+        ROLE_ADMINISTRACION_SUPERVISOR: [ROLE_ADMINISTRACION_USUARIO]
+        ROLE_OPERACIONES_SUPERVISOR:    [ROLE_OPERACIONES_USUARIO]
+        ROLE_ADMINISTRACION_JEFE:       [ROLE_ADMINISTRACION_SUPERVISOR]
+        ROLE_OPERACIONES_JEFE:          [ROLE_OPERACIONES_SUPERVISOR]
+        ROLE_ADMIN:                     [ROLE_STAFF, ROLE_ADMINISTRACION_JEFE, ROLE_OPERACIONES_JEFE]
+        ROLE_SUPER_ADMIN:               [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        SONATA:                         [ROLE_SONATA_PAGE_ADMIN_PAGE_EDIT]
+
 
     # set access_strategy to unanimous, else you may have unexpected behaviors
     access_decision_manager:
@@ -33,8 +40,9 @@ security:
     firewalls:
 
         # -> custom firewall for the admin area of the URL
-        admin:
-            pattern:      /admin(.*)
+        main:
+            pattern:            .*
+            context:            user
             form_login:
                 provider:       fos_userbundle
                 login_path:     /admin/login
@@ -43,20 +51,8 @@ security:
                 failure_path:   null
             logout:
                 path:           /admin/logout
-            anonymous:    true
-        # -> end custom configuration
-
-        # defaut login area for standard users
-        main:
-            pattern:      .*
-            form_login:
-                provider:       fos_userbundle
-                login_path:     /login
-                use_forward:    false
-                check_path:     /login_check
-                failure_path:   null
-            logout:       true
-            anonymous:    true
+                target:         /
+            anonymous: true
 
     access_control:
         # URL of FOSUserBundle which need to be available to anonymous users
@@ -86,8 +82,10 @@ security:
         # Secured part of the site
         # This config requires being logged for the whole site and having the admin role for the admin part.
         # Change these rules to adapt them to your needs
-        - { path: ^/admin/, role: ROLE_ADMIN }
+        - { path: ^/admin/, role: ROLE_STAFF }
         - { path: ^/dbproceso/carga, role: ROLE_ADMIN }
+        - { path: ^/dbproceso/docsaptipo, role: ROLE_ADMINISTRACION_SUPERVISOR }
+        - { path: ^/dbproceso/doccptipo, role: ROLE_ADMINISTRACION_SUPERVISOR }
         - { path: ^/dbproceso/, role: ROLE_STAFF }
 
         #- { path: ^/proveedor/informacion/, ROLE_ADMIN } en annotaciones
@@ -113,6 +111,6 @@ security:
         
 parameters:
     # ... other parameters
-    security.acl.permission.map.class: Sonata\AdminBundle\Security\Acl\Permission\AdminPermissionMap
+    #security.acl.permission.map.class: Sonata\AdminBundle\Security\Acl\Permission\AdminPermissionMap
     # optionally use a custom MaskBuilder
     #sonata.admin.security.mask.builder.class: Sonata\AdminBundle\Security\Acl\Permission\MaskBuilder

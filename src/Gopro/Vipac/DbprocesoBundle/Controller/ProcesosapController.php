@@ -516,6 +516,7 @@ class ProcesosapController extends BaseController
 
             return $value;
         };
+        
 
         $this->seekAndStack($docSapTipos, ['codigosretencion', 'codigosretencion'], ['codigoretencion', 'codigodetraccion'], ['WTCode', 'WTCode'], [$codigosRetencionDetraccionFormater, $codigosRetencionDetraccionFormater]);
 
