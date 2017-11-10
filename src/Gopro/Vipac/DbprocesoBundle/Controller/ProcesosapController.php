@@ -804,41 +804,44 @@ class ProcesosapController extends BaseController
 
             $esDiferido = false;
 
-            $esGrabado = false;
+            /*
+             * deteccion de files domiciliados y calculo del total de pasajeros de todos los files
+             * $esGrabado = false;
 
             if(!empty($docSapTipos[$linea['TipoProceso']]['forzargravado'])){
                 $esGrabado = true;
             }
 
-            $razonGrabado = array();
-            //deteccion de files domiciliados y calculo del total de pasajeros de todos los files
+            $razonGrabado = [];
+            */
+
             foreach ($linea['Files'] as $file):
                 $this->setSuma('numeroPax', $fileInfoIndizado[$file]['NUMERO_PAX']);
-                //var_dump($fileInfoIndizado[$file]['DOMICILIADO']);
-                //var_dump($fileInfoIndizado[$file]['COD_SAP']);
+                /*
                 if ($fileInfoIndizado[$file]['DOMICILIADO'] == 1){
                     $esGrabado = true;
                     $razonGrabado[] = $file . ' es domiciliado';
                 }
-
-                if ($fileInfoIndizado[$file]['COD_SAP'] == 'SOP'){
+                if ($fileInfoIndizado[$file]['COD_SAP'] == 'SOP' || $fileInfoIndizado[$file]['COD_SAP'] == 'MOT'){
                     $esGrabado = true;
                     $razonGrabado[] = $file . ' es venta opcional';
                 }
+                */
             endforeach;
-
-            //die;
 
             $numPax = $this->getSuma('numeroPax');
             $numFiles = count($linea['Files']);
 
             if (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)
-                && $esGrabado == false
+                //&& $esGrabado == false
             ) {
                 $esDiferido = true;
-            } elseif (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)){
-                $this->setMensajes('El documento de la fila ' . $linea['excelRowNumber'] . ' podria diferirse pero es gravado: ' . implode(', ', $razonGrabado). '.');
             }
+
+            /*
+            elseif (intval($anoServicio) * 12 + intval($mesServicio) > intval($anoContable) * 12 + intval($mesContable)){
+                $this->setMensajes('El documento de la fila ' . $linea['excelRowNumber'] . ' podria diferirse pero es gravado: ' . implode(', ', $razonGrabado). '.');
+            }*/
 
             if (!empty($esDiferido)) {
                 $cuenta = $this->cuentaDiferido;
@@ -1006,6 +1009,16 @@ class ProcesosapController extends BaseController
             $k = 1;
 
             foreach ($linea['Files'] as $file):
+
+                if (!empty($docSapTipos[$linea['TipoProceso']]['forzargravado'])
+                    || $fileInfoIndizado[$file]['DOMICILIADO'] == 1
+                    || $fileInfoIndizado[$file]['COD_SAP'] == 'SOP'
+                ){
+                    $fileGrabado = true;
+                }else{
+                    $fileGrabado = false;
+                }
+
                 $numFileFormat = $file;
                 if(strpos($file, '-') > 0){
                     $numFileFormat = str_replace('-', '0', $file);
@@ -1032,17 +1045,21 @@ class ProcesosapController extends BaseController
                     $resultadoDet[$nroLineaDet]['LineTaxTotal'] = $linea['TaxTotal'] - $this->getSuma('impuesto');
                 }
 
+                
                 if ($igv > 0) {
-                    if (isset($linea['TaxCode'])) {
+                    if (isset($linea['TaxCode'])) { //forzado
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $linea['TaxCode'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $linea['TaxCode'];
-                    } elseif ($esGrabado === true) {
+                    }elseif ($fileGrabado === true) {
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado']; //IGV
                     } else {
                         if (!empty($esDiferido)) {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif']; // DNGD_IGV
                             $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'];
+                        }elseif($fileInfoIndizado[$file]['COD_SAP'] == 'MOT'){ //para  OTAS
+                            $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGR_IGV';
+                            $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGR_IGV';
                         } else {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //DNGR_IGV
                             $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //'DNGR_IGV';
