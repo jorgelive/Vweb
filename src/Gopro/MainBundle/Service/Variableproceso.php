@@ -96,7 +96,7 @@ class Variableproceso implements ContainerAwareInterface{
             }
 
         }else{
-            return unixtojd(strtotime($variable)) - gregoriantojd(1, 1, 1900) + 2;
+            return unixtojd(strtotime($variable . ' GMT-5')) - gregoriantojd(1, 1, 1900) + 2;
         }
     }
 
