@@ -1054,12 +1054,12 @@ class ProcesosapController extends BaseController
                         $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado'];
                         $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvgravado']; //IGV
                     } else {
-                        if (!empty($esDiferido)) {
-                            $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif']; // DNGD_IGV
-                            $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'];
-                        }elseif($fileInfoIndizado[$file]['COD_SAP'] == 'MOT'){ //para  OTAS
+                        if($fileInfoIndizado[$file]['COD_SAP'] == 'MOT'){ //para  OTAS
                             $resultadoDet[$nroLineaDet]['VatGroup'] = 'DNGR_IGV';
                             $resultadoDet[$nroLineaDet]['TaxCode'] = 'DNGR_IGV';
+                        }elseif (!empty($esDiferido)) {
+                            $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif']; // DNGD_IGV
+                            $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravadodif'];
                         } else {
                             $resultadoDet[$nroLineaDet]['VatGroup'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //DNGR_IGV
                             $resultadoDet[$nroLineaDet]['TaxCode'] = $docSapTipos[$linea['TipoProceso']]['codigoigvnogravado']; //'DNGR_IGV';
