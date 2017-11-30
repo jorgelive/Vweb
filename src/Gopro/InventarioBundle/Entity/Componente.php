@@ -6,14 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
-use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Componente
  *
  * @ORM\Table(name="inv_componente")
  * @ORM\Entity
- * @GRID\Source(columns="id, item.id, item.nombre, componentetipo.nombre, componenteestado.nombre, fechacompra, fechafingarantia, caracteristicas.contenido:Group_Concat:Distinct, softwares.nombre:Group_Concat:Distinct", groupBy={"id", "item.nombre"})
  */
 class Componente
 {
@@ -30,7 +28,6 @@ class Componente
      * @var \DateTime $fechacompra
      *
      * @ORM\Column(type="datetime", nullable=true)
-     * @Grid\Column(field="fechacompra", title="Compra", format="Y-m-d")
      */
     private $fechacompra;
 
@@ -38,7 +35,6 @@ class Componente
      * @var \DateTime$fechafingarantia
      *
      * @ORM\Column(type="datetime", nullable=true)
-     * @Grid\Column(field="fechafingarantia", title="Garantía", format="Y-m-d")
      */
     private $fechafingarantia;
 
@@ -70,8 +66,6 @@ class Componente
      *
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="componentes")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(field="item.nombre", title="Item")
-     * @Grid\Column(filter="select", visible=false, field="item.id", title="Item ID")
      */
     private $item;
 
@@ -80,7 +74,6 @@ class Componente
      *
      * @ORM\ManyToOne(targetEntity="Componentetipo", inversedBy="componentes")
      * @ORM\JoinColumn(name="componentetipo_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="componentetipo.nombre", title="Tipo")
      */
     private $componentetipo;
 
@@ -89,7 +82,6 @@ class Componente
      *
      * @ORM\ManyToOne(targetEntity="Componenteestado", inversedBy="componentes")
      * @ORM\JoinColumn(name="componenteestado_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="componenteestado.nombre", title="Estado")
      */
     private $componenteestado;
 
@@ -97,7 +89,6 @@ class Componente
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="Caracteristica", mappedBy="componente", cascade={"persist","remove"}, orphanRemoval=true)
-     * @GRID\Column(field="caracteristicas.contenido:Group_Concat:Distinct", title="Caracteristicas", filterable=false)
      */
     private $caracteristicas;
 
@@ -106,7 +97,6 @@ class Componente
      *
      * @ORM\ManyToMany(targetEntity="Software",inversedBy="componentes")
      * @ORM\JoinTable(name="inv_componente_software")
-     * @GRID\Column(field="softwares.nombre:Group_Concat:Distinct", title="Software", filterable=false)
      */
     private $softwares;
 

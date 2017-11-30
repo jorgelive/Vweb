@@ -26,9 +26,8 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-    form:
-        resources:
-            - 'SonataCoreBundle:Form:datepicker.html.twig'
+    form_themes:
+        - 'SonataCoreBundle:Form:datepicker.html.twig'
 
 # Assetic Configuration
 assetic:
@@ -150,6 +149,9 @@ fos_user:
     user_class: Gopro\UserBundle\Entity\User
     group:
         group_class: Gopro\UserBundle\Entity\Group
+    from_email:
+        address: postmaster@vipac.pe
+        sender_name: Vipac Postmaster
 
 # Sonata Configuration
 sonata_block:

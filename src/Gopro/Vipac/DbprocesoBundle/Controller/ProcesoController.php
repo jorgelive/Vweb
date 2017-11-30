@@ -31,7 +31,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
@@ -118,7 +118,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
@@ -624,7 +624,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
@@ -891,7 +891,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
@@ -960,7 +960,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 
@@ -1030,7 +1030,7 @@ class ProcesoController extends BaseController
         $archivosAlmacenados = $repositorio->findBy(array('user' => $this->getUser(), 'operacion' => $operacion), array('creado' => 'DESC'));
 
         $opciones = array('operacion' => $operacion);
-        $formulario = $this->createForm(new ArchivocamposType(), $opciones, array(
+        $formulario = $this->createForm(ArchivocamposType::class, $opciones, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
         ));
 

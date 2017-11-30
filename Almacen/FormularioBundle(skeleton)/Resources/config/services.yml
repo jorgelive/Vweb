@@ -1,7 +1,0 @@
-parameters:
-    gopro.vipac.controller.informacion.class: Gopro\Vipac\ProveedorBundle\Controller\InformacionController
-
-services:
-    gopro.vipac.informacion.controller:
-        class: "%gopro.vipac.controller.informacion.class%"
-        tags: [ { name: "security.secure_service" } ]

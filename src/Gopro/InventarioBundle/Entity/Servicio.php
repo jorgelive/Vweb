@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
-use APY\DataGridBundle\Grid\Mapping as GRID;
 
 
 /**
@@ -14,7 +13,6 @@ use APY\DataGridBundle\Grid\Mapping as GRID;
  *
  * @ORM\Table(name="inv_servicio")
  * @ORM\Entity
- * @GRID\Source(columns="id, fecha, descripcion, item.nombre, serviciotipo.nombre, servicioestado.nombre")
  */
 class Servicio
 {
@@ -24,7 +22,6 @@ class Servicio
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @GRID\Column(visible=false)
      */
     private $id;
 
@@ -33,15 +30,13 @@ class Servicio
      *
      * @ORM\Column(name="descripcion", type="string", length=255)
      * @Assert\NotBlank
-     * @Grid\Column(title="Descripción")
-     */
+      */
     private $descripcion;
 
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="tiempo", type="datetime")
-     * @Grid\Column(format="Y-m-d", title="Tiempo")
      */
     private $tiempo;
 
@@ -66,7 +61,6 @@ class Servicio
      *
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="servicios")
      * @ORM\JoinColumn(name="item_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(field="item.nombre", title="Item")
      */
     private $item;
 
@@ -75,7 +69,6 @@ class Servicio
      *
      * @ORM\ManyToOne(targetEntity="Serviciotipo", inversedBy="servicios")
      * @ORM\JoinColumn(name="serviciotipo_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="serviciotipo.nombre", title="Tipo")
      */
     private $serviciotipo;
 
@@ -84,7 +77,6 @@ class Servicio
      *
      * @ORM\ManyToOne(targetEntity="Servicioestado", inversedBy="servicios")
      * @ORM\JoinColumn(name="servicioestado_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="servicioestado.nombre", title="Estado")
      */
     private $servicioestado;
 

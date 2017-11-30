@@ -5,14 +5,12 @@ namespace Gopro\InventarioBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
-use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Caracteristica
  *
  * @ORM\Table(name="inv_caracteristica")
  * @ORM\Entity
- * @GRID\Source(columns="id, componente.item.id, componente.item.nombre, componente.componentetipo.nombre, caracteristicatipo.nombre, contenido")
  */
 class Caracteristica
 {
@@ -22,7 +20,6 @@ class Caracteristica
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Grid\Column(visible=false, field="id", title="ID")
      */
     private $id;
 
@@ -55,9 +52,6 @@ class Caracteristica
      *
      * @ORM\ManyToOne(targetEntity="Componente", inversedBy="caracteristicas")
      * @ORM\JoinColumn(name="componente_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", visible=false, field="componente.item.id", title="Item ID")
-     * @Grid\Column(filter="select", field="componente.item.nombre", title="Item")
-     * @Grid\Column(filter="select", field="componente.componentetipo.nombre", title="Componente")
      */
     private $componente;
 
@@ -66,7 +60,6 @@ class Caracteristica
      *
      * @ORM\ManyToOne(targetEntity="Caracteristicatipo", inversedBy="caracteristicas")
      * @ORM\JoinColumn(name="caracteristicatipo_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="caracteristicatipo.nombre", title="Caracteristicatipo")
      */
     private $caracteristicatipo;
 

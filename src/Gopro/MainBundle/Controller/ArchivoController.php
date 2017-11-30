@@ -84,7 +84,7 @@ class ArchivoController extends BaseController
     */
     private function createCreateForm(Archivo $entity)
     {
-        $form = $this->createForm(new ArchivoType(), $entity, array(
+        $form = $this->createForm(ArchivoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_main_archivo_create'),
             'method' => 'POST',
         ));
@@ -173,7 +173,7 @@ class ArchivoController extends BaseController
     */
     private function createEditForm(Archivo $entity)
     {
-        $form = $this->createForm(new ArchivoType(), $entity, array(
+        $form = $this->createForm(ArchivoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_main_archivo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

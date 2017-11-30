@@ -1,6 +1,6 @@
 $(document).ready(function()
 {
-    var formulario=$('form[name="gopro_mainbundle_archivo"]');
+    var formulario=$('form[name="archivo"]');
     var url=formulario.attr('action');
 
     $("#cargadorArchivos").uploadFile({
@@ -9,7 +9,7 @@ $(document).ready(function()
         {
             return formulario.serializeObject();
         },
-        fileName: 'gopro_mainbundle_archivo[archivo]',
+        fileName: 'archivo[archivo]',
         multiple:false,
         showStatusAfterSuccess:false,
         dragDropStr: "<span><b>Area para arrastrar y soltar archivos</b></span>",

@@ -6,11 +6,11 @@ services:
     gopro_dbproceso_cargador:
         class: %cargador.class%
         calls:
-            - [ setContainer,[ @service_container ] ]
-        scope: prototype
+            - [ setContainer,[ "@service_container" ] ]
+        shared: false
     gopro_dbproceso_proceso:
         class: %proceso.class%
         calls:
-            - [ setContainer,[ @service_container ] ]
-        scope: prototype
+            - [ setContainer,[ "@service_container" ] ]
+        shared: false
 

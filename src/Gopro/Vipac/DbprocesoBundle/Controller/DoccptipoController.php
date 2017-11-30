@@ -62,7 +62,7 @@ class DoccptipoController extends Controller
     */
     private function createCreateForm(Doccptipo $entity)
     {
-        $form = $this->createForm(new DoccptipoType(), $entity, array(
+        $form = $this->createForm(DoccptipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_dbproceso_doccptipo_create'),
             'method' => 'POST',
         ));
@@ -142,7 +142,7 @@ class DoccptipoController extends Controller
     */
     private function createEditForm(Doccptipo $entity)
     {
-        $form = $this->createForm(new DoccptipoType(), $entity, array(
+        $form = $this->createForm(DoccptipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_dbproceso_doccptipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

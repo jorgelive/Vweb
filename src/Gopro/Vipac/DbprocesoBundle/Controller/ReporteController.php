@@ -26,7 +26,7 @@ class ReporteController extends BaseController
     public function vencimientocpAction(Request $request)
     {
         $datos = array();
-        $formulario = $this->createForm(new ParametrosType(), $datos, array(
+        $formulario = $this->createForm(ParametrosType::class, $datos, array(
             'action' => $this->generateUrl('gopro_vipac_dbproceso_reporte_vencimientocp'),
             'method' => 'POST',
         ));

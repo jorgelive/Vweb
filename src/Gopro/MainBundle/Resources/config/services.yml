@@ -7,14 +7,14 @@ services:
     gopro_main_archivozip:
         class: %archivozip.class%
         calls:
-            - [ setContainer,[ @service_container ] ]
-        scope: prototype
+            - [ setContainer,[ "@service_container" ] ]
+        shared: false
     gopro_main_archivoexcel:
         class: %archivoexcel.class%
         calls:
-            - [ setContainer,[ @service_container ] ]
-        scope: prototype
+            - [ setContainer,[ "@service_container" ] ]
+        shared: false
     gopro_main_variableproceso:
         class: %variableproceso.class%
         calls:
-            - [ setContainer,[ @service_container ] ]
+            - [ setContainer,[ "@service_container" ] ]

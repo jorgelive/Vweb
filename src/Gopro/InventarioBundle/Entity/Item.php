@@ -6,14 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\ArrayCollection;
-use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * Item
  *
  * @ORM\Table(name="inv_item")
  * @ORM\Entity(repositoryClass="Gopro\InventarioBundle\Entity\Repository\ItemRepository")
- * @GRID\Source(columns="id, nombre, itemtipo.nombre, dependencia.nombre")
  */
 class Item
 {
@@ -76,7 +74,6 @@ class Item
      *
      * @ORM\ManyToOne(targetEntity="Gopro\UserBundle\Entity\Dependencia")
      * @ORM\JoinColumn(name="dependencia_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="dependencia.nombre", title="Ubicacíón")
      */
     private $dependencia;
 
@@ -85,7 +82,6 @@ class Item
      *
      * @ORM\ManyToOne(targetEntity="Itemtipo", inversedBy="items")
      * @ORM\JoinColumn(name="itemtipo_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="itemtipo.nombre", title="Tipo")
      */
     private $itemtipo;
 

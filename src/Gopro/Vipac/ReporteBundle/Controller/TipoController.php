@@ -71,7 +71,7 @@ class TipoController extends Controller
     */
     private function createCreateForm(Tipo $entity)
     {
-        $form = $this->createForm(new TipoType(), $entity, array(
+        $form = $this->createForm(TipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_tipo_create'),
             'method' => 'POST',
         ));
@@ -160,7 +160,7 @@ class TipoController extends Controller
     */
     private function createEditForm(Tipo $entity)
     {
-        $form = $this->createForm(new TipoType(), $entity, array(
+        $form = $this->createForm(TipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_tipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

@@ -134,7 +134,7 @@ class SentenciaController extends BaseController
     */
     private function createCreateForm(Sentencia $entity)
     {
-        $form = $this->createForm(new SentenciaType(), $entity, array(
+        $form = $this->createForm(SentenciaType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_sentencia_create'),
             'method' => 'POST',
         ));
@@ -702,7 +702,7 @@ class SentenciaController extends BaseController
     */
     private function createEditForm(Sentencia $entity)
     {
-        $form = $this->createForm(new SentenciaType(), $entity, array(
+        $form = $this->createForm(SentenciaType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_sentencia_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

@@ -83,7 +83,7 @@ class MonedaController extends BaseController
     */
     private function createCreateForm(Moneda $entity)
     {
-        $form = $this->createForm(new MonedaType(), $entity, array(
+        $form = $this->createForm(MonedaType::class, $entity, array(
             'action' => $this->generateUrl('gopro_maestro_moneda_create'),
             'method' => 'POST',
         ));
@@ -172,7 +172,7 @@ class MonedaController extends BaseController
     */
     private function createEditForm(Moneda $entity)
     {
-        $form = $this->createForm(new MonedaType(), $entity, array(
+        $form = $this->createForm(MonedaType::class, $entity, array(
             'action' => $this->generateUrl('gopro_maestro_moneda_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

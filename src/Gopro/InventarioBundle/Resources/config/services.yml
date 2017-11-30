@@ -1,32 +1,32 @@
 services:
     gopro_inventario.admin.item:
         class: Gopro\InventarioBundle\Admin\ItemAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Item, GoproInventarioBundle:ItemAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Item, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Items}
     gopro_inventario.admin.componente:
         class: Gopro\InventarioBundle\Admin\ComponenteAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Componente, GoproInventarioBundle:ComponenteAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Componente, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Componentes}
     gopro_inventario.admin.caracteristica:
         class: Gopro\InventarioBundle\Admin\CaracteristicaAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Caracteristica, GoproInventarioBundle:CaracteristicaAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Caracteristica, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Caracteristicas}
     gopro_inventario.admin.itemtipo:
         class: Gopro\InventarioBundle\Admin\ItemtipoAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Itemtipo, GoproInventarioBundle:ItemtipoAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Itemtipo,~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: 'Tipos de item'}
     gopro_inventario.admin.componentetipo:
         class: Gopro\InventarioBundle\Admin\ComponentetipoAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Componentetipo, GoproInventarioBundle:ComponentetipoAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Componentetipo, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: 'Tipos de componente'}
     gopro_inventario.admin.componenteestado:
         class: Gopro\InventarioBundle\Admin\ComponenteestadoAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Componenteestado, GoproInventarioBundle:ComponenteestadoAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Componenteestado, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: 'Estados de componente'}
     gopro_inventario.admin.caracteristicatipo:
@@ -36,28 +36,28 @@ services:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: 'Tipos de caracteristica'}
     gopro_inventario.admin.software:
         class: Gopro\InventarioBundle\Admin\SoftwareAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Software, GoproInventarioBundle:SoftwareAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Software, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Inventario, label: Software}
     gopro_inventario.admin.servicio:
         class: Gopro\InventarioBundle\Admin\ServicioAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Servicio, GoproInventarioBundle:ServicioAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Servicio, ~]
         calls:
-            - [ setSecurityContext, [@security.context]]
+            - [ setSecurityContext, ["@security.authorization_checker"]]
         tags:
            - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Servicios'}
     gopro_inventario.admin.servicioaccion:
         class: Gopro\InventarioBundle\Admin\ServicioaccionAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Servicioaccion, GoproInventarioBundle:ServicioaccionAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Servicioaccion, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Acciones realizadas'}
     gopro_inventario.admin.serviciotipo:
         class: Gopro\InventarioBundle\Admin\ServiciotipoAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Serviciotipo, GoproInventarioBundle:ServiciotipoAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Serviciotipo, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Tipos de servicio'}
     gopro_inventario.admin.servicioestado:
         class: Gopro\InventarioBundle\Admin\ServicioestadoAdmin
-        arguments: [~, Gopro\InventarioBundle\Entity\Servicioestado, GoproInventarioBundle:ServicioestadoAdmin]
+        arguments: [~, Gopro\InventarioBundle\Entity\Servicioestado, ~]
         tags:
             - {name: sonata.admin, manager_type: orm, group: Servicios, label: 'Estados de servicio'}

@@ -86,7 +86,7 @@ class ParametroController extends Controller
     */
     private function createCreateForm(Parametro $entity)
     {
-        $form = $this->createForm(new ParametroType(), $entity, array(
+        $form = $this->createForm(ParametroType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_parametro_create'),
             'method' => 'POST',
         ));
@@ -176,7 +176,7 @@ class ParametroController extends Controller
     */
     private function createEditForm(Parametro $entity)
     {
-        $form = $this->createForm(new ParametroType(), $entity, array(
+        $form = $this->createForm(ParametroType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_parametro_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

@@ -25,7 +25,7 @@ class FirmaController extends Controller
         $textarea='';
         $body='';
         $css='';
-        $formulario = $this->createForm(new FirmaType(), $datos, array(
+        $formulario = $this->createForm(FirmaType::class, $datos, array(
             'action' => $this->generateUrl('gopro_vipac_extra_firma'),
             'method' => 'POST',
         ));

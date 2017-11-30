@@ -74,7 +74,7 @@ class CampoController extends Controller
     */
     private function createCreateForm(Campo $entity)
     {
-        $form = $this->createForm(new CampoType(), $entity, array(
+        $form = $this->createForm(CampoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_campo_create'),
             'method' => 'POST',
         ));
@@ -164,7 +164,7 @@ class CampoController extends Controller
     */
     private function createEditForm(Campo $entity)
     {
-        $form = $this->createForm(new CampoType(), $entity, array(
+        $form = $this->createForm(CampoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_campo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

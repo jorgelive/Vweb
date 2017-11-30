@@ -71,7 +71,7 @@ class OperadorController extends Controller
     */
     private function createCreateForm(Operador $entity)
     {
-        $form = $this->createForm(new OperadorType(), $entity, array(
+        $form = $this->createForm(OperadorType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_operador_create'),
             'method' => 'POST',
         ));
@@ -160,7 +160,7 @@ class OperadorController extends Controller
     */
     private function createEditForm(Operador $entity)
     {
-        $form = $this->createForm(new OperadorType(), $entity, array(
+        $form = $this->createForm(OperadorType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_reporte_operador_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));

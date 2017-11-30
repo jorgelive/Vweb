@@ -5,14 +5,12 @@ namespace Gopro\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
-use APY\DataGridBundle\Grid\Mapping as GRID;
 
 /**
  * cuenta
  *
  * @ORM\Table(name="use_cuenta")
  * @ORM\Entity
- * @GRID\Source(columns="id, cuentatipo.nombre, nombre")
  */
 class Cuenta
 {
@@ -22,7 +20,6 @@ class Cuenta
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Grid\Column(visible=false, field="id", title="ID")
      */
     private $id;
 
@@ -63,7 +60,6 @@ class Cuenta
      *
      * @ORM\ManyToOne(targetEntity="User", inversedBy="cuentas")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="user.username", title="Usuario")
      */
     private $user;
 
@@ -72,7 +68,6 @@ class Cuenta
      *
      * @ORM\ManyToOne(targetEntity="Cuentatipo", inversedBy="cuentas")
      * @ORM\JoinColumn(name="cuentatipo_id", referencedColumnName="id", nullable=false)
-     * @Grid\Column(filter="select", field="cuentatipo.nombre", title="Tipo de Cuenta")
      */
     private $cuentatipo;
 

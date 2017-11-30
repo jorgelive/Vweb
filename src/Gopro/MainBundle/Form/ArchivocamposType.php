@@ -21,8 +21,8 @@ class ArchivocamposType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return 'gopro_mainbundle_archivo';//suplantando
+        return 'archivo';//suplantando
     }
 }

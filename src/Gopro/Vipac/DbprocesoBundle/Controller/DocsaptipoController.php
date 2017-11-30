@@ -62,7 +62,7 @@ class DocsaptipoController extends Controller
     */
     private function createCreateForm(Docsaptipo $entity)
     {
-        $form = $this->createForm(new DocsaptipoType(), $entity, array(
+        $form = $this->createForm(DocsaptipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_dbproceso_docsaptipo_create'),
             'method' => 'POST',
         ));
@@ -142,7 +142,7 @@ class DocsaptipoController extends Controller
     */
     private function createEditForm(Docsaptipo $entity)
     {
-        $form = $this->createForm(new DocsaptipoType(), $entity, array(
+        $form = $this->createForm(DocsaptipoType::class, $entity, array(
             'action' => $this->generateUrl('gopro_vipac_dbproceso_docsaptipo_update', array('id' => $entity->getId())),
             'method' => 'PUT',
         ));
