@@ -1184,7 +1184,8 @@ class ProcesosapController extends BaseController
             $resultadoCab[$nroLinea]['U_SYP_PORC_DETR'] = '';
 
             //sobrescribimos la retencion
-            if (!empty($docSapTipos[$linea['TipoProceso']]['codigoretencion']) && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montoretencion']
+            if (!empty($docSapTipos[$linea['TipoProceso']]['codigoretencion'])
+                && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montoretencion']
                 && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')
             ) {
                 $resultadoCab[$nroLinea]['U_SYP_DET_RET'] = substr($docSapTipos[$linea['TipoProceso']]['codigoretencion'], 0, 1);
@@ -1194,8 +1195,10 @@ class ProcesosapController extends BaseController
             }
 
             //sobrescribimos la detraccion
-            if (!empty($docSapTipos[$linea['TipoProceso']]['codigodetraccion']) && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montodetraccion']
-                && !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')
+            if (!empty($docSapTipos[$linea['TipoProceso']]['codigodetraccion'])
+                && $coeficienteMoneda * $linea['MontoTotal'] >= $docSapTipos[$linea['TipoProceso']]['montodetraccion']
+                //la detraccion no entra en buen contribuyente
+                //&& !($proveedoresInfoIndizado{$linea['ruc']}['U_SYP_AGENRE'] == 'Y' || $proveedoresInfoIndizado{$linea['ruc']}['U_SYP_SNBUEN'] == 'Y')
             ) {
                 //limpiamos el valor total
                 $resultadoCab[$nroLinea]['DocTotal'] = '';
